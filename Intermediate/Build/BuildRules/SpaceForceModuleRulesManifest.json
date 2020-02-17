@@ -1,8 +1,0 @@
-{
-	"SourceFiles": [
-		"A:\\UE4\\projects\\SpaceForce\\Source\\SpaceForce\\SpaceForce.Build.cs",
-		"A:\\UE4\\projects\\SpaceForce\\Source\\SpaceForce.Target.cs",
-		"A:\\UE4\\projects\\SpaceForce\\Source\\SpaceForceEditor.Target.cs"
-	],
-	"EngineVersion": "4.24.1"
-}

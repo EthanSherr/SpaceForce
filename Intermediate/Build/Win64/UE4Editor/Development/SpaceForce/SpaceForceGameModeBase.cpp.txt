@@ -1,7 +1,0 @@
-A:\UE4\projects\SpaceForce\Intermediate\Build\Win64\UE4Editor\Development\SpaceForce\Definitions.SpaceForce.h
-a:\ue4\projects\spaceforce\source\spaceforce\SpaceForceGameModeBase.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\Engine\Classes\GameFramework/GameModeBase.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\Engine\Classes\Engine/ServerStatReplicator.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ServerStatReplicator.generated.h
-C:\Program Files\Epic Games\UE_4.24\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\GameModeBase.generated.h
-A:\UE4\projects\SpaceForce\Intermediate\Build\Win64\UE4Editor\Inc\SpaceForce\SpaceForceGameModeBase.generated.h
