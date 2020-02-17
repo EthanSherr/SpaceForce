@@ -1,0 +1,9 @@
+A:\UE4\projects\SpaceForce\Intermediate\Build\Win64\UE4Editor\Development\SpaceForce\Definitions.SpaceForce.h
+C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\CoreUObject\Public\UObject/GeneratedCppIncludes.h
+C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\CoreUObject\Public\UObject/MetaData.h
+A:\UE4\projects\SpaceForce\Source\SpaceForce/SpaceForceGameModeBase.h
+C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\Engine\Classes\GameFramework/GameModeBase.h
+C:\Program Files\Epic Games\UE_4.24\Engine\Source\Runtime\Engine\Classes\Engine/ServerStatReplicator.h
+C:\Program Files\Epic Games\UE_4.24\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\ServerStatReplicator.generated.h
+C:\Program Files\Epic Games\UE_4.24\Engine\Intermediate\Build\Win64\UE4Editor\Inc\Engine\GameModeBase.generated.h
+a:\ue4\projects\spaceforce\intermediate\build\win64\ue4editor\inc\spaceforce\SpaceForceGameModeBase.generated.h

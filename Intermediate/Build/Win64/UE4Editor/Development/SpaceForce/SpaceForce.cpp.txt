@@ -1,0 +1,2 @@
+A:\UE4\projects\SpaceForce\Intermediate\Build\Win64\UE4Editor\Development\SpaceForce\Definitions.SpaceForce.h
+a:\ue4\projects\spaceforce\source\spaceforce\SpaceForce.h

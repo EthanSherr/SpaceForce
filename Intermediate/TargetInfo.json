@@ -1,0 +1,14 @@
+{
+	"Targets": [
+		{
+			"Name": "SpaceForce",
+			"Path": "A:\\UE4\\projects\\SpaceForce\\Source\\SpaceForce.Target.cs",
+			"Type": "Game"
+		},
+		{
+			"Name": "SpaceForceEditor",
+			"Path": "A:\\UE4\\projects\\SpaceForce\\Source\\SpaceForceEditor.Target.cs",
+			"Type": "Editor"
+		}
+	]
+}
