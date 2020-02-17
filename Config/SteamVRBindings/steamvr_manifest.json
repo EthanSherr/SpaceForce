@@ -78,11 +78,11 @@
 			"requirement": "optional"
 		},
 		{
-			"name": "/actions/main/in/TriggerLeft",
+			"name": "/actions/main/in/LeftTrigger",
 			"type": "boolean"
 		},
 		{
-			"name": "/actions/main/in/TriggerRight",
+			"name": "/actions/main/in/RightTrigger",
 			"type": "boolean"
 		}
 	],
@@ -200,8 +200,8 @@
 			"/actions/main/in/open_console": "Open Console",
 			"/actions/main/out/vibrateleft": "Haptic (Left)",
 			"/actions/main/out/vibrateright": "Haptic (Right)",
-			"/actions/main/in/TriggerLeft": "TriggerLeft",
-			"/actions/main/in/TriggerRight": "TriggerRight",
+			"/actions/main/in/LeftTrigger": "LeftTrigger",
+			"/actions/main/in/RightTrigger": "RightTrigger",
 			"/actions/main": "Main Game Actions"
 		}
 	]

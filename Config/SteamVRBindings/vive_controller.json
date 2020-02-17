@@ -14,7 +14,7 @@
 					{
 						"click":
 						{
-							"output": "/actions/main/in/TriggerLeft"
+							"output": "/actions/main/in/LeftTrigger"
 						}
 					}
 				},
@@ -25,7 +25,7 @@
 					{
 						"click":
 						{
-							"output": "/actions/main/in/TriggerRight"
+							"output": "/actions/main/in/RightTrigger"
 						}
 					}
 				}
