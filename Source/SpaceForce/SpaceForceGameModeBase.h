@@ -14,4 +14,6 @@ class SPACEFORCE_API ASpaceForceGameModeBase : public AGameModeBase
 {
 	GENERATED_UCLASS_BODY()
 	
+	//give the player the pawn
+	virtual void PostLogin(APlayerController* NewPlayer) override;
 };

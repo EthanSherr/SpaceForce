@@ -2,6 +2,7 @@
 
 
 #include "SpaceForceGameModeBase.h"
+#include "GameFramework/PlayerController.h"
 
 ASpaceForceGameModeBase::ASpaceForceGameModeBase(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -10,4 +11,13 @@ ASpaceForceGameModeBase::ASpaceForceGameModeBase(const FObjectInitializer& Objec
 
 	static ConstructorHelpers::FClassFinder<APlayerController> PilotPlayerControllerOb(TEXT("/Game/Blueprints/PilotPlayerController"));
 	PlayerControllerClass = PilotPlayerControllerOb.Class;
+}
+
+void ASpaceForceGameModeBase::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+	//if (NewPlayer && NewPlayer->GetPawn() == NULL) 
+	//{
+	//	NewPlayer
+	//}
 }
