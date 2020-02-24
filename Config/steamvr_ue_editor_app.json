@@ -2,7 +2,7 @@
 	"source": "UE",
 	"applications": [
 		{
-			"app_key": "application.generated.ue.spaceforce-10757647.ue4editor.exe",
+			"app_key": "application.generated.ue.spaceforce-0.ue4editor.exe",
 			"launch_type": "url",
 			"url": "steam://launch/",
 			"action_manifest_path": "A:/UE4/projects/SpaceForce/Config/SteamVRBindings/steamvr_manifest.json",
@@ -10,7 +10,7 @@
 			{
 				"en_us":
 				{
-					"name": "SpaceForce-10757647 [UE Editor]"
+					"name": "SpaceForce-0 [UE Editor]"
 				}
 			}
 		}
