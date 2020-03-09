@@ -10,5 +10,8 @@ public class SpaceForceEditorTarget : TargetRules
 		Type = TargetType.Editor;
 
 		ExtraModuleNames.AddRange( new string[] { "SpaceForce" } );
+
+		bCompileChaos = true;
+		bUseChaos = true;
 	}
 }
