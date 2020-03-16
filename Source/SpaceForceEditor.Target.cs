@@ -11,7 +11,7 @@ public class SpaceForceEditorTarget : TargetRules
 
 		ExtraModuleNames.AddRange( new string[] { "SpaceForce" } );
 
-		bCompileChaos = true;
-		bUseChaos = true;
+		//bCompileChaos = true;
+		//bUseChaos = true;
 	}
 }

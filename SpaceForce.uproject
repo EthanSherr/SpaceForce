@@ -17,6 +17,14 @@
 		{
 			"Name": "Niagara",
 			"Enabled": true
+		},
+		{
+			"Name": "ChaosEditor",
+			"Enabled": true
+		},
+		{
+			"Name": "ChaosSolverPlugin",
+			"Enabled": true
 		}
 	]
 }
