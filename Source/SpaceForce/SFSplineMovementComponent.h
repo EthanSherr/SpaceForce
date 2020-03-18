@@ -30,6 +30,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetLocationAtDistanceAlongSpline(float distance, bool bWithOffset);
 
+	UPROPERTY(EditAnywhere)
+	ASFFlightPath* NextFlightPath;
+
 private:
 
 	UPROPERTY(EditAnywhere)

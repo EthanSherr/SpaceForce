@@ -66,5 +66,10 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	}
 
 	distanceAlongPath = nextDistance;
+	if (distanceAlongPath >= FlightPath->Spline->GetSplineLength() && NextFlightPath != NULL)
+	{
+		SetFlightPath(NextFlightPath, 0.0f);
+		NextFlightPath = NULL;
+	}
 }
 
