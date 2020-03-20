@@ -19,6 +19,26 @@ void USFSplineMovementComponent::SetFlightPath(ASFFlightPath* FP, float distance
 
 }
 
+void USFSplineMovementComponent::SetNextFlightPath(ASFFlightPath* FP)
+{
+	NextFlightPath = FP;
+}
+
+ASFFlightPath* USFSplineMovementComponent::GetFlightPath()
+{
+	return FlightPath;
+}
+
+void USFSplineMovementComponent::SetSpeed(float s)
+{
+	speed = s;
+}
+
+float USFSplineMovementComponent::GetSpeed()
+{
+	return speed;
+}
+
 FVector USFSplineMovementComponent::GetLocationAtDistanceAlongSpline(float distance, bool bWithOffset)
 {
 	if (FlightPath == NULL)

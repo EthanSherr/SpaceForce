@@ -18,11 +18,23 @@ public:
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-	UFUNCTION(BlueprintSetter)
+	UFUNCTION(BlueprintCallable)
 	void SetFlightPath(ASFFlightPath* FlightPath, float distanceAlongPath);
 
-	UPROPERTY(EditAnywhere)
+	UFUNCTION(BlueprintCallable)
+	void SetNextFlightPath(ASFFlightPath* FlightPath);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ASFFlightPath* GetFlightPath();
+
+	UPROPERTY(EditAnywhere, BlueprintSetter=SetSpeed, BlueprintGetter=GetSpeed)
 	float speed;
+
+	UFUNCTION(BlueprintCallable, BlueprintSetter)
+	void SetSpeed(float s);
+
+	UFUNCTION(BlueprintCallable, BlueprintGetter)
+	float GetSpeed();
 
 	UPROPERTY(EditAnywhere)
 	bool bOrientToSpline;
