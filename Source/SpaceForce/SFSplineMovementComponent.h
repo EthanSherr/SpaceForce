@@ -42,8 +42,18 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetLocationAtDistanceAlongSpline(float distance, bool bWithOffset);
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	ASFFlightPath* NextFlightPath;
+
+	UFUNCTION()
+	virtual void InitializeComponent() override;
+
+	UFUNCTION()
+	virtual void BeginPlay() override;
+
+	UPROPERTY(EditAnywhere)
+		float initialOffset = 0.0f;
+
 
 private:
 
@@ -52,6 +62,8 @@ private:
 
 	UPROPERTY()
 	float distanceAlongPath;
+
+	FVector LastLocation;
 
 		
 };

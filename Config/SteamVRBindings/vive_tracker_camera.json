@@ -8,7 +8,7 @@
 		{
 			"sources": [
 				{
-					"mode": "button",
+					"mode": "trigger",
 					"path": "/user/hand/left/input/trigger",
 					"inputs":
 					{
@@ -19,13 +19,35 @@
 					}
 				},
 				{
-					"mode": "button",
+					"mode": "trigger",
 					"path": "/user/hand/right/input/trigger",
 					"inputs":
 					{
 						"click":
 						{
 							"output": "/actions/main/in/RightTrigger"
+						}
+					}
+				},
+				{
+					"mode": "button",
+					"path": "/user/hand/left/input/grip",
+					"inputs":
+					{
+						"click":
+						{
+							"output": "/actions/main/in/LeftGrip"
+						}
+					}
+				},
+				{
+					"mode": "button",
+					"path": "/user/hand/right/input/grip",
+					"inputs":
+					{
+						"click":
+						{
+							"output": "/actions/main/in/RightGrip"
 						}
 					}
 				}
@@ -74,5 +96,5 @@
 			]
 		}
 	},
-	"description": "SpaceForce-10757647"
+	"description": "SpaceForce-0"
 }

@@ -9,6 +9,31 @@
 
 class USplineComponent;
 
+USTRUCT(BlueprintType)
+struct SPACEFORCE_API FSplineDistance {
+	GENERATED_USTRUCT_BODY()
+	
+	UPROPERTY()
+	float Distance;
+
+	UPROPERTY()
+	FVector Location;
+
+	UPROPERTY()
+	FVector Forward;
+
+	FORCEINLINE FSplineDistance() {
+		Distance = 0.0f;
+		Location = FVector::ZeroVector;
+		Forward = FVector::ZeroVector;
+	};
+
+	FORCEINLINE FString ToString() const
+	{
+		return FString::Printf(TEXT("Distance: %f, Location: (%s), Forward: (%s)"), Distance, *Location.ToString(), *Forward.ToString());
+	}
+};
+
 UCLASS()
 class SPACEFORCE_API ASFFlightPath : public AActor
 {
@@ -23,7 +48,20 @@ public:
 	UFUNCTION(BlueprintPure)
 	FVector GetLocationAtDistance(float distance);
 
+	UPROPERTY(EditAnywhere)
+	float SplineStepSize;
+
+	UPROPERTY(EditAnywhere)
+	bool UseCustomInterpolation;
+
 private:
+
+	void SetupStartSphere();
 	void SetupSpline();
+
+	UPROPERTY()
+	TArray<FSplineDistance> Points;
+
+	bool PointsForDistance(float Distance, FSplineDistance& OutStart, FSplineDistance& OutEnd);
 
 };

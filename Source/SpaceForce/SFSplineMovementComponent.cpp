@@ -9,14 +9,18 @@
 USFSplineMovementComponent::USFSplineMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	SetTickGroup(ETickingGroup::TG_PrePhysics);
 }
 
 
 void USFSplineMovementComponent::SetFlightPath(ASFFlightPath* FP, float distance)
 {
 	FlightPath = FP;
+	if (FP == NULL) {
+		return;
+	}
 	distanceAlongPath = distance;
-
+	LastLocation = FlightPath->GetLocationAtDistance(distanceAlongPath);
 }
 
 void USFSplineMovementComponent::SetNextFlightPath(ASFFlightPath* FP)
@@ -46,10 +50,10 @@ FVector USFSplineMovementComponent::GetLocationAtDistanceAlongSpline(float dista
 		return FVector();
 	}
 	
-	FVector Location = FlightPath->Spline->GetLocationAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
+	FVector Location = FlightPath->GetLocationAtDistance(distance);
 
 	if (bWithOffset) {
-		FVector CurrentLocation = FlightPath->Spline->GetLocationAtDistanceAlongSpline(distanceAlongPath, ESplineCoordinateSpace::World);
+		FVector CurrentLocation = FlightPath->GetLocationAtDistance(distanceAlongPath);
 		USceneComponent* Root = GetOwner()->GetRootComponent();
 		FVector OffsetFromPath = Root->GetComponentLocation() - CurrentLocation;
 		Location += OffsetFromPath;
@@ -57,10 +61,22 @@ FVector USFSplineMovementComponent::GetLocationAtDistanceAlongSpline(float dista
 	return Location;
 }
 
+void USFSplineMovementComponent::InitializeComponent()
+{
+	UE_LOG(LogTemp, Warning, TEXT("InitializeComponent"))
+}
+
+void USFSplineMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	SetFlightPath(FlightPath, initialOffset);
+}
+
 // Called every frame
 void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
 	USceneComponent* Root = GetOwner()->GetRootComponent();
 	if (Root == NULL) {
 		UE_LOG(LogTemp, Warning, TEXT("Cannot move component, root is null"))
@@ -72,11 +88,15 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		return;
 	}
 
-	float nextDistance = DeltaTime * speed + distanceAlongPath;
+	float deltaDistance = DeltaTime * speed;
+	float nextDistance = deltaDistance + distanceAlongPath;
 
-	FVector LastLocation = FlightPath->Spline->GetLocationAtDistanceAlongSpline(distanceAlongPath, ESplineCoordinateSpace::World);
-	FVector NextLocation = FlightPath->Spline->GetLocationAtDistanceAlongSpline(nextDistance, ESplineCoordinateSpace::World);
-	
+	FVector NextLocation = FlightPath->GetLocationAtDistance(nextDistance);
+
+	UE_LOG(LogTemp, Warning, TEXT("d %f \t\tnextDistance %f"),
+		deltaDistance - (NextLocation - LastLocation).Size(),
+		nextDistance)
+
 	Root->AddWorldOffset(NextLocation - LastLocation, true, NULL, ETeleportType::None);
 
 	if (bOrientToSpline)
@@ -86,6 +106,8 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	}
 
 	distanceAlongPath = nextDistance;
+	LastLocation = NextLocation;
+
 	if (distanceAlongPath >= FlightPath->Spline->GetSplineLength() && NextFlightPath != NULL)
 	{
 		SetFlightPath(NextFlightPath, 0.0f);
