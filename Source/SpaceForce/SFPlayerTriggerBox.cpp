@@ -3,8 +3,23 @@
 
 #include "SFPlayerTriggerBox.h"
 
-// Sets default values for this component's properties
-USFPlayerTriggerBox::USFPlayerTriggerBox(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+ASFPlayerTriggerBox::ASFPlayerTriggerBox(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = false;
+
+	TriggerBox = ObjectInitializer.CreateDefaultSubobject<UBoxComponent>(this, TEXT("TriggerBox"));
+	TriggerBox->SetBoxExtent(FVector(300, 1000, 1000));
+	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &ASFPlayerTriggerBox::OnOverlapBegin);
 }
+
+void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	for (AActor* MaybeResponder : PlayerTriggerResponders)
+	{
+		if (MaybeResponder->GetClass()->ImplementsInterface(USFPlayerTriggerResponder::StaticClass()))
+		{
+			ISFPlayerTriggerResponder::Execute_PlayerEnteredRegion(MaybeResponder);
+		}
+	}
+}
+

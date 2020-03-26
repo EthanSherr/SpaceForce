@@ -3,16 +3,23 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "GameFramework/Actor.h"
+#include "Components/BoxComponent.h"
+#include "SFPlayerTriggerResponder.h"
 #include "SFPlayerTriggerBox.generated.h"
 
-
-UCLASS( ClassGroup=("Custom"), meta=(BlueprintSpawnableComponent) )
-class SPACEFORCE_API USFPlayerTriggerBox : public UActorComponent
+UCLASS()
+class SPACEFORCE_API ASFPlayerTriggerBox : public AActor
 {
 	GENERATED_UCLASS_BODY()
 
-public:	
-		
-		
+public:
+	UPROPERTY(EditAnywhere)
+	UBoxComponent* TriggerBox;
+
+	UPROPERTY(EditAnywhere)
+	TArray<AActor*> PlayerTriggerResponders;
+
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };
