@@ -12,12 +12,19 @@ ASFFlightPath::ASFFlightPath(const FObjectInitializer& ObjectInitializer) : Supe
 	PrimaryActorTick.bCanEverTick = false;
 	Spline = ObjectInitializer.CreateDefaultSubobject<USplineComponent>(this, TEXT("SplinePath"));
 	SplineStepSize = 2.0f;
+	bPathForPlayer = false;
 }
 
 void ASFFlightPath::OnConstruction(const FTransform& Transform)
 {
-	SetupStartSphere();
-	SetupSpline();
+	if (bPathForPlayer) {
+		SetupStartSphere();
+	}
+
+	Points.Empty();
+	if (bUseCustomInterpolation) {
+		SetupSpline();
+	}
 }
 
 void ASFFlightPath::SetupStartSphere()
@@ -32,11 +39,6 @@ void ASFFlightPath::SetupStartSphere()
 
 void ASFFlightPath::SetupSpline()
 {
-	Points.Empty();
-	if (!UseCustomInterpolation) {
-		return;
-	}
-
 	if (SplineStepSize <= 0.0f) {
 		UE_LOG(LogTemp, Error, TEXT("SplineSmoothingStepSize must be more than 0, defaulting to 2.0"))
 		SplineStepSize = 2.0f;
@@ -63,7 +65,7 @@ void ASFFlightPath::SetupSpline()
 
 FVector ASFFlightPath::GetLocationAtDistance(float distance)
 {
-	if (UseCustomInterpolation) {
+	if (bUseCustomInterpolation) {
 		FSplineDistance start, end;
 		if (PointsForDistance(distance, start, end)) {
 			float a = (distance - start.Distance) / (end.Distance - start.Distance);

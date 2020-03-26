@@ -52,7 +52,10 @@ public:
 	float SplineStepSize;
 
 	UPROPERTY(EditAnywhere)
-	bool UseCustomInterpolation;
+	bool bUseCustomInterpolation;
+
+	UPROPERTY(EditAnywhere)
+	bool bPathForPlayer;
 
 private:
 
