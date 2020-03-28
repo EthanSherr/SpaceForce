@@ -7,6 +7,7 @@
 #include "SFHealthComponent.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthChanged, float, NewHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDeath, float, NewHealth);
 
 UCLASS(ClassGroup = "Custom", meta = (BlueprintSpawnableComponent))
 class SPACEFORCE_API USFHealthComponent : public UActorComponent
@@ -26,6 +27,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthChanged OnHealthChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnDeath OnDeath;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float Health;

@@ -107,15 +107,12 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 	FVector v = UpdatedComponent->GetComponentVelocity();
 
-	//UE_LOG(LogTemp, Warning, TEXT("1 UpdatedComopnent is %s Component.GetComponentVelocity (%s)"), 
-	//	*UpdatedComponent->GetName(),
-	//	*UpdatedComponent->GetComponentVelocity().ToString())
-	//UE_LOG(LogTemp, Warning, TEXT("2 Owner is (%s) and its root is (%s) Actor.GetVelocity (%s)"), 
+	//UE_LOG(LogTemp, Warning, TEXT("Owner is (%s) and its root is (%s) Actor.GetVelocity (%s)"), 
 	//	*GetOwner()->GetName(), 
 	//	*GetOwner()->GetRootComponent()->GetName(), 
 	//	*GetOwner()->GetVelocity().ToString())
 
-	FQuat NextRotation;
+	FQuat NextRotation = UpdatedComponent->GetComponentQuat();
 	if (bOrientToSpline)
 	{
 		NextRotation = FlightPath->Spline->GetQuaternionAtDistanceAlongSpline(nextDistance, ESplineCoordinateSpace::World);

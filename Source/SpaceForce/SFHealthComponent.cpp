@@ -13,17 +13,24 @@ USFHealthComponent::USFHealthComponent(const FObjectInitializer& ObjectInitializ
 
 float USFHealthComponent::ChangeHealth(float DeltaHealth)
 {
-	Health += DeltaHealth;
+	bool AlreadyDead = IsDead();
+	float UpdatedHealth = Health + DeltaHealth;
+	Health = UpdatedHealth;
 	if (OnHealthChanged.IsBound())
 	{
 		OnHealthChanged.Broadcast(Health);
 	}
+	if (!AlreadyDead && IsDead() && OnDeath.IsBound())
+	{
+		OnDeath.Broadcast(Health);
+	}
+
 	return Health;
 }
 
 bool USFHealthComponent::IsDead()
 {
-	return Health < 0;
+	return Health <= 0;
 }
 
 bool USFHealthComponent::IsAlive()
