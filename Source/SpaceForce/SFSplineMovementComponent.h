@@ -3,20 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Components/ActorComponent.h"
+#include "GameFramework/MovementComponent.h"
 #include "SFSplineMovementComponent.generated.h"
 
 class USplineComponent;
 class ASFFlightPath;
 
-UCLASS( ClassGroup="Custom", meta=(BlueprintSpawnableComponent) )
-class SPACEFORCE_API USFSplineMovementComponent : public UActorComponent
+UCLASS( ClassGroup=Movement, meta=(BlueprintSpawnableComponent), ShowCategories=(Velocity) )
+class SPACEFORCE_API USFSplineMovementComponent : public UMovementComponent
 {
 	GENERATED_UCLASS_BODY()
 
 public:	
-	// Called every frame
+	// Begin UActorComponent
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	// End UActorComponentInterface
+
+	// Begin UMovementComponent
+	virtual float GetMaxSpeed() const override { return speed; }
+	virtual void InitializeComponent() override;
+	virtual void UpdateTickRegistration() override;
+	// End UMovementComponent Interface
 
 	UFUNCTION(BlueprintCallable)
 	void SetFlightPath(ASFFlightPath* FlightPath, float distanceAlongPath);
@@ -46,14 +53,13 @@ public:
 	ASFFlightPath* NextFlightPath;
 
 	UFUNCTION()
-	virtual void InitializeComponent() override;
-
-	UFUNCTION()
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere)
-		float initialOffset = 0.0f;
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	float initialOffset = 0.0f;
 
+	UPROPERTY(EditAnywhere, Category = "Debug")
+	bool bVerboseDelta;
 
 private:
 

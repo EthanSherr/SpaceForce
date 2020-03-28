@@ -9,9 +9,27 @@
 USFSplineMovementComponent::USFSplineMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	SetTickGroup(ETickingGroup::TG_PrePhysics);
+	//SetTickGroup(ETickingGroup::TG_PrePhysics);
 }
 
+void USFSplineMovementComponent::InitializeComponent()
+{
+	Super::InitializeComponent();
+	UE_LOG(LogTemp, Warning, TEXT("InitializeComponent"))
+}
+
+void USFSplineMovementComponent::UpdateTickRegistration()
+{
+	Super::UpdateTickRegistration();
+	UE_LOG(LogTemp, Warning, TEXT("UpdateTickRegistration"))
+}
+
+void USFSplineMovementComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	UE_LOG(LogTemp, Warning, TEXT("UpdatedComponent %s"), *UpdatedComponent->GetName())
+	SetFlightPath(FlightPath, initialOffset);
+}
 
 void USFSplineMovementComponent::SetFlightPath(ASFFlightPath* FP, float distance)
 {
@@ -54,22 +72,10 @@ FVector USFSplineMovementComponent::GetLocationAtDistanceAlongSpline(float dista
 
 	if (bWithOffset) {
 		FVector CurrentLocation = FlightPath->GetLocationAtDistance(distanceAlongPath);
-		USceneComponent* Root = GetOwner()->GetRootComponent();
-		FVector OffsetFromPath = Root->GetComponentLocation() - CurrentLocation;
+		FVector OffsetFromPath = UpdatedComponent->GetComponentLocation() - CurrentLocation;
 		Location += OffsetFromPath;
 	}
 	return Location;
-}
-
-void USFSplineMovementComponent::InitializeComponent()
-{
-	UE_LOG(LogTemp, Warning, TEXT("InitializeComponent"))
-}
-
-void USFSplineMovementComponent::BeginPlay()
-{
-	Super::BeginPlay();
-	SetFlightPath(FlightPath, initialOffset);
 }
 
 // Called every frame
@@ -77,13 +83,12 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	USceneComponent* Root = GetOwner()->GetRootComponent();
-	if (Root == NULL) {
+	if (!UpdatedComponent) {
 		UE_LOG(LogTemp, Warning, TEXT("Cannot move component, root is null"))
 		return;
 	}
 
-	if (FlightPath == NULL)
+	if (!FlightPath)
 	{
 		return;
 	}
@@ -92,22 +97,38 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 	float nextDistance = deltaDistance + distanceAlongPath;
 
 	FVector NextLocation = FlightPath->GetLocationAtDistance(nextDistance);
+	FVector DeltaLocation = NextLocation - LastLocation;
 
-	UE_LOG(LogTemp, Warning, TEXT("d %f \t\tnextDistance %f"),
-		deltaDistance - (NextLocation - LastLocation).Size(),
-		nextDistance)
+	if (bVerboseDelta) {
+		UE_LOG(LogTemp, Warning, TEXT("d %f \t\tnextDistance %f"),
+			deltaDistance - (DeltaLocation).Size(),
+			nextDistance)
+	}
 
-	Root->AddWorldOffset(NextLocation - LastLocation, true, NULL, ETeleportType::None);
+	FVector v = UpdatedComponent->GetComponentVelocity();
 
+	//UE_LOG(LogTemp, Warning, TEXT("1 UpdatedComopnent is %s Component.GetComponentVelocity (%s)"), 
+	//	*UpdatedComponent->GetName(),
+	//	*UpdatedComponent->GetComponentVelocity().ToString())
+	//UE_LOG(LogTemp, Warning, TEXT("2 Owner is (%s) and its root is (%s) Actor.GetVelocity (%s)"), 
+	//	*GetOwner()->GetName(), 
+	//	*GetOwner()->GetRootComponent()->GetName(), 
+	//	*GetOwner()->GetVelocity().ToString())
+
+	FQuat NextRotation;
 	if (bOrientToSpline)
 	{
-		FQuat NextRotation = FlightPath->Spline->GetQuaternionAtDistanceAlongSpline(nextDistance, ESplineCoordinateSpace::World);
-		Root->SetWorldRotation(NextRotation, true, NULL, ETeleportType::None);
+		NextRotation = FlightPath->Spline->GetQuaternionAtDistanceAlongSpline(nextDistance, ESplineCoordinateSpace::World);
 	}
+
+	MoveUpdatedComponent(DeltaLocation, NextRotation, true, NULL, ETeleportType::None);
 
 	distanceAlongPath = nextDistance;
 	LastLocation = NextLocation;
+	Velocity = DeltaLocation / DeltaTime;
+	UpdateComponentVelocity();
 
+	// Use the next flight path if current path is over
 	if (distanceAlongPath >= FlightPath->Spline->GetSplineLength() && NextFlightPath != NULL)
 	{
 		SetFlightPath(NextFlightPath, 0.0f);
