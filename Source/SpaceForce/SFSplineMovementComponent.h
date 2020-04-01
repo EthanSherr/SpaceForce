@@ -49,6 +49,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetLocationAtDistanceAlongSpline(float distance, bool bWithOffset);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetDirectionAtDistanceAlongSpline(float distance);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	const float GetDistance() { return distanceAlongPath; }
+
 	UPROPERTY()
 	ASFFlightPath* NextFlightPath;
 

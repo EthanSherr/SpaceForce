@@ -78,6 +78,14 @@ FVector USFSplineMovementComponent::GetLocationAtDistanceAlongSpline(float dista
 	return Location;
 }
 
+FVector USFSplineMovementComponent::GetDirectionAtDistanceAlongSpline(float distance)
+{
+	if (!FlightPath) {
+		return FVector::ZeroVector;
+	}
+	return FlightPath->Spline->GetDirectionAtDistanceAlongSpline(distance, ESplineCoordinateSpace::World);
+}
+
 // Called every frame
 void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {

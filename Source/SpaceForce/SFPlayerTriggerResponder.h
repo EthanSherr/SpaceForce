@@ -16,5 +16,5 @@ class SPACEFORCE_API ISFPlayerTriggerResponder
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "PlayerTriggerResponder")
-	void PlayerEnteredRegion();
+	void PlayerEnteredRegion(AActor *Player);
 };

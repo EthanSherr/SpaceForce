@@ -18,7 +18,7 @@ void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 	{
 		if (MaybeResponder->GetClass()->ImplementsInterface(USFPlayerTriggerResponder::StaticClass()))
 		{
-			ISFPlayerTriggerResponder::Execute_PlayerEnteredRegion(MaybeResponder);
+			ISFPlayerTriggerResponder::Execute_PlayerEnteredRegion(MaybeResponder, OtherActor);
 		}
 	}
 }
