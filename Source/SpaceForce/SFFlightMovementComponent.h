@@ -10,19 +10,26 @@
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEFORCE_API USFFlightMovementComponent : public UActorComponent
 {
-	GENERATED_BODY()
+	GENERATED_UCLASS_BODY()
 
 public:	
-	// Sets default values for this component's properties
 	USFFlightMovementComponent();
 
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
-		
+	UPROPERTY(EditAnywhere)
+	float MaxRotationSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float MaxSpeed;
+
+	UFUNCTION(BlueprintCallable)
+	void AddInputVector(FRotator rotation);
+
+private:
+	FRotator DeltaRotation;
 };

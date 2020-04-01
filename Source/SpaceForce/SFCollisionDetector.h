@@ -6,7 +6,6 @@
 #include "Components/ActorComponent.h"
 #include "SFCollisionDetector.generated.h"
 
-
 class UCurveFloat;
 
 USTRUCT(BlueprintType)
@@ -17,9 +16,16 @@ struct SPACEFORCE_API FCollisionDetectionResult {
 	bool bCollisionDetected;
 
 	UPROPERTY(BlueprintReadWrite)
-	FVector AvoidanceResponse;
+	FVector CollisionVector;
 
-	FORCEINLINE FCollisionDetectionResult() : bCollisionDetected(false), AvoidanceResponse(FVector::ZeroVector) {}
+	UPROPERTY(BlueprintReadWrite)
+	FRotator SuggestedDeltaRotation;
+
+	FCollisionDetectionResult() 
+		: bCollisionDetected(false), CollisionVector(FVector::ZeroVector), SuggestedDeltaRotation(FRotator::ZeroRotator) {}
+
+	FCollisionDetectionResult(bool _bCollisionDetected, FVector _CollisionVector, FRotator _SuggestedDeltaRotation)
+		: bCollisionDetected(_bCollisionDetected), CollisionVector(_CollisionVector), SuggestedDeltaRotation(_SuggestedDeltaRotation) {}
 };
 
 USTRUCT()
@@ -66,8 +72,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FCollisionDetectionResult DetectCollisions();
 
-public:
-	UPROPERTY()
-	FCollisionSignal LastCollisionSignal;
+private:
+	void DebugStrengths(TArray<FCollisionSignal> strengths);
 
 };

@@ -2,33 +2,31 @@
 
 
 #include "SFFlightMovementComponent.h"
+#include "GameFramework/Actor.h"
 
-// Sets default values for this component's properties
-USFFlightMovementComponent::USFFlightMovementComponent()
+USFFlightMovementComponent::USFFlightMovementComponent(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	MaxRotationSpeed = 5.0f;
+	MaxSpeed = 50.0f;
 }
 
-
-// Called when the game starts
 void USFFlightMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// ...
-	
+	DeltaRotation = FRotator::ZeroRotator;
 }
 
-
-// Called every frame
 void USFFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	GetOwner()->AddActorLocalRotation(DeltaTime * MaxRotationSpeed * DeltaRotation);
+	GetOwner()->AddActorLocalOffset(DeltaTime * MaxSpeed * FVector::ForwardVector);
+	DeltaRotation = FRotator::ZeroRotator;
+}
 
-	// ...
+void USFFlightMovementComponent::AddInputVector(FRotator rotation)
+{
+	DeltaRotation += rotation;
 }
 
