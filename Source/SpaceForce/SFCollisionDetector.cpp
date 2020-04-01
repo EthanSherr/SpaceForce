@@ -11,10 +11,9 @@ USFCollisionDetector::USFCollisionDetector(const class FObjectInitializer& Objec
 {
 	PrimaryComponentTick.bCanEverTick = false;
 	GridDimension = 3;
-	SensorSpacing = 75.0f;
+	SensorSpacing = 25.0f;
 	SensorDistanceFromOrigin = 450.0f;
 	bDebugTraces = true;
-	ResponseCurve = NULL;
 }
 
 void USFCollisionDetector::BeginPlay()
@@ -26,8 +25,8 @@ void USFCollisionDetector::BeginPlay()
 		int y = i % GridDimension - GridDimension / 2;
 		int z = i / GridDimension - GridDimension / 2;
 
-		FVector sensorGridPoint = FVector(SensorDistanceFromOrigin, y * SensorSpacing, z * SensorSpacing);
-		FVector sensorPoint = SensorDistanceFromOrigin * sensorGridPoint.GetSafeNormal();
+		FVector sensorGridPoint = FRotator(y * SensorSpacing, z * SensorSpacing, 0).RotateVector(FVector::ForwardVector);
+		FVector sensorPoint = SensorDistanceFromOrigin * sensorGridPoint;
 		SensorPoints[i] = sensorPoint;
 	}
 }
