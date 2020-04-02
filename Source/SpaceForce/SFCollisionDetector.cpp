@@ -88,7 +88,7 @@ FCollisionDetectionResult USFCollisionDetector::DetectCollisions()
 		suggestedOrientation *= collisionVector.Size();
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Pitch, Yaw (%f, %f) strength was %f"), suggestedOrientation.Pitch, suggestedOrientation.Yaw, collisionVector.Size())
+	//UE_LOG(LogTemp, Warning, TEXT("Pitch, Yaw (%f, %f) collsionVector |(%s)| = %f"), suggestedOrientation.Pitch, suggestedOrientation.Yaw, *collisionVector.ToString(), collisionVector.Size())
 	FCollisionDetectionResult result = FCollisionDetectionResult(bCollisionDetected, collisionVector, suggestedOrientation);
 	return result;
 }
