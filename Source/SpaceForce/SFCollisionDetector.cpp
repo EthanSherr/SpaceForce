@@ -12,7 +12,7 @@ USFCollisionDetector::USFCollisionDetector(const class FObjectInitializer& Objec
 	PrimaryComponentTick.bCanEverTick = false;
 	GridDimension = 3;
 	SensorSpacing = 25.0f;
-	SensorDistanceFromOrigin = 450.0f;
+	SensorDistanceFromOrigin = 600.0f;
 	bDebugTraces = true;
 }
 
@@ -26,7 +26,7 @@ void USFCollisionDetector::BeginPlay()
 		int z = i / GridDimension - GridDimension / 2;
 
 		FVector sensorGridPoint = FRotator(y * SensorSpacing, z * SensorSpacing, 0).RotateVector(FVector::ForwardVector);
-		FVector sensorPoint = SensorDistanceFromOrigin * sensorGridPoint;
+		FVector sensorPoint = sensorGridPoint;
 		SensorPoints[i] = sensorPoint;
 	}
 }
@@ -41,10 +41,11 @@ FCollisionDetectionResult USFCollisionDetector::DetectCollisions()
 	signalStrengths.Init(FCollisionSignal(), SensorPoints.Num());
 	bool bCollisionDetected = false;
 	FVector collisionVector = FVector::ZeroVector;
+	float normalizedSignalStrengths = 0.0f;
 	for (int i = 0; i < SensorPoints.Num(); i++)
 	{
 		FVector point = SensorPoints[i];
-		FVector sensorLocation = GetOwner()->GetActorRotation().RotateVector(point) + actorLocation;
+		FVector sensorLocation = SensorDistanceFromOrigin * GetOwner()->GetActorRotation().RotateVector(point) + actorLocation;
 
 		FHitResult outHit;
 		float responseStrength = 0.0f;
@@ -53,10 +54,10 @@ FCollisionDetectionResult USFCollisionDetector::DetectCollisions()
 		{
 			FVector delta = outHit.Location - actorLocation;
 			float impactDistance = delta.Size();
-			float maxDistance = point.Size();
-			float a = 1 - (maxDistance - impactDistance) / maxDistance;
+			float a = 1 - (SensorDistanceFromOrigin - impactDistance) / SensorDistanceFromOrigin;
 			responseStrength = ResponseCurve ? ResponseCurve->GetFloatValue(a) : 1.0f;
-			collisionVector += responseStrength * point.GetSafeNormal();
+			normalizedSignalStrengths += responseStrength;
+			collisionVector += responseStrength * point;
 			bCollisionDetected = true;
 		}
 		signalStrengths[i].Index = i;
@@ -75,7 +76,7 @@ FCollisionDetectionResult USFCollisionDetector::DetectCollisions()
 		}
 	}
 
-	collisionVector /= SensorPoints.Num();
+	collisionVector /= GridDimension;
 
 	FRotator suggestedOrientation = FRotator::ZeroRotator;
 	if (bCollisionDetected)
@@ -89,14 +90,6 @@ FCollisionDetectionResult USFCollisionDetector::DetectCollisions()
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Pitch, Yaw (%f, %f) collsionVector |(%s)| = %f"), suggestedOrientation.Pitch, suggestedOrientation.Yaw, *collisionVector.ToString(), collisionVector.Size())
-	FCollisionDetectionResult result = FCollisionDetectionResult(bCollisionDetected, collisionVector, suggestedOrientation);
+	FCollisionDetectionResult result = FCollisionDetectionResult(bCollisionDetected, collisionVector, suggestedOrientation, normalizedSignalStrengths);
 	return result;
 }
-
-void USFCollisionDetector::DebugStrengths(TArray<FCollisionSignal> str)
-{
-	UE_LOG(LogTemp, Warning, TEXT("Signals \n"))
-}
-
-
-

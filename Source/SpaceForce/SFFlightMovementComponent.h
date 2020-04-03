@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SFFlightMovementComponent.generated.h"
 
+class USFCollisionDetector;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEFORCE_API USFFlightMovementComponent : public UActorComponent
@@ -17,19 +18,53 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	void InitializeCollisionDetection();
 
 public:	
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 	UPROPERTY(EditAnywhere)
-	float MaxRotationSpeed;
+	bool bDrawDebugLines;
+
+	UPROPERTY(EditAnywhere)
+	bool bAdjustRollToFavorPitch;
+
+	UPROPERTY(EditAnywhere)
+	FRotator MaxRotationSpeed;
 
 	UPROPERTY(EditAnywhere)
 	float MaxSpeed;
 
+	UPROPERTY(EditAnywhere)
+	float MinSpeed;
+
+	UPROPERTY(EditAnywhere)
+	float Deceleration;
+
+	UPROPERTY(EditAnywhere)
+	float Acceleration;
+
 	UFUNCTION(BlueprintCallable)
 	void AddInputVector(FRotator rotation);
 
+	UFUNCTION(BlueprintCallable)
+	void MoveTo(FVector worldLocation);
+
+	UFUNCTION(BlueprintCallable)
+	void SetTargetThrust(float value);
+
 private:
 	FRotator DeltaRotation;
+
+	USFCollisionDetector* CollisionDetector;
+
+	float thrust;
+	float currentSpeed;
+
+	FVector targetPoint;
+	bool bHasTargetPoint;
+
+	UFUNCTION()
+	void MoveTowardsTarget(FVector worldTarget);
+
 };

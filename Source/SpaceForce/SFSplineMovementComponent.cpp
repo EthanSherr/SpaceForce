@@ -9,7 +9,6 @@
 USFSplineMovementComponent::USFSplineMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
-	//SetTickGroup(ETickingGroup::TG_PrePhysics);
 }
 
 void USFSplineMovementComponent::InitializeComponent()

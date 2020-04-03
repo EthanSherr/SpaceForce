@@ -21,11 +21,14 @@ struct SPACEFORCE_API FCollisionDetectionResult {
 	UPROPERTY(BlueprintReadWrite)
 	FRotator SuggestedDeltaRotation;
 
-	FCollisionDetectionResult() 
-		: bCollisionDetected(false), CollisionVector(FVector::ZeroVector), SuggestedDeltaRotation(FRotator::ZeroRotator) {}
+	UPROPERTY(BlueprintReadWrite)
+	float NormalizedSignalStrength;
 
-	FCollisionDetectionResult(bool _bCollisionDetected, FVector _CollisionVector, FRotator _SuggestedDeltaRotation)
-		: bCollisionDetected(_bCollisionDetected), CollisionVector(_CollisionVector), SuggestedDeltaRotation(_SuggestedDeltaRotation) {}
+	FCollisionDetectionResult() 
+		: bCollisionDetected(false), CollisionVector(FVector::ZeroVector), SuggestedDeltaRotation(FRotator::ZeroRotator), NormalizedSignalStrength(0.0f) {}
+
+	FCollisionDetectionResult(bool _bCollisionDetected, FVector _CollisionVector, FRotator _SuggestedDeltaRotation, float _NormalizedSignalStrength)
+		: bCollisionDetected(_bCollisionDetected), CollisionVector(_CollisionVector), SuggestedDeltaRotation(_SuggestedDeltaRotation), NormalizedSignalStrength(_NormalizedSignalStrength){}
 };
 
 USTRUCT()
@@ -71,8 +74,5 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FCollisionDetectionResult DetectCollisions();
-
-private:
-	void DebugStrengths(TArray<FCollisionSignal> strengths);
 
 };
