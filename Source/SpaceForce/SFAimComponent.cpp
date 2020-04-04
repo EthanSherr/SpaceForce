@@ -45,13 +45,10 @@ FAimCallibration USFAimComponent::GetAimCallibration() {
 		return FAimCallibration();
 	}
 	FTransform socketTransform = BarrelSocket->GetSocketTransform(SkeletalMesh);
-	FRotator currentRot = socketTransform.GetRotation().Rotator() - GetOwner()->GetActorRotation();
-	FTransform t = GetOwner()->GetTransform().Inverse() * socketTransform;
-
 	FVector deltaToBarrel = Target - socketTransform.GetLocation();
 	FVector componentSpaceTarget = GetOwner()->GetActorRotation().UnrotateVector(deltaToBarrel);
 	FRotator targetRotation = FRotationMatrix::MakeFromX(componentSpaceTarget).Rotator();
-	auto callibration = FAimCallibration(currentRot, targetRotation);
+	auto callibration = FAimCallibration(socketTransform.GetRotation().Rotator(), targetRotation);
 	UE_LOG(LogTemp, Warning, TEXT("calibraiton %s"), *callibration.ToString())
 	return callibration;
 }
