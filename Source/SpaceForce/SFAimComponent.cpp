@@ -5,6 +5,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
+#include "SFTurretDelegate.h"
+#include "MyBlueprintFunctionLibrary.h"
 
 // Sets default values for this component's properties
 USFAimComponent::USFAimComponent()
@@ -21,11 +23,12 @@ bool USFAimComponent::WasInitialized(bool logError)
 	return wasInit;
 }
 
-void USFAimComponent::Initialize(USkeletalMeshComponent* SKM, FName Barrel, FName Muzzle)
+void USFAimComponent::Initialize(USkeletalMeshComponent* SKM, float projectileSpeed, FName Barrel, FName Muzzle)
 {
 	SkeletalMesh = SKM;
 	BarrelSocket = SKM->GetSocketByName(Barrel);
 	MuzzleSocket = SKM->GetSocketByName(Muzzle);
+	ProjectileSpeed = projectileSpeed;
 	if (!WasInitialized(true)) {
 		return;
 	}
@@ -35,11 +38,9 @@ void USFAimComponent::Initialize(USkeletalMeshComponent* SKM, FName Barrel, FNam
 	FRotator socketRotationInComponentSpace = socketTransform.Rotator() - SkeletalMesh->GetComponentRotation();
 
 	UE_LOG(LogTemp, Warning, TEXT("socketRotationInComponentSpace %s"), *socketRotationInComponentSpace.ToString())
-
 }
 
-void USFAimComponent::AimAt(FVector target)
-{
+void USFAimComponent::AimAt(FVector target) {
 	if (!WasInitialized()) {
 		return;
 	}
@@ -77,4 +78,20 @@ bool USFAimComponent::IsAimingAtTarget(float tolerance) {
 	bool result = deltaRotator.Pitch <= tolerance && deltaRotator.Yaw <= tolerance;
 //	UE_LOG(LogTemp, Warning, TEXT("socketTransformWorld : %s targetRotation: %s same %d"), *socketTransformWorld.Rotator().ToString(), *targetRotation.ToString(), result)
 	return deltaRotator.Pitch <= tolerance && deltaRotator.Yaw <= tolerance;
+}
+
+bool USFAimComponent::Fire() {
+
+	if (!GetOwner()->Implements<USFTurretDelegate>()) {
+		return false;
+	}
+	return ISFTurretDelegate::Execute_Fire(GetOwner(), this);
+}
+
+FTransform USFAimComponent::GetMuzzleTransform() {
+	return MuzzleSocket->GetSocketTransform(SkeletalMesh);
+}
+
+FTransform USFAimComponent::GetBarrelTransform() {
+	return BarrelSocket->GetSocketTransform(SkeletalMesh);
 }

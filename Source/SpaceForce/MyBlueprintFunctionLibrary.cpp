@@ -5,8 +5,6 @@
 
 FProjectilePredictionResult UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(FVector P0, FVector V0, FVector P1, float s1, float m) {
 	FProjectilePredictionResult result;
-
-	
 	FVector D = P0 - P1;
 	float a = FMath::Square(V0.X) + FMath::Square(V0.Y) + FMath::Square(V0.Z) - FMath::Square(s1);
 	float b = 2 * (D.X*V0.X + D.Y*V0.Y + D.Z*V0.Z - s1 * m);
@@ -27,7 +25,6 @@ FProjectilePredictionResult UMyBlueprintFunctionLibrary::ComputeProjectilePredic
 
 	result.bSuccess = true;
 	result.predictedImpact = V0 * t + P0;
-	//result.projectileVelocity = (P0 - P1).GetSafeNormal() * s0;
 	result.time = t;
 
 	return result;

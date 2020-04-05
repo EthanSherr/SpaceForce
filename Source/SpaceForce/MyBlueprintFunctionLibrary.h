@@ -23,15 +23,11 @@ struct FProjectilePredictionResult
 		float time;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		FVector projectileVelocity;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		FVector predictedImpact;
 
 	FProjectilePredictionResult() {
 		bSuccess = false;
 		time = -1.f;
-		projectileVelocity = FVector::ZeroVector;
 		predictedImpact = FVector::ZeroVector;
 	}
 };

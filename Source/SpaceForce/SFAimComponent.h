@@ -36,7 +36,7 @@ public:
 	USFAimComponent();
 
 	UFUNCTION(BlueprintCallable)
-	void Initialize(class USkeletalMeshComponent* Mesh, FName Barrel = FName("Barrel"), FName Muzzle = FName("Muzzle"));
+	void Initialize(class USkeletalMeshComponent* Mesh, float projectileSpeed, FName Barrel = FName("Barrel"), FName Muzzle = FName("Muzzle"));
 
 	// Set target location to give AimComponent a target & valid responses from GetBarrelLookAtLocation
 	UFUNCTION(BlueprintCallable)
@@ -57,12 +57,26 @@ public:
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-		FORCEINLINE float GetBarrelLength() {
+	FORCEINLINE float GetBarrelLength() {
 		return BarrelLength;
 	}
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE float GetProjectileSpeed() {
+		return ProjectileSpeed;
+	}
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAimingAtTarget(float tolerance = 1);
+
+	UFUNCTION(BlueprintCallable)
+	bool Fire();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FTransform GetMuzzleTransform();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FTransform GetBarrelTransform();
 
 private:
 	bool WasInitialized(bool logError = false);
@@ -72,6 +86,7 @@ private:
 	const class USkeletalMeshSocket* MuzzleSocket;
 
 	float BarrelLength;
+	float ProjectileSpeed;
 
 	//AimAt variables
 	bool bWasTargetSet;
