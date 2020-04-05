@@ -61,6 +61,9 @@ public:
 		return BarrelLength;
 	}
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool IsAimingAtTarget(float tolerance = 1);
+
 private:
 	bool WasInitialized(bool logError = false);
 	//init variables

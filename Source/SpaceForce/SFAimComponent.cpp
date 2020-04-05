@@ -4,6 +4,7 @@
 #include "SFAimComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values for this component's properties
 USFAimComponent::USFAimComponent()
@@ -29,6 +30,12 @@ void USFAimComponent::Initialize(USkeletalMeshComponent* SKM, FName Barrel, FNam
 		return;
 	}
 	BarrelLength = FVector::Distance(BarrelSocket->GetSocketLocation(SKM), MuzzleSocket->GetSocketLocation(SKM));
+
+	FTransform socketTransform = BarrelSocket->GetSocketTransform(SkeletalMesh);
+	FRotator socketRotationInComponentSpace = socketTransform.Rotator() - SkeletalMesh->GetComponentRotation();
+
+	UE_LOG(LogTemp, Warning, TEXT("socketRotationInComponentSpace %s"), *socketRotationInComponentSpace.ToString())
+
 }
 
 void USFAimComponent::AimAt(FVector target)
@@ -44,12 +51,30 @@ FAimCallibration USFAimComponent::GetAimCallibration() {
 	if (!bWasTargetSet) {
 		return FAimCallibration();
 	}
-	FTransform socketTransform = BarrelSocket->GetSocketTransform(SkeletalMesh);
-	FVector deltaToBarrel = Target - socketTransform.GetLocation();
-	FVector componentSpaceTarget = GetOwner()->GetActorRotation().UnrotateVector(deltaToBarrel);
-	FRotator targetRotation = FRotationMatrix::MakeFromX(componentSpaceTarget).Rotator();
-	auto callibration = FAimCallibration(socketTransform.GetRotation().Rotator(), targetRotation);
-	UE_LOG(LogTemp, Warning, TEXT("calibraiton %s"), *callibration.ToString())
-	return callibration;
+	FTransform socketTransformWorld = BarrelSocket->GetSocketTransform(SkeletalMesh);
+
+	FVector relativeTarget = GetOwner()->GetActorRotation().UnrotateVector(Target - socketTransformWorld.GetTranslation());
+	FRotator to = FRotationMatrix::MakeFromX(relativeTarget).Rotator();
+
+	//From is not correct
+	FRotator dr = GetOwner()->GetActorRotation() - socketTransformWorld.Rotator();
+	FRotator from = FRotationMatrix::MakeFromX(dr.RotateVector(FVector::ForwardVector)).Rotator();
+	auto cal = FAimCallibration(from, to);
+	return cal;
 }
 
+bool USFAimComponent::IsAimingAtTarget(float tolerance) {
+
+	if (!bWasTargetSet) {
+		return false;
+	}
+
+	FTransform socketTransformWorld = BarrelSocket->GetSocketTransform(SkeletalMesh);
+	FRotator barrelRotation = socketTransformWorld.Rotator();
+	FRotator targetRotation = FRotationMatrix::MakeFromX(Target - socketTransformWorld.GetLocation()).Rotator();
+	FRotator deltaRotator = barrelRotation - targetRotation;
+
+	bool result = deltaRotator.Pitch <= tolerance && deltaRotator.Yaw <= tolerance;
+//	UE_LOG(LogTemp, Warning, TEXT("socketTransformWorld : %s targetRotation: %s same %d"), *socketTransformWorld.Rotator().ToString(), *targetRotation.ToString(), result)
+	return deltaRotator.Pitch <= tolerance && deltaRotator.Yaw <= tolerance;
+}
