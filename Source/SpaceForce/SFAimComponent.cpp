@@ -7,6 +7,7 @@
 #include "DrawDebugHelpers.h"
 #include "SFTurretDelegate.h"
 #include "MyBlueprintFunctionLibrary.h"
+#include "GameFramework/MovementComponent.h"
 
 // Sets default values for this component's properties
 USFAimComponent::USFAimComponent()
@@ -33,35 +34,51 @@ void USFAimComponent::Initialize(USkeletalMeshComponent* SKM, float projectileSp
 		return;
 	}
 	BarrelLength = FVector::Distance(BarrelSocket->GetSocketLocation(SKM), MuzzleSocket->GetSocketLocation(SKM));
-
-	FTransform socketTransform = BarrelSocket->GetSocketTransform(SkeletalMesh);
-	FRotator socketRotationInComponentSpace = socketTransform.Rotator() - SkeletalMesh->GetComponentRotation();
-
-	UE_LOG(LogTemp, Warning, TEXT("socketRotationInComponentSpace %s"), *socketRotationInComponentSpace.ToString())
 }
 
 void USFAimComponent::AimAt(FVector target) {
-	if (!WasInitialized()) {
+	if (!WasInitialized(true)) {
 		return;
 	}
 	bWasTargetSet = true;
 	Target = target;
 }
 
-FAimCallibration USFAimComponent::GetAimCallibration() {
-	if (!bWasTargetSet) {
-		return FAimCallibration();
+void USFAimComponent::AimAtActor(AActor* actor, bool withLead) {
+	if (!WasInitialized(true)) {
+		return;
 	}
+	bWasTargetSet = actor != NULL;
+	TrackedActor = actor;
+	bLeadTrackedActor = withLead;
+}
+
+FRotator USFAimComponent::GetAimCallibration() {
+	if (!bWasTargetSet) {
+		return FRotator::ZeroRotator;
+	}
+
+	if (TrackedActor != NULL) {
+		if (bLeadTrackedActor) {
+
+			UMovementComponent* movementComp = (UMovementComponent*)TrackedActor->GetComponentByClass(UMovementComponent::StaticClass());
+			FProjectilePredictionResult result = UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(
+				TrackedActor->GetActorLocation(), 
+				movementComp != NULL ? movementComp->Velocity : TrackedActor->GetVelocity(),
+				GetBarrelTransform().GetLocation(),
+				ProjectileSpeed, 
+				BarrelLength);
+			if (result.bSuccess) {
+				Target = result.predictedImpact;
+			}
+		} else {
+			Target = TrackedActor->GetActorLocation();
+		}
+	}
+
 	FTransform socketTransformWorld = BarrelSocket->GetSocketTransform(SkeletalMesh);
-
 	FVector relativeTarget = GetOwner()->GetActorRotation().UnrotateVector(Target - socketTransformWorld.GetTranslation());
-	FRotator to = FRotationMatrix::MakeFromX(relativeTarget).Rotator();
-
-	//From is not correct
-	FRotator dr = GetOwner()->GetActorRotation() - socketTransformWorld.Rotator();
-	FRotator from = FRotationMatrix::MakeFromX(dr.RotateVector(FVector::ForwardVector)).Rotator();
-	auto cal = FAimCallibration(from, to);
-	return cal;
+	return FRotationMatrix::MakeFromX(relativeTarget).Rotator();
 }
 
 bool USFAimComponent::IsAimingAtTarget(float tolerance) {
@@ -81,7 +98,6 @@ bool USFAimComponent::IsAimingAtTarget(float tolerance) {
 }
 
 bool USFAimComponent::Fire() {
-
 	if (!GetOwner()->Implements<USFTurretDelegate>()) {
 		return false;
 	}

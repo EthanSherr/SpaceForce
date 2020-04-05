@@ -37,9 +37,11 @@ class SPACEFORCE_API UMyBlueprintFunctionLibrary : public UBlueprintFunctionLibr
 {
 	GENERATED_BODY()
 
+public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "MyCategory")
-		static FProjectilePredictionResult ComputeProjectilePrediction(FVector targetPosition, FVector targetVelocity, FVector projectileOrigin, float projectileSpeed, float muzzleOffsetMagnitudeFromProjectileOrigin);
+	static FProjectilePredictionResult ComputeProjectilePrediction(FVector targetPosition, FVector targetVelocity, FVector projectileOrigin, float projectileSpeed, float muzzleOffsetMagnitudeFromProjectileOrigin);
 
+private:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "MyCategory")
-		static float MinNonNegative(float a, float b);
+	static float MinNonNegative(float a, float b);
 };

@@ -5,26 +5,6 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "SFAimComponent.generated.h"
-USTRUCT(Blueprintable)
-struct SPACEFORCE_API FAimCallibration
-{
-	GENERATED_USTRUCT_BODY()
-
-public:
-	UPROPERTY(BlueprintReadWrite)
-	FRotator From;
-
-	UPROPERTY(BlueprintReadWrite)
-	FRotator To;
-
-	FORCEINLINE FString ToString() const
-	{
-		return FString::Printf(TEXT("from: (%s) to: (%s)"), *From.ToString(), *To.ToString());
-	}
-
-	FORCEINLINE FAimCallibration() : From(FRotator::ZeroRotator), To(FRotator::ZeroRotator) {};
-	FORCEINLINE FAimCallibration(FRotator from, FRotator to) : From(from), To(to) {};
-};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEFORCE_API USFAimComponent : public UActorComponent
@@ -42,9 +22,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AimAt(FVector target);
 
+	UFUNCTION(BlueprintCallable)
+	void AimAtActor(AActor* actor, bool withLead = true);
+
 	//Gives you the desired pitch/yaw for the barrel in component space (used by anim bp)
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FAimCallibration GetAimCallibration();
+	UFUNCTION(BlueprintCallable)
+	FRotator GetAimCallibration();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE	bool HasTarget() {
@@ -91,4 +74,7 @@ private:
 	//AimAt variables
 	bool bWasTargetSet;
 	FVector Target;
+
+	AActor* TrackedActor;
+	bool bLeadTrackedActor;
 };
