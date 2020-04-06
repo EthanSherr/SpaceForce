@@ -47,11 +47,11 @@ void USFFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		MaxRotationSpeed.Roll * DeltaRotation.Roll);
 	GetOwner()->AddActorLocalRotation(DeltaTime * RotationVelocity);
 
-	UE_LOG(LogTemp, Warning, TEXT("dthrust %f from %f"), (DeltaTime * thrust * (thrust > 0 ? Acceleration : -Deceleration)), thrust)
+	//UE_LOG(LogTemp, Warning, TEXT("dthrust %f from %f"), (DeltaTime * thrust * (thrust > 0 ? Acceleration : -Deceleration)), thrust)
 	currentSpeed += DeltaTime * thrust * (thrust > 0 ? Acceleration : -Deceleration);
 	currentSpeed = FMath::Max(FMath::Min(currentSpeed, MaxSpeed), MinSpeed);
 
-	UE_LOG(LogTemp, Warning, TEXT("speed %f, DeltaRotation %s"), currentSpeed, *DeltaRotation.ToString())
+	//UE_LOG(LogTemp, Warning, TEXT("speed %f, DeltaRotation %s"), currentSpeed, *DeltaRotation.ToString())
 	FVector LastLocation = GetOwner()->GetActorLocation();
 	GetOwner()->AddActorLocalOffset(DeltaTime * currentSpeed * FVector::ForwardVector);
 	if (bDrawDebugLines) {

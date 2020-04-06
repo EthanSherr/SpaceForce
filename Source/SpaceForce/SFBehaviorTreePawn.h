@@ -17,4 +17,7 @@ protected:
 public:	
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* BehaviorTree;
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void AttackActor(AActor* actor);
 };
