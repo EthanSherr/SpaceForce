@@ -18,6 +18,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Initialize(class USkeletalMeshComponent* Mesh, float projectileSpeed, FName Barrel = FName("Barrel"), FName Muzzle = FName("Muzzle"));
 
+	UPROPERTY(EditDefaultsOnly)
+	float AimSpeed;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE float GetAimSpeed() {
+		return AimSpeed;
+	}
+
 	// Set target location to give AimComponent a target & valid responses from GetBarrelLookAtLocation
 	UFUNCTION(BlueprintCallable)
 	void AimAt(FVector target);

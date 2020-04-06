@@ -9,10 +9,7 @@
 UCLASS()
 class SPACEFORCE_API ASFBehaviorTreePawn : public APawn
 {
-	GENERATED_BODY()
-
-public:
-	ASFBehaviorTreePawn();
+	GENERATED_UCLASS_BODY()
 
 protected:
 	virtual void BeginPlay() override;

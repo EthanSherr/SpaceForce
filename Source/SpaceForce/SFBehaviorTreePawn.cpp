@@ -5,7 +5,8 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "AIController.h"
 
-ASFBehaviorTreePawn::ASFBehaviorTreePawn()
+
+ASFBehaviorTreePawn::ASFBehaviorTreePawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 }

@@ -13,6 +13,7 @@
 USFAimComponent::USFAimComponent()
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	AimSpeed = 30.0f;
 }
 
 bool USFAimComponent::WasInitialized(bool logError)
