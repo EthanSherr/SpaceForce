@@ -53,6 +53,12 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetTargetThrust(float value);
 
+	UPROPERTY(EditAnywhere)
+	bool bEnabled;
+
+	UFUNCTION(BlueprintCallable)
+		void SetEnabled(bool val);
+
 private:
 	FRotator DeltaRotation;
 

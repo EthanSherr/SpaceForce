@@ -41,6 +41,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "MyCategory")
 	static FProjectilePredictionResult ComputeProjectilePrediction(FVector targetPosition, FVector targetVelocity, FVector projectileOrigin, float projectileSpeed, float muzzleOffsetMagnitudeFromProjectileOrigin);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Float math")
+	static float MinMax(float v, float min, float max);
+
 private:
 	UFUNCTION(BlueprintCallable, BlueprintPure, Category = "MyCategory")
 	static float MinNonNegative(float a, float b);

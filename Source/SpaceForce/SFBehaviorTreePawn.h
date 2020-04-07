@@ -20,4 +20,7 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void AttackActor(AActor* actor);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	void MoveTo(FVector location);
 };

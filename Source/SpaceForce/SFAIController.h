@@ -19,4 +19,7 @@ public:
     UFUNCTION(BlueprintCallable)
     void AttackActor(AActor* actor);
 
+    UFUNCTION(BlueprintCallable)
+    void MoveTo(FVector vector);
+
 };

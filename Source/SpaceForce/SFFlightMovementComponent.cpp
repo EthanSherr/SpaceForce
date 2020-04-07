@@ -17,6 +17,7 @@ USFFlightMovementComponent::USFFlightMovementComponent(const class FObjectInitia
 	Deceleration = 60.0f;
 	bDrawDebugLines = true;
 	bAdjustRollToFavorPitch = true;
+	bEnabled = true;
 }
 
 void USFFlightMovementComponent::InitializeCollisionDetection()
@@ -34,6 +35,9 @@ void USFFlightMovementComponent::BeginPlay()
 
 void USFFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
+	if (!bEnabled) {
+		return;
+	}
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
 	if (bHasTargetPoint)
@@ -73,6 +77,7 @@ void USFFlightMovementComponent::MoveTo(FVector targetWorldLocation)
 {
 	bHasTargetPoint = true;
 	targetPoint = targetWorldLocation;
+	UE_LOG(LogTemp, Warning, TEXT("targetPoint %s"), *targetPoint.ToString())
 }
 
 void USFFlightMovementComponent::MoveTowardsTarget(FVector targetWorldLocation)
@@ -108,4 +113,9 @@ void USFFlightMovementComponent::MoveTowardsTarget(FVector targetWorldLocation)
 void USFFlightMovementComponent::SetTargetThrust(float value)
 {
 	thrust = FMath::Max(FMath::Min(value, 1.0f), -1.0f);
+}
+
+void USFFlightMovementComponent::SetEnabled(bool val)
+{
+	bEnabled = val;
 }

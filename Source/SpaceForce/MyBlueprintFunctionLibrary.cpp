@@ -41,3 +41,7 @@ float UMyBlueprintFunctionLibrary::MinNonNegative(float a, float b) {
 	}
 	return -1.f;
 }
+
+float UMyBlueprintFunctionLibrary::MinMax(float v, float min, float max) {
+	return FMath::Max(FMath::Min(v, max), min);
+}
