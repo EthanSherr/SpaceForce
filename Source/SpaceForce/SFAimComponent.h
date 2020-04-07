@@ -6,6 +6,21 @@
 #include "Components/ActorComponent.h"
 #include "SFAimComponent.generated.h"
 
+USTRUCT(Blueprintable)
+struct SPACEFORCE_API FAimCallibration
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FRotator From;
+
+	UPROPERTY(BlueprintReadWrite)
+	FRotator To;
+
+	FAimCallibration() : From(FRotator::ZeroRotator), To(FRotator::ZeroRotator) {}
+	FAimCallibration(FRotator from, FRotator to) : From(from), To(to) {}
+};
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEFORCE_API USFAimComponent : public UActorComponent
 {
@@ -14,6 +29,9 @@ class SPACEFORCE_API USFAimComponent : public UActorComponent
 public:	
 	// Sets default values for this component's properties
 	USFAimComponent();
+
+	UFUNCTION(BlueprintCallable)
+	void Debug();
 
 	UFUNCTION(BlueprintCallable)
 	void Initialize(class USkeletalMeshComponent* Mesh, float projectileSpeed, FName Barrel = FName("Barrel"), FName Muzzle = FName("Muzzle"));
@@ -35,7 +53,7 @@ public:
 
 	//Gives you the desired pitch/yaw for the barrel in component space (used by anim bp)
 	UFUNCTION(BlueprintCallable)
-	FRotator GetAimCallibration();
+	FAimCallibration GetAimCallibration();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE	bool HasTarget() {
@@ -75,7 +93,7 @@ private:
 	class USkeletalMeshComponent* SkeletalMesh;
 	const class USkeletalMeshSocket* BarrelSocket;
 	const class USkeletalMeshSocket* MuzzleSocket;
-
+	FTransform InitialBarrelTransformCS;
 	float BarrelLength;
 	float ProjectileSpeed;
 
@@ -85,4 +103,6 @@ private:
 
 	AActor* TrackedActor;
 	bool bLeadTrackedActor;
+
+	bool UpdateTargetFromTrackedActor();
 };

@@ -34,6 +34,8 @@ void USFAimComponent::Initialize(USkeletalMeshComponent* SKM, float projectileSp
 	if (!WasInitialized(true)) {
 		return;
 	}
+	InitialBarrelTransformCS = BarrelSocket->GetSocketTransform(SKM) * SkeletalMesh->GetComponentTransform().Inverse();
+	UE_LOG(LogTemp, Warning, TEXT("%s InitialBarrelTransform %s"), *GetOwner()->GetName(), *InitialBarrelTransformCS.ToString())
 	BarrelLength = FVector::Distance(BarrelSocket->GetSocketLocation(SKM), MuzzleSocket->GetSocketLocation(SKM));
 }
 
@@ -54,32 +56,70 @@ void USFAimComponent::AimAtActor(AActor* actor, bool withLead) {
 	bLeadTrackedActor = withLead;
 }
 
-FRotator USFAimComponent::GetAimCallibration() {
+//FRotator USFAimComponent::GetAimCallibration() {
+//	if (!bWasTargetSet) {
+//		return FRotator::ZeroRotator;
+//	}
+//
+//	UpdateTargetFromTrackedActor();
+//
+//	FTransform socketTransformWorld = BarrelSocket->GetSocketTransform(SkeletalMesh);
+//	FVector relativeTarget = GetOwner()->GetActorRotation().UnrotateVector(Target - socketTransformWorld.GetTranslation());
+//	return FRotationMatrix::MakeFromX(relativeTarget).Rotator();
+//}
+
+void USFAimComponent::Debug() 
+{
+	FTransform t = InitialBarrelTransformCS * SkeletalMesh->GetComponentTransform();
+	FVector forward = t.Rotator().RotateVector(FVector::ForwardVector);
+
+	DrawDebugLine(GetWorld(), t.GetLocation(), forward * 100 + t.GetLocation(), FColor::Green, false, 0, 1, 1);
+}
+
+FAimCallibration USFAimComponent::GetAimCallibration() {
 	if (!bWasTargetSet) {
-		return FRotator::ZeroRotator;
+		return FAimCallibration();
 	}
 
-	if (TrackedActor != NULL) {
-		if (bLeadTrackedActor) {
+	UpdateTargetFromTrackedActor();
 
-			UMovementComponent* movementComp = (UMovementComponent*)TrackedActor->GetComponentByClass(UMovementComponent::StaticClass());
-			FProjectilePredictionResult result = UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(
-				TrackedActor->GetActorLocation(), 
-				movementComp != NULL ? movementComp->Velocity : TrackedActor->GetVelocity(),
-				GetBarrelTransform().GetLocation(),
-				ProjectileSpeed, 
-				BarrelLength);
-			if (result.bSuccess) {
-				Target = result.predictedImpact;
-			}
-		} else {
-			Target = TrackedActor->GetActorLocation();
-		}
+	FTransform initialBarrelWS = InitialBarrelTransformCS * SkeletalMesh->GetComponentTransform();
+	FVector initialBarrelForwardWS = initialBarrelWS.Rotator().RotateVector(FVector::ForwardVector);
+	FTransform socketTransformWS = BarrelSocket->GetSocketTransform(SkeletalMesh);
+
+	FRotator from = socketTransformWS.Rotator() - initialBarrelWS.Rotator();
+
+	FTransform t = socketTransformWS * initialBarrelWS.Inverse();
+
+
+
+	FVector relativeTarget = initialBarrelWS.Rotator().UnrotateVector(Target - socketTransformWS.GetTranslation());
+
+	FRotator to = FRotationMatrix::MakeFromX(relativeTarget).Rotator();
+
+	return FAimCallibration(from, to);
+}
+
+bool USFAimComponent::UpdateTargetFromTrackedActor()
+{
+	if (TrackedActor == NULL) {
+		return false;
 	}
-
-	FTransform socketTransformWorld = BarrelSocket->GetSocketTransform(SkeletalMesh);
-	FVector relativeTarget = GetOwner()->GetActorRotation().UnrotateVector(Target - socketTransformWorld.GetTranslation());
-	return FRotationMatrix::MakeFromX(relativeTarget).Rotator();
+	if (!bLeadTrackedActor) {
+		Target = TrackedActor->GetActorLocation();
+		return true;
+	}
+	UMovementComponent* movementComp = (UMovementComponent*)TrackedActor->GetComponentByClass(UMovementComponent::StaticClass());
+	FProjectilePredictionResult result = UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(
+		TrackedActor->GetActorLocation(),
+		movementComp != NULL ? movementComp->Velocity : TrackedActor->GetVelocity(),
+		GetBarrelTransform().GetLocation(),
+		ProjectileSpeed,
+		BarrelLength);
+	if (result.bSuccess) {
+		Target = result.predictedImpact;
+	}
+	return result.bSuccess;
 }
 
 bool USFAimComponent::IsAimingAtTarget(float tolerance) {
@@ -93,8 +133,6 @@ bool USFAimComponent::IsAimingAtTarget(float tolerance) {
 	FRotator targetRotation = FRotationMatrix::MakeFromX(Target - socketTransformWorld.GetLocation()).Rotator();
 	FRotator deltaRotator = barrelRotation - targetRotation;
 
-	bool result = deltaRotator.Pitch <= tolerance && deltaRotator.Yaw <= tolerance;
-//	UE_LOG(LogTemp, Warning, TEXT("socketTransformWorld : %s targetRotation: %s same %d"), *socketTransformWorld.Rotator().ToString(), *targetRotation.ToString(), result)
 	return deltaRotator.Pitch <= tolerance && deltaRotator.Yaw <= tolerance;
 }
 
