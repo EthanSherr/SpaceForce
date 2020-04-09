@@ -47,8 +47,6 @@ public:
 	UPROPERTY(BlueprintGetter = GetTarget, BlueprintSetter = SetTarget)
 	FVector Target;
 
-	FVector TargetVelocity;
-
 	UPROPERTY(BlueprintGetter = GetTargetActor, BlueprintSetter = SetTargetActor)
 	AActor* TargetActor;
 
@@ -81,11 +79,17 @@ protected:
 private:
 	FVector CalculateForces();
 
+	FVector CalculateTorque(FVector forward);
+
 	bool IsValid(bool logError = false);
 
 	float ComputeDampingCoefficient(FSpringConfig config, float mass);
 	float DampingCoefficient;
 
 	class UPrimitiveComponent* GetUpdatedPrimitiveComp();
+
+	FVector DefaultForward = FVector::ForwardVector;
+
+	FVector TargetVelocity = FVector::ZeroVector;
 
 };

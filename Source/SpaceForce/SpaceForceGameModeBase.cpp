@@ -11,6 +11,16 @@ ASpaceForceGameModeBase::ASpaceForceGameModeBase(const FObjectInitializer& Objec
 
 	//static ConstructorHelpers::FClassFinder<APlayerController> PilotPlayerControllerOb(TEXT("/Game/Blueprints/PilotPlayerController"));
 	//PlayerControllerClass = PilotPlayerControllerOb.Class;
+
+	UE_LOG(LogTemp, Warning, TEXT("Quaternion tests:"))
+
+	FVector v1 = FVector::ForwardVector;
+	FVector v2 = FVector::RightVector;
+
+	auto quat = FQuat::FindBetween(v1, v2);
+
+	UE_LOG(LogTemp, Warning, TEXT("quat => %s"), *quat.ToString())
+	UE_LOG(LogTemp, Warning, TEXT("Tests done"))
 }
 
 void ASpaceForceGameModeBase::PostLogin(APlayerController* NewPlayer)
