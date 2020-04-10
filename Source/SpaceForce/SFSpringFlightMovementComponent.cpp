@@ -29,10 +29,6 @@ void USFSpringFlightMovementComponent::BeginPlay() {
 		return;
 	}
 	DampingCoefficient = ComputeDampingCoefficient(SpringConfig, (GetUpdatedPrimitiveComp()->GetMass()));
-	if (bDebugRotation) {
-		//GetUpdatedPrimitiveComp()->SetPhysicsAngularVelocity(FVector(1, 1, 1) * 200);
-		//GetUpdatedPrimitiveComp()->SetWorldRotation(FRotator(45, 0, 0));
-	}
 }
 
 void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -83,28 +79,24 @@ FVector USFSpringFlightMovementComponent::CalculateForces() {
 }
 
 FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
-	if (bDebugRotation) {
 
-		auto prim = GetUpdatedPrimitiveComp();
+	auto prim = GetUpdatedPrimitiveComp();
 
-		FVector L = prim->GetComponentLocation();
-		FVector vForward = forward.GetSafeNormal();
-		FVector vUp = FRotator(90, 0, 0).RotateVector(vForward);
-		FVector vRight = FVector::CrossProduct(vUp, vForward);
-		DrawDebugLine(GetWorld(), L, L + vForward * 100, FColor::Red, false, 0, 0, 1);
-//		DrawDebugLine(GetWorld(), L, L + vUp * 100, FColor::Blue, false, 0, 0, 1);
-//		DrawDebugLine(GetWorld(), L, L + vRight * 100, FColor::Green, false, 0, 0, 1);
-		DrawDebugLine(GetWorld(), L, L + GetUpdatedPrimitiveComp()->GetForwardVector() * 50, FColor::Purple, false, 0, 1, 1);
-	
-		FQuat rot = FQuat::FindBetween(prim->GetForwardVector(), vForward);
-		UE_LOG(LogTemp, Warning, TEXT("rot %s"), *rot.ToString())
+	FVector L = prim->GetComponentLocation();
+	FVector vForward = forward.GetSafeNormal();
+	FVector vUp = FRotator(90, 0, 0).RotateVector(vForward);
+	FVector vRight = FVector::CrossProduct(vUp, vForward);
+
+	FQuat rot = FQuat::FindBetween(prim->GetForwardVector(), vForward);
+	UE_LOG(LogTemp, Warning, TEXT("rot %s"), *rot.ToString())
 		FVector Fr = 12000 * FVector(rot.X, rot.Y, rot.Z);
+	if (bDebugRotation) {
+		DrawDebugLine(GetWorld(), L, L + vForward * 100, FColor::Red, false, 0, 0, 1);
+		DrawDebugLine(GetWorld(), L, L + GetUpdatedPrimitiveComp()->GetForwardVector() * 50, FColor::Purple, false, 0, 1, 1);
 		DrawDebugLine(GetWorld(), L, L + Fr, FColor::Yellow, false, 0, 2, 1);
-
-		FVector Fd = -7 * prim->ScaleByMomentOfInertia(prim->GetPhysicsAngularVelocityInRadians());
-		return Fr + Fd;
 	}
-	return FVector::ZeroVector;
+	FVector Fd = -7 * prim->ScaleByMomentOfInertia(prim->GetPhysicsAngularVelocityInRadians());
+	return Fr + Fd;
 }
 
 float USFSpringFlightMovementComponent::ComputeDampingCoefficient(FSpringConfig config, float mass) {
