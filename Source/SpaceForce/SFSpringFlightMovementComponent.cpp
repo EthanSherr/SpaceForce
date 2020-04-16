@@ -40,22 +40,24 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 
 	auto prim = GetUpdatedPrimitiveComp();
 	FVector forward = prim->GetComponentVelocity();
-	UE_LOG(LogTemp, Warning, TEXT("ship %s vel %s"), *GetOwner()->GetName(), *prim->GetComponentVelocity().ToString())
-	if (prim->GetComponentVelocity().Size() < 30) {
-		forward = DefaultForward;
-	}
+	//if (prim->GetComponentVelocity().Size() < 30) {
+	//	forward = DefaultForward;
+	//}
 
-	UpdateTarget();
+	UpdateTarget(DeltaTime);
 	prim->AddForce(CalculateForces());
 	prim->AddTorqueInRadians(CalculateTorque(forward));
 }
 
-void USFSpringFlightMovementComponent::UpdateTarget()
+void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
 {
 	if (TargetActor != NULL) {
 		Target = TargetActor->GetActorLocation();
 		TargetVelocity = TargetActor->GetVelocity();
-//		UE_LOG(LogTemp, Warning, TEXT("Target %s TargetVelocity %s"), *Target.ToString(), *TargetVelocity.ToString())
+	}
+	if (bCalculateVelocityOfTarget) {
+		TargetVelocity = (Target - LastTargetPosition) / DeltaTime;
+		LastTargetPosition = Target;
 	}
 }
 
@@ -85,12 +87,12 @@ FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
 	FVector L = prim->GetComponentLocation();
 	FVector vForward = forward.GetSafeNormal();
 	FVector vUp = FRotator(90, 0, 0).RotateVector(vForward);
-	FVector vRight = FVector::CrossProduct(vUp, vForward);
 
-	FQuat rot = FQuat::FindBetween(prim->GetForwardVector(), vForward);
-	UE_LOG(LogTemp, Warning, TEXT("rot %s"), *rot.ToString())
-		FVector Fr = 12000 * FVector(rot.X, rot.Y, rot.Z);
+	FQuat rot = FQuat::FindBetween(prim->GetForwardVector(), vForward) + FQuat::FindBetween(prim->GetUpVector(), vUp);
+	FVector Fr = 12000 * FVector(rot.X, rot.Y, rot.Z);
+
 	if (bDebugRotation) {
+		UE_LOG(LogTemp, Warning, TEXT("rot %s"), *rot.ToString())
 		DrawDebugLine(GetWorld(), L, L + vForward * 100, FColor::Red, false, 0, 0, 1);
 		DrawDebugLine(GetWorld(), L, L + GetUpdatedPrimitiveComp()->GetForwardVector() * 50, FColor::Purple, false, 0, 1, 1);
 		DrawDebugLine(GetWorld(), L, L + Fr, FColor::Yellow, false, 0, 2, 1);
@@ -106,12 +108,18 @@ float USFSpringFlightMovementComponent::ComputeDampingCoefficient(FSpringConfig 
 // Begin Targeting Methods
 void USFSpringFlightMovementComponent::SetTarget(FVector value) {
 	Target = value;
+	LastTargetPosition = value;
 	bHasTarget = true;
 }
 
 void USFSpringFlightMovementComponent::SetTargetActor(AActor* value) {
 	TargetActor = value;
-	bHasTarget = true;
+	if (value != NULL) {
+		LastTargetPosition = TargetActor->GetActorLocation();
+		bHasTarget = true;
+	} else {
+		bHasTarget = false;
+	}
 }
 
 FVector USFSpringFlightMovementComponent::GetTarget() {
@@ -123,7 +131,7 @@ AActor* USFSpringFlightMovementComponent::GetTargetActor() {
 }
 
 void USFSpringFlightMovementComponent::ClearTarget() {
-	TargetVelocity = Target = FVector::ZeroVector;
+	LastTargetPosition = TargetVelocity = Target = FVector::ZeroVector;
 	TargetActor = NULL;
 	bHasTarget = false;
 }
@@ -132,3 +140,9 @@ void USFSpringFlightMovementComponent::ClearTarget() {
 UPrimitiveComponent* USFSpringFlightMovementComponent::GetUpdatedPrimitiveComp() {
 	return Cast<UPrimitiveComponent>(UpdatedComponent);
 }
+
+//void USFSpringFlightMovementComponent::GetMaxSpeed()
+//{
+//	float maxFs = SpringConfig.Stiffness * SpringConfig.MaxExtension;
+//	float maxFd = DampingCoefficient * V ? ;
+//}

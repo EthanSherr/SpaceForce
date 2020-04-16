@@ -4,3 +4,6 @@
 
 #include "CoreMinimal.h"
 
+#define COLLISION_PROJECTILE	ECC_GameTraceChannel1
+
+#define COLLISION_PROFILE_TRIGGER FName("Trigger")

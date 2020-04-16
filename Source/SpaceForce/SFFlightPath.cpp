@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
+#include "SpaceForce.h"
 #include "SFFlightPath.h"
 #include "Components/SplineComponent.h"
 #include "Components/SphereComponent.h"
@@ -35,6 +36,8 @@ void ASFFlightPath::SetupStartSphere()
 	BeginSphere->RegisterComponentWithWorld(GetWorld());
 	BeginSphere->CreationMethod = EComponentCreationMethod::UserConstructionScript;
 	BeginSphere->SetWorldLocation(BeginSphereLocation, false, NULL, ETeleportType::TeleportPhysics);
+	BeginSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
+	BeginSphere->SetCollisionResponseToChannel(COLLISION_PROJECTILE, ECR_Ignore);
 }
 
 void ASFFlightPath::SetupSpline()

@@ -64,11 +64,15 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ClearTarget();
+
+	UPROPERTY(EditAnywhere)
+	bool bCalculateVelocityOfTarget = true;
+
 private:
 	UPROPERTY()
 	bool bHasTarget;
 
-	void UpdateTarget();
+	void UpdateTarget(float DeltaTime);
 // End target
 	
 protected:
@@ -91,5 +95,9 @@ private:
 	FVector DefaultForward = FVector::ForwardVector;
 
 	FVector TargetVelocity = FVector::ZeroVector;
+
+	FVector LastTargetPosition;
+
+//	float GetMaxSpeed();
 
 };
