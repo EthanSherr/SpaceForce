@@ -20,6 +20,6 @@ public:
     void AttackActor(AActor* actor);
 
     UFUNCTION(BlueprintCallable)
-    void MoveTo(FVector vector);
+    void MoveToVector(FVector vector);
 
 };

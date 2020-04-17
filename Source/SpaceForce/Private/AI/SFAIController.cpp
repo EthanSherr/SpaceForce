@@ -17,7 +17,7 @@ void ASFAIController::AttackActor(AActor* target)
 	}
 }
 
-void ASFAIController::MoveTo(FVector vector) {
+void ASFAIController::MoveToVector(FVector vector) {
 	ASFBehaviorTreePawn* btPawn = Cast<ASFBehaviorTreePawn>(GetPawn());
 	if (btPawn) {
 		btPawn->MoveTo(vector);
