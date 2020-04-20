@@ -14,19 +14,19 @@ USFSplineMovementComponent::USFSplineMovementComponent(const FObjectInitializer&
 void USFSplineMovementComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
-	UE_LOG(LogTemp, Warning, TEXT("InitializeComponent"))
+	//UE_LOG(LogTemp, Warning, TEXT("InitializeComponent"))
 }
 
 void USFSplineMovementComponent::UpdateTickRegistration()
 {
 	Super::UpdateTickRegistration();
-	UE_LOG(LogTemp, Warning, TEXT("UpdateTickRegistration"))
+	//UE_LOG(LogTemp, Warning, TEXT("UpdateTickRegistration"))
 }
 
 void USFSplineMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	UE_LOG(LogTemp, Warning, TEXT("UpdatedComponent %s"), *UpdatedComponent->GetName())
+	//UE_LOG(LogTemp, Warning, TEXT("BeginPlay %s"), *UpdatedComponent->GetName())
 	SetFlightPath(FlightPath, initialOffset);
 }
 
