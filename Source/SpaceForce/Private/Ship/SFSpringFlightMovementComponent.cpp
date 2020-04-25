@@ -8,15 +8,19 @@
 USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickGroup = ETickingGroup::TG_PrePhysics;
-
-	SpringConfig = FSpringConfig(25.0f, 0.7f, 50.0f);
+	LinearStiffness = 25.0f;
+	LinearCriticalDamping = 0.7f;
+	LinearMaxSpeed = 40.0f;
+	AngularStiffness = 20.0f;
+	AngularDamping = 7.0f;
+	bMaintainMaxSpeed = false;
 }
 
 bool USFSpringFlightMovementComponent::IsValid(bool logError) {
 	auto primitive = GetUpdatedPrimitiveComp();
 	bool bIsValid = primitive != NULL && primitive->IsSimulatingPhysics();
 	if (!bIsValid && logError) {
-		UE_LOG(LogTemp, Warning, TEXT("%s's root component (%s) does not simulate physics, can't apply spring forces."),
+		UE_LOG(LogTemp, Error, TEXT("%s's root component (%s) does not simulate physics, can't apply spring forces."),
 			*GetOwner()->GetName(),
 			*GetOwner()->GetRootComponent()->GetName())
 	}
@@ -28,7 +32,14 @@ void USFSpringFlightMovementComponent::BeginPlay() {
 	if (!IsValid(true)) {
 		return;
 	}
-	DampingCoefficient = ComputeDampingCoefficient(SpringConfig, (GetUpdatedPrimitiveComp()->GetMass()));
+	SpringConfig = FSpringConfig::FromCriticalDampingAndMaxSpeed(
+		LinearStiffness, 
+		LinearCriticalDamping, 
+		LinearMaxSpeed, 
+		GetUpdatedPrimitiveComp()->GetMass());
+	if (InitialTarget) {
+		SetTargetActor(InitialTarget);
+	}
 }
 
 void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -40,13 +51,10 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 
 	auto prim = GetUpdatedPrimitiveComp();
 	FVector forward = prim->GetComponentVelocity();
-	//if (prim->GetComponentVelocity().Size() < 30) {
-	//	forward = DefaultForward;
-	//}
 
 	UpdateTarget(DeltaTime);
 	prim->AddForce(CalculateForces());
-	prim->AddTorqueInRadians(CalculateTorque(forward));
+	prim->AddTorqueInRadians(CalculateTorque(forward), FName(), true);
 }
 
 void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
@@ -66,7 +74,7 @@ FVector USFSpringFlightMovementComponent::CalculateForces() {
 	auto Primitive = GetUpdatedPrimitiveComp();
 	FVector DeltaL = Target - Primitive->GetComponentLocation();
 	FVector DeltaV = TargetVelocity - Primitive->GetComponentVelocity();
-	if (SpringConfig.MaxExtension > 0.0f && SpringConfig.MaxExtension < DeltaL.Size()) {
+	if (SpringConfig.MaxExtension > 0.0f && (bMaintainMaxSpeed || SpringConfig.MaxExtension < DeltaL.Size())) {
 		DeltaL = DeltaL.GetSafeNormal() * SpringConfig.MaxExtension;
 		if (bDebug) {
 			DrawDebugLine(GetWorld(), Primitive->GetComponentLocation() + DeltaL, Target, FColor::Red, false, 0, 0, 1);
@@ -76,7 +84,8 @@ FVector USFSpringFlightMovementComponent::CalculateForces() {
 		DrawDebugLine(GetWorld(), Primitive->GetComponentLocation(), Target, FColor::Green, false, 0, 0, 1);
 	}
 	FVector Fs = SpringConfig.Stiffness * DeltaL;
-	FVector Fd = DampingCoefficient * DeltaV;
+	FVector Fd = SpringConfig.Damping * DeltaV;
+	//UE_LOG(LogTemp, Warning, TEXT("GetVelocity (%f)"), DeltaV.Size())
 	return Fs + Fd;
 }
 
@@ -89,7 +98,7 @@ FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
 	FVector vUp = FRotator(90, 0, 0).RotateVector(vForward);
 
 	FQuat rot = FQuat::FindBetween(prim->GetForwardVector(), vForward) + FQuat::FindBetween(prim->GetUpVector(), vUp);
-	FVector Fr = 12000 * FVector(rot.X, rot.Y, rot.Z);
+	FVector Fr = AngularStiffness * FVector(rot.X, rot.Y, rot.Z);
 
 	if (bDebugRotation) {
 		UE_LOG(LogTemp, Warning, TEXT("rot %s"), *rot.ToString())
@@ -97,12 +106,8 @@ FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
 		DrawDebugLine(GetWorld(), L, L + GetUpdatedPrimitiveComp()->GetForwardVector() * 50, FColor::Purple, false, 0, 1, 1);
 		DrawDebugLine(GetWorld(), L, L + Fr, FColor::Yellow, false, 0, 2, 1);
 	}
-	FVector Fd = -7 * prim->ScaleByMomentOfInertia(prim->GetPhysicsAngularVelocityInRadians());
+	FVector Fd = -AngularDamping * prim->GetPhysicsAngularVelocityInRadians();
 	return Fr + Fd;
-}
-
-float USFSpringFlightMovementComponent::ComputeDampingCoefficient(FSpringConfig config, float mass) {
-	return config.CriticalDampingCoefficient * 2 * FMath::Sqrt(config.Stiffness * mass);
 }
 
 // Begin Targeting Methods
@@ -120,6 +125,14 @@ void USFSpringFlightMovementComponent::SetTargetActor(AActor* value) {
 	} else {
 		bHasTarget = false;
 	}
+}
+
+void USFSpringFlightMovementComponent::SetSpeed(float Speed) {
+	if (!IsValid(true)) {
+		return;
+	}
+	LinearMaxSpeed = Speed;
+	SpringConfig = FSpringConfig::FromCriticalDampingAndMaxSpeed(LinearStiffness, LinearCriticalDamping, Speed, GetUpdatedPrimitiveComp()->GetMass());
 }
 
 FVector USFSpringFlightMovementComponent::GetTarget() {
@@ -140,9 +153,3 @@ void USFSpringFlightMovementComponent::ClearTarget() {
 UPrimitiveComponent* USFSpringFlightMovementComponent::GetUpdatedPrimitiveComp() {
 	return Cast<UPrimitiveComponent>(UpdatedComponent);
 }
-
-//void USFSpringFlightMovementComponent::GetMaxSpeed()
-//{
-//	float maxFs = SpringConfig.Stiffness * SpringConfig.MaxExtension;
-//	float maxFd = DampingCoefficient * V ? ;
-//}

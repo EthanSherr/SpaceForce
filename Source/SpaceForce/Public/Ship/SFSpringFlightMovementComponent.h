@@ -14,15 +14,20 @@ struct SPACEFORCE_API FSpringConfig {
 	float Stiffness;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	float CriticalDampingCoefficient;
+	float Damping;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float MaxExtension;
 
-	FSpringConfig() : Stiffness(0.0f), CriticalDampingCoefficient(0.0f), MaxExtension(0.0f) {}
+	FSpringConfig() : Stiffness(0.0f), Damping(0.0f), MaxExtension(0.0f) {}
 
-	FSpringConfig(float stiffness, float criticalDamping, float maxExtension) : Stiffness(stiffness), CriticalDampingCoefficient(criticalDamping), MaxExtension(maxExtension) {}
+	FSpringConfig(float stiffness, float damping, float maxExtension) : Stiffness(stiffness), Damping(damping), MaxExtension(maxExtension) {}
 
+	static FSpringConfig FromCriticalDampingAndMaxSpeed(float Stiffness, float CriticalDamping, float MaxSpeed, float Mass) {
+		float Damping = CriticalDamping * 2 * FMath::Sqrt(Stiffness * Mass);
+		float MaxExtension = Damping * MaxSpeed / Stiffness;
+		return FSpringConfig(Stiffness, Damping, MaxExtension);
+	}
 };
 
 class AActor;
@@ -33,15 +38,32 @@ class SPACEFORCE_API USFSpringFlightMovementComponent : public UPawnMovementComp
 	GENERATED_UCLASS_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float LinearStiffness;
 
-	UPROPERTY(EditAnywhere)
-	FSpringConfig SpringConfig;
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float LinearCriticalDamping;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float LinearMaxSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float AngularStiffness;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float AngularDamping;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	bool bMaintainMaxSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bDebug;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bDebugRotation;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	AActor* InitialTarget;
 
 // Begin target
 	UPROPERTY(BlueprintGetter = GetTarget, BlueprintSetter = SetTarget)
@@ -63,6 +85,9 @@ public:
 	void SetTargetActor(AActor* value);
 
 	UFUNCTION(BlueprintCallable)
+	void SetSpeed(float Value);
+
+	UFUNCTION(BlueprintCallable)
 	void ClearTarget();
 
 	UPROPERTY(EditAnywhere)
@@ -76,6 +101,9 @@ private:
 // End target
 	
 protected:
+	UPROPERTY(Transient)
+	FSpringConfig SpringConfig;
+
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 
 	void BeginPlay() override;
@@ -87,9 +115,6 @@ private:
 
 	bool IsValid(bool logError = false);
 
-	float ComputeDampingCoefficient(FSpringConfig config, float mass);
-	float DampingCoefficient;
-
 	class UPrimitiveComponent* GetUpdatedPrimitiveComp();
 
 	FVector DefaultForward = FVector::ForwardVector;
@@ -97,7 +122,5 @@ private:
 	FVector TargetVelocity = FVector::ZeroVector;
 
 	FVector LastTargetPosition;
-
-//	float GetMaxSpeed();
 
 };

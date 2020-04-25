@@ -7,3 +7,4 @@
 #define COLLISION_PROJECTILE	ECC_GameTraceChannel1
 
 #define COLLISION_PROFILE_TRIGGER FName("Trigger")
+#define COLLISION_PROFILE_PAWN FName("Pawn")

@@ -3,19 +3,21 @@
 
 #include "SFBehaviorTreePawn.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "SFAIController.h"
 #include "AIController.h"
 
-
-ASFBehaviorTreePawn::ASFBehaviorTreePawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
-{
+ASFBehaviorTreePawn::ASFBehaviorTreePawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
 }
 
-void ASFBehaviorTreePawn::BeginPlay()
-{
+void ASFBehaviorTreePawn::BeginPlay() {
 	AAIController* aiController = Cast<AAIController>(GetController());
 	if (BehaviorTree != NULL && aiController != NULL) {
 		aiController->RunBehaviorTree(BehaviorTree);
 	}
 	Super::BeginPlay();
+}
+
+ASFAIController* ASFBehaviorTreePawn::GetSFAIController() const {
+	return Cast<ASFAIController>(GetController());
 }

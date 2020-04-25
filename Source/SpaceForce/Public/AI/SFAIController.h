@@ -14,12 +14,26 @@ class SPACEFORCE_API ASFAIController : public AAIController
 {
     GENERATED_UCLASS_BODY()
 
+protected:
+    virtual void OnPossess(class APawn* InPawn) override;
+
+    int32 EnemyKeyID;
+
+private:
+    UPROPERTY(transient)
+    class UBlackboardComponent* BlackboardComp;
+    UPROPERTY(transient)
+    class UBehaviorTreeComponent* BehaviorComp;
+
 public:
 
     UFUNCTION(BlueprintCallable)
     void AttackActor(AActor* actor);
 
     UFUNCTION(BlueprintCallable)
-    void MoveTo(FVector vector);
+    void MoveToVector(FVector vector);
+
+    UFUNCTION(BlueprintCallable)
+    void SetEnemyInBlackboard(AActor* Enemy);
 
 };
