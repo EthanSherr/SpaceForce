@@ -21,6 +21,12 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void AttackActor(AActor* actor);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement")
 	void MoveTo(FVector location);
+
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement")
+	void SetSpeed(float Speed);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	class ASFAIController* GetSFAIController() const;
 };

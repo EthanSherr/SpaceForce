@@ -47,11 +47,23 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float LinearMaxSpeed;
 
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float AngularStiffness;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float AngularDamping;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	bool bMaintainMaxSpeed;
+
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bDebug;
 
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bDebugRotation;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	AActor* InitialTarget;
 
 // Begin target
 	UPROPERTY(BlueprintGetter = GetTarget, BlueprintSetter = SetTarget)
@@ -71,6 +83,9 @@ public:
 
 	UFUNCTION(BlueprintSetter)
 	void SetTargetActor(AActor* value);
+
+	UFUNCTION(BlueprintCallable)
+	void SetSpeed(float Value);
 
 	UFUNCTION(BlueprintCallable)
 	void ClearTarget();
