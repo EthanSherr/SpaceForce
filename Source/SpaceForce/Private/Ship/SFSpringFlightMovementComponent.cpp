@@ -101,7 +101,7 @@ FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
 	FVector Fr = AngularStiffness * FVector(rot.X, rot.Y, rot.Z);
 
 	if (bDebugRotation) {
-		UE_LOG(LogTemp, Warning, TEXT("rot %s"), *rot.ToString())
+		UE_LOG(LogTemp, Warning, TEXT("rot %s"), *rot.ToString());
 		DrawDebugLine(GetWorld(), L, L + vForward * 100, FColor::Red, false, 0, 0, 1);
 		DrawDebugLine(GetWorld(), L, L + GetUpdatedPrimitiveComp()->GetForwardVector() * 50, FColor::Purple, false, 0, 1, 1);
 		DrawDebugLine(GetWorld(), L, L + Fr, FColor::Yellow, false, 0, 2, 1);
