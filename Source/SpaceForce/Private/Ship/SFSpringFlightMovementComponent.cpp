@@ -3,6 +3,7 @@
 
 #include "SFSpringFlightMovementComponent.h"
 #include "Components/PrimitiveComponent.h"
+#include "AI/SFCollisionDetector.h"
 #include "DrawDebugHelpers.h"
 
 USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
@@ -27,6 +28,12 @@ bool USFSpringFlightMovementComponent::IsValid(bool logError) {
 	return bIsValid;
 }
 
+void USFSpringFlightMovementComponent::AddInputVector(FVector WorldVector, bool bForce) {
+	//Super::AddInputVector(WorldVector, bForce);
+	SetTarget(WorldVector + GetUpdatedPrimitiveComp()->GetComponentLocation());
+	UE_LOG(LogTemp, Warning, TEXT("SpringFlightMovement called AddInputVector and GetPendingInputVector() = %s"), *GetPendingInputVector().ToString())
+}
+
 void USFSpringFlightMovementComponent::BeginPlay() {
 	Super::BeginPlay();
 	if (!IsValid(true)) {
@@ -40,6 +47,7 @@ void USFSpringFlightMovementComponent::BeginPlay() {
 	if (InitialTarget) {
 		SetTargetActor(InitialTarget);
 	}
+	CollisionDetector = (USFCollisionDetector*)GetOwner()->GetComponentByClass(USFCollisionDetector::StaticClass());
 }
 
 void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -52,8 +60,28 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 	auto prim = GetUpdatedPrimitiveComp();
 	FVector forward = prim->GetComponentVelocity();
 
+	FCollisionDetectionResult result;
+	if (CollisionDetector) {
+		result = CollisionDetector->DetectCollisions();
+	}
+
 	UpdateTarget(DeltaTime);
-	prim->AddForce(CalculateForces());
+	FVector LinearForces;
+	if (result.bCollisionDetected) {
+		FCollisionSignal MinimumSignal = FCollisionSignal(9999999.0f, FVector::ZeroVector);
+		for (auto CollisionSignal : result.CollisionSignals) {
+			if (CollisionSignal.Strength < MinimumSignal.Strength) {
+				MinimumSignal = CollisionSignal;
+			}
+		}
+		FVector P1 = GetUpdatedPrimitiveComp()->GetComponentLocation();
+		FVector P2 = MinimumSignal.SensorWorld * (Target - P1).Size() + P1;
+		DrawDebugPoint(GetWorld(), P2, 1, FColor::White, false, 3.0f, 1);
+		LinearForces = CalculateForces(P2, TargetVelocity);
+	} else {
+		LinearForces = CalculateForces(Target, TargetVelocity);
+	}
+	prim->AddForce(LinearForces);
 	prim->AddTorqueInRadians(CalculateTorque(forward), FName(), true);
 }
 
@@ -70,18 +98,18 @@ void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
 }
 
 // Calculate Forces
-FVector USFSpringFlightMovementComponent::CalculateForces() {
+FVector USFSpringFlightMovementComponent::CalculateForces(FVector P2, FVector P2Velocity) {
 	auto Primitive = GetUpdatedPrimitiveComp();
-	FVector DeltaL = Target - Primitive->GetComponentLocation();
-	FVector DeltaV = TargetVelocity - Primitive->GetComponentVelocity();
+	FVector DeltaL = P2 - Primitive->GetComponentLocation();
+	FVector DeltaV = P2Velocity - Primitive->GetComponentVelocity();
 	if (SpringConfig.MaxExtension > 0.0f && (bMaintainMaxSpeed || SpringConfig.MaxExtension < DeltaL.Size())) {
 		DeltaL = DeltaL.GetSafeNormal() * SpringConfig.MaxExtension;
 		if (bDebug) {
-			DrawDebugLine(GetWorld(), Primitive->GetComponentLocation() + DeltaL, Target, FColor::Red, false, 0, 0, 1);
+			DrawDebugLine(GetWorld(), Primitive->GetComponentLocation() + DeltaL, P2, FColor::Red, false, 0, 0, 1);
 			DrawDebugLine(GetWorld(), Primitive->GetComponentLocation(), Primitive->GetComponentLocation() + DeltaL, FColor::Green, false, 0, 0, 1);
 		}
 	} else if (bDebug) {
-		DrawDebugLine(GetWorld(), Primitive->GetComponentLocation(), Target, FColor::Green, false, 0, 0, 1);
+		DrawDebugLine(GetWorld(), Primitive->GetComponentLocation(), P2, FColor::Blue, false, 0, 0, 1);
 	}
 	FVector Fs = SpringConfig.Stiffness * DeltaL;
 	FVector Fd = SpringConfig.Damping * DeltaV;
@@ -97,7 +125,7 @@ FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
 	FVector vForward = forward.GetSafeNormal();
 	FVector vUp = FRotator(90, 0, 0).RotateVector(vForward);
 
-	FQuat rot = FQuat::FindBetween(prim->GetForwardVector(), vForward) + FQuat::FindBetween(prim->GetUpVector(), vUp);
+	FQuat rot = FQuat::FindBetween(prim->GetForwardVector(), vForward); // +FQuat::FindBetween(prim->GetUpVector(), vUp);
 	FVector Fr = AngularStiffness * FVector(rot.X, rot.Y, rot.Z);
 
 	if (bDebugRotation) {

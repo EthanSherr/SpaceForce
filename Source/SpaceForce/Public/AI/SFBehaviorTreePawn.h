@@ -14,6 +14,8 @@ class SPACEFORCE_API ASFBehaviorTreePawn : public APawn
 protected:
 	virtual void BeginPlay() override;
 
+	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
+
 public:	
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* BehaviorTree;
@@ -29,4 +31,5 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class ASFAIController* GetSFAIController() const;
+
 };

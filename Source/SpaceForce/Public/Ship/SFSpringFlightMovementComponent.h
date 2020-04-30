@@ -28,6 +28,10 @@ struct SPACEFORCE_API FSpringConfig {
 		float MaxExtension = Damping * MaxSpeed / Stiffness;
 		return FSpringConfig(Stiffness, Damping, MaxExtension);
 	}
+
+	FORCEINLINE FString ToString() const {
+		return FString::Printf(TEXT("Stiffness=%3.3f Damping=%3.3f MaxExtension=%3.3f"), Stiffness, Damping, MaxExtension);
+	}
 };
 
 class AActor;
@@ -101,15 +105,20 @@ private:
 // End target
 	
 protected:
+
+	void AddInputVector(FVector WorldVector, bool bForce = false) override;
+
 	UPROPERTY(Transient)
 	FSpringConfig SpringConfig;
+
+	class USFCollisionDetector* CollisionDetector;
 
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 
 	void BeginPlay() override;
 
 private:
-	FVector CalculateForces();
+	FVector CalculateForces(FVector P2, FVector P2Velocity);
 
 	FVector CalculateTorque(FVector forward);
 

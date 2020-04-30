@@ -9,6 +9,21 @@
 class UCurveFloat;
 
 USTRUCT(BlueprintType)
+struct SPACEFORCE_API FCollisionSignal {
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	float Strength;
+
+	UPROPERTY(BlueprintReadWrite)
+	FVector SensorWorld;
+
+	FCollisionSignal() : Strength(0.0f), SensorWorld(FVector::ZeroVector) {}
+	FCollisionSignal(float strength, FVector worldSensor) : Strength(strength), SensorWorld(worldSensor) {}
+};
+
+
+USTRUCT(BlueprintType)
 struct SPACEFORCE_API FCollisionDetectionResult {
 	GENERATED_USTRUCT_BODY()
 
@@ -24,25 +39,16 @@ struct SPACEFORCE_API FCollisionDetectionResult {
 	UPROPERTY(BlueprintReadWrite)
 	float NormalizedSignalStrength;
 
+	UPROPERTY(BlueprintReadWrite)
+	TArray<FCollisionSignal> CollisionSignals;
+
 	FCollisionDetectionResult() 
 		: bCollisionDetected(false), CollisionVector(FVector::ZeroVector), SuggestedDeltaRotation(FRotator::ZeroRotator), NormalizedSignalStrength(0.0f) {}
 
-	FCollisionDetectionResult(bool _bCollisionDetected, FVector _CollisionVector, FRotator _SuggestedDeltaRotation, float _NormalizedSignalStrength)
-		: bCollisionDetected(_bCollisionDetected), CollisionVector(_CollisionVector), SuggestedDeltaRotation(_SuggestedDeltaRotation), NormalizedSignalStrength(_NormalizedSignalStrength){}
-};
-
-USTRUCT()
-struct SPACEFORCE_API FCollisionSignal {
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY()
-	float Strength;
-
-	UPROPERTY()
-	int Index;
-
-	FCollisionSignal() : Strength(0.0f), Index(-1) {}
-	FCollisionSignal(float strength, int index) : Strength(strength), Index(index) {}
+	FCollisionDetectionResult(bool _bCollisionDetected, FVector _CollisionVector, FRotator _SuggestedDeltaRotation, float _NormalizedSignalStrength, TArray<FCollisionSignal> _CollisionSignals)
+		: bCollisionDetected(_bCollisionDetected), CollisionVector(_CollisionVector), 
+		SuggestedDeltaRotation(_SuggestedDeltaRotation), NormalizedSignalStrength(_NormalizedSignalStrength), CollisionSignals(_CollisionSignals)
+		{}
 };
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )

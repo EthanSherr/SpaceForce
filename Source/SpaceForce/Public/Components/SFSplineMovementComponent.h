@@ -55,6 +55,9 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const float GetDistance() { return distanceAlongPath; }
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	const FVector GetLocation() { return GetLocationAtDistanceAlongSpline(GetDistance(), false); }
+
 	UPROPERTY()
 	ASFFlightPath* NextFlightPath;
 

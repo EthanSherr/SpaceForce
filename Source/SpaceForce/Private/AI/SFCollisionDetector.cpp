@@ -38,7 +38,6 @@ FCollisionDetectionResult USFCollisionDetector::DetectCollisions()
 	params.AddIgnoredActor(GetOwner());
 
 	TArray<FCollisionSignal> signalStrengths;
-	signalStrengths.Init(FCollisionSignal(), SensorPoints.Num());
 	bool bCollisionDetected = false;
 	FVector collisionVector = FVector::ZeroVector;
 	float normalizedSignalStrengths = 0.0f;
@@ -60,8 +59,7 @@ FCollisionDetectionResult USFCollisionDetector::DetectCollisions()
 			collisionVector += responseStrength * point;
 			bCollisionDetected = true;
 		}
-		signalStrengths[i].Index = i;
-		signalStrengths[i].Strength = responseStrength;
+		signalStrengths.Add(FCollisionSignal(responseStrength, GetOwner()->GetActorRotation().RotateVector(point)));
 
 		if (bDebugTraces)
 		{
@@ -90,6 +88,6 @@ FCollisionDetectionResult USFCollisionDetector::DetectCollisions()
 	}
 
 	//UE_LOG(LogTemp, Warning, TEXT("Pitch, Yaw (%f, %f) collsionVector |(%s)| = %f"), suggestedOrientation.Pitch, suggestedOrientation.Yaw, *collisionVector.ToString(), collisionVector.Size())
-	FCollisionDetectionResult result = FCollisionDetectionResult(bCollisionDetected, collisionVector, suggestedOrientation, normalizedSignalStrengths);
+	FCollisionDetectionResult result = FCollisionDetectionResult(bCollisionDetected, collisionVector, suggestedOrientation, normalizedSignalStrengths, signalStrengths);
 	return result;
 }

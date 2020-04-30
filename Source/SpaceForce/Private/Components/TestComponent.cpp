@@ -1,8 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "Components/SphereComponent.h"
 #include "TestComponent.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values for this component's properties
 UTestComponent::UTestComponent(const FObjectInitializer& Init) : Super(Init)
