@@ -31,7 +31,7 @@ bool USFSpringFlightMovementComponent::IsValid(bool logError) {
 void USFSpringFlightMovementComponent::AddInputVector(FVector WorldVector, bool bForce) {
 	//Super::AddInputVector(WorldVector, bForce);
 	SetTarget(WorldVector + GetUpdatedPrimitiveComp()->GetComponentLocation());
-	UE_LOG(LogTemp, Warning, TEXT("SpringFlightMovement called AddInputVector and GetPendingInputVector() = %s"), *GetPendingInputVector().ToString())
+	//PendingInputVector grows until cleared with ConsumeInputVector().
 }
 
 void USFSpringFlightMovementComponent::BeginPlay() {
