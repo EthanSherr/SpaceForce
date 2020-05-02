@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 
 #define COLLISION_PROJECTILE	ECC_GameTraceChannel1
+#define COLLISION_GENERATOR 	ECC_GameTraceChannel2
 
 #define COLLISION_PROFILE_TRIGGER FName("Trigger")
 #define COLLISION_PROFILE_PAWN FName("Pawn")
+#define COLLISION_PROFILE_GENERATOR FName("Generator")

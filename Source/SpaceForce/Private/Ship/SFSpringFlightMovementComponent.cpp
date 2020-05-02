@@ -3,7 +3,6 @@
 
 #include "SFSpringFlightMovementComponent.h"
 #include "Components/PrimitiveComponent.h"
-#include "AI/SFCollisionDetector.h"
 #include "DrawDebugHelpers.h"
 
 USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
@@ -29,8 +28,8 @@ bool USFSpringFlightMovementComponent::IsValid(bool logError) {
 }
 
 void USFSpringFlightMovementComponent::AddInputVector(FVector WorldVector, bool bForce) {
-	//Super::AddInputVector(WorldVector, bForce);
 	SetTarget(WorldVector + GetUpdatedPrimitiveComp()->GetComponentLocation());
+	//Super::AddInputVector(WorldVector, bForce);
 	//PendingInputVector grows until cleared with ConsumeInputVector().
 }
 
@@ -47,7 +46,6 @@ void USFSpringFlightMovementComponent::BeginPlay() {
 	if (InitialTarget) {
 		SetTargetActor(InitialTarget);
 	}
-	CollisionDetector = (USFCollisionDetector*)GetOwner()->GetComponentByClass(USFCollisionDetector::StaticClass());
 }
 
 void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -59,29 +57,8 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 
 	auto prim = GetUpdatedPrimitiveComp();
 	FVector forward = prim->GetComponentVelocity();
-
-	FCollisionDetectionResult result;
-	if (CollisionDetector) {
-		result = CollisionDetector->DetectCollisions();
-	}
-
 	UpdateTarget(DeltaTime);
-	FVector LinearForces;
-	if (result.bCollisionDetected) {
-		FCollisionSignal MinimumSignal = FCollisionSignal(9999999.0f, FVector::ZeroVector);
-		for (auto CollisionSignal : result.CollisionSignals) {
-			if (CollisionSignal.Strength < MinimumSignal.Strength) {
-				MinimumSignal = CollisionSignal;
-			}
-		}
-		FVector P1 = GetUpdatedPrimitiveComp()->GetComponentLocation();
-		FVector P2 = MinimumSignal.SensorWorld * (Target - P1).Size() + P1;
-		DrawDebugPoint(GetWorld(), P2, 1, FColor::White, false, 3.0f, 1);
-		LinearForces = CalculateForces(P2, TargetVelocity);
-	} else {
-		LinearForces = CalculateForces(Target, TargetVelocity);
-	}
-	prim->AddForce(LinearForces);
+	prim->AddForce(CalculateForces(Target, TargetVelocity));
 	prim->AddTorqueInRadians(CalculateTorque(forward), FName(), true);
 }
 
@@ -113,12 +90,10 @@ FVector USFSpringFlightMovementComponent::CalculateForces(FVector P2, FVector P2
 	}
 	FVector Fs = SpringConfig.Stiffness * DeltaL;
 	FVector Fd = SpringConfig.Damping * DeltaV;
-	//UE_LOG(LogTemp, Warning, TEXT("GetVelocity (%f)"), DeltaV.Size())
 	return Fs + Fd;
 }
 
 FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
-
 	auto prim = GetUpdatedPrimitiveComp();
 
 	FVector L = prim->GetComponentLocation();
@@ -129,7 +104,6 @@ FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
 	FVector Fr = AngularStiffness * FVector(rot.X, rot.Y, rot.Z);
 
 	if (bDebugRotation) {
-		UE_LOG(LogTemp, Warning, TEXT("rot %s"), *rot.ToString());
 		DrawDebugLine(GetWorld(), L, L + vForward * 100, FColor::Red, false, 0, 0, 1);
 		DrawDebugLine(GetWorld(), L, L + GetUpdatedPrimitiveComp()->GetForwardVector() * 50, FColor::Purple, false, 0, 1, 1);
 		DrawDebugLine(GetWorld(), L, L + Fr, FColor::Yellow, false, 0, 2, 1);

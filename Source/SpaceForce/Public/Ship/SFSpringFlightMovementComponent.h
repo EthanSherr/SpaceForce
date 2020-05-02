@@ -111,8 +111,6 @@ protected:
 	UPROPERTY(Transient)
 	FSpringConfig SpringConfig;
 
-	class USFCollisionDetector* CollisionDetector;
-
 	void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction);
 
 	void BeginPlay() override;

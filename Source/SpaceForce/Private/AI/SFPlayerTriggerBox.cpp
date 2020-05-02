@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SpaceForce.h"
 #include "SFPlayerTriggerBox.h"
+#include "SpaceForce.h"
 
 ASFPlayerTriggerBox::ASFPlayerTriggerBox(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
