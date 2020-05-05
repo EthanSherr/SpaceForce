@@ -15,9 +15,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Generation")
 	FRandomStream Stream;
 
-	class UStaticMeshComponent* ShapeMeshExterior;
-
-	class UStaticMeshComponent* ShapeMeshInterior;
+	class UStaticMeshComponent* ShapeMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Generation")
 	int Count;
@@ -26,10 +24,13 @@ public:
 	class UStaticMesh* TemplateMesh;
 
 	UPROPERTY(EditAnywhere, Category = "Generation")
-	class UStaticMesh* ExteriorMesh;
+	class UStaticMesh* BrushMesh;
 
-	UPROPERTY(EditAnywhere, Category = "Generation")
-	class UStaticMesh* InteriorMesh;
+	UPROPERTY(EditAnywhere, Category = "Generation|Advanced")
+	float TunnelingDelta;
+
+	UPROPERTY(EditAnywhere, Category = "Generation|Advanced")
+	int MaxIterations;
 
 	UPROPERTY(EditAnywhere, Category = "Generation|Ranges")
 	float MinScale;
@@ -37,12 +38,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Generation|Ranges")
 	float MaxScale;
 
+	UPROPERTY(EditAnywhere, Category = "Generation|Debug")
+	bool bDebug;
 
+	UPROPERTY(EditAnywhere, Category = "Generation|Debug")
+	bool bDebugLines;
 
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
-	virtual void Tick(float DeltaTime) override;
+	int Intersections(FVector Beginning, FVector End);
 
 private:
 	void GenerateTemplates();
