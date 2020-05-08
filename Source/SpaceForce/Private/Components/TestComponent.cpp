@@ -32,7 +32,7 @@ void UTestComponent::MakeSomeOtherComponent() {
 	BeginSphere->SetWorldLocation(Owner->GetActorLocation(), false, NULL, ETeleportType::TeleportPhysics);
 	BeginSphere->SetCollisionResponseToAllChannels(ECR_Overlap);
 	BeginSphere->bHiddenInGame = false;
-	BeginSphere->bVisible = true;
+	BeginSphere->SetVisibility(false);
 }
 
 void UTestComponent::InitializeComponent() {
