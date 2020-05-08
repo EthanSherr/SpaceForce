@@ -67,4 +67,8 @@ private:
 
 	bool PointsForDistance(float Distance, FSplineDistance& OutStart, FSplineDistance& OutEnd);
 
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector FindLocationClosestToWorldLocation(FVector Location);
+
 };

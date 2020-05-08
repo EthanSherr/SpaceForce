@@ -6,11 +6,6 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "MyBlueprintFunctionLibrary.generated.h"
 
-/**
- * 
- */
-
-
 USTRUCT(BlueprintType)
 struct FProjectilePredictionResult
 {

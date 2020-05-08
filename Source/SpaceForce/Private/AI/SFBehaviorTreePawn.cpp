@@ -23,6 +23,5 @@ ASFAIController* ASFBehaviorTreePawn::GetSFAIController() const {
 }
 
 void ASFBehaviorTreePawn::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce) {
-	UE_LOG(LogTemp, Warning, TEXT("AddMovementInput was called! worldirection %s"), *WorldDirection.ToString())
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 }

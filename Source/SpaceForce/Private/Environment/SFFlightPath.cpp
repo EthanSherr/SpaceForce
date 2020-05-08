@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "SpaceForce.h"
 #include "SFFlightPath.h"
+#include "SpaceForce.h"
 #include "Components/SplineComponent.h"
 #include "Components/SphereComponent.h"
 #include "DrawDebugHelpers.h"
@@ -122,3 +122,13 @@ bool ASFFlightPath::PointsForDistance(float Distance, FSplineDistance& OutStart,
 	return true;
 }
 
+//Closest point on spline to location begin
+
+FVector ASFFlightPath::FindLocationClosestToWorldLocation(FVector Target) {
+	if (!Spline) {
+		return FVector::ZeroVector;
+	}
+	return Spline->FindLocationClosestToWorldLocation(Target, ESplineCoordinateSpace::World);
+}
+
+//Closest point on spline to location end
