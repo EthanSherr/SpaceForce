@@ -23,7 +23,6 @@ struct FProjectilePredictionResult
 	FProjectilePredictionResult() {
 		bSuccess = false;
 		time = -1.f;
-		predictedImpact = FVector::ZeroVector;
 	}
 };
 
