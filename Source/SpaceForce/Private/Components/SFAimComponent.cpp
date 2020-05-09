@@ -109,10 +109,9 @@ bool USFAimComponent::UpdateTargetFromTrackedActor()
 		Target = TrackedActor->GetActorLocation();
 		return true;
 	}
-	UMovementComponent* movementComp = (UMovementComponent*)TrackedActor->GetComponentByClass(UMovementComponent::StaticClass());
 	FProjectilePredictionResult result = UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(
 		TrackedActor->GetActorLocation(),
-		movementComp != NULL ? movementComp->Velocity : TrackedActor->GetVelocity(),
+		TrackedActor->GetVelocity(),
 		GetBarrelTransform().GetLocation(),
 		ProjectileSpeed,
 		BarrelLength);

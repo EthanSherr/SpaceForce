@@ -112,13 +112,6 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 			nextDistance)
 	}
 
-	FVector v = UpdatedComponent->GetComponentVelocity();
-
-	//UE_LOG(LogTemp, Warning, TEXT("Owner is (%s) and its root is (%s) Actor.GetVelocity (%s)"), 
-	//	*GetOwner()->GetName(), 
-	//	*GetOwner()->GetRootComponent()->GetName(), 
-	//	*GetOwner()->GetVelocity().ToString())
-
 	FQuat NextRotation = UpdatedComponent->GetComponentQuat();
 	if (bOrientToSpline)
 	{

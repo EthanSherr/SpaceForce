@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/MovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 #include "SFSplineMovementComponent.generated.h"
 
 class USplineComponent;
 class ASFFlightPath;
 
 UCLASS( ClassGroup=Movement, meta=(BlueprintSpawnableComponent), ShowCategories=(Velocity) )
-class SPACEFORCE_API USFSplineMovementComponent : public UMovementComponent
+class SPACEFORCE_API USFSplineMovementComponent : public UPawnMovementComponent
 {
 	GENERATED_UCLASS_BODY()
 
