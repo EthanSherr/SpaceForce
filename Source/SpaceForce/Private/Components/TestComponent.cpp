@@ -38,7 +38,7 @@ void UTestComponent::MakeSomeOtherComponent() {
 void UTestComponent::InitializeComponent() {
 	Super::InitializeComponent();
 	UE_LOG(LogTemp, Warning, TEXT("Initialize Component!"))
-		MakeSomeOtherComponent();
+	MakeSomeOtherComponent();
 }
 
 
