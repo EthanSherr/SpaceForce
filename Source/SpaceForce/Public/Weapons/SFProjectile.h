@@ -55,7 +55,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Projectile", Meta = (ExposeOnSpawn = true))
 	TArray<AActor*> IgnoreActors;
 
-	UPROPERTY(BlueprintReadWrite, Category = "Projectile", Meta = (ExposeOnSpawn = true))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile", Meta = (ExposeOnSpawn = true))
 	float Speed;
 
 private:

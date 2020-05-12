@@ -29,6 +29,7 @@ ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Supe
 	MovementComp->InitialSpeed = Speed;
 	MovementComp->MaxSpeed = Speed;
 	AudioComp = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("AudioComp"));
+	AudioComp->SetupAttachment(RootComponent);
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
