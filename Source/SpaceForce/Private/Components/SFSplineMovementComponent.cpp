@@ -50,16 +50,6 @@ ASFFlightPath* USFSplineMovementComponent::GetFlightPath()
 	return FlightPath;
 }
 
-void USFSplineMovementComponent::SetSpeed(float s)
-{
-	speed = s;
-}
-
-float USFSplineMovementComponent::GetSpeed()
-{
-	return speed;
-}
-
 FVector USFSplineMovementComponent::GetLocationAtDistanceAlongSpline(float distance, bool bWithOffset)
 {
 	if (FlightPath == NULL)
@@ -100,7 +90,7 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 		return;
 	}
 
-	float deltaDistance = DeltaTime * speed;
+	float deltaDistance = DeltaTime * Speed;
 	float nextDistance = deltaDistance + distanceAlongPath;
 
 	FVector NextLocation = FlightPath->GetLocationAtDistance(nextDistance);

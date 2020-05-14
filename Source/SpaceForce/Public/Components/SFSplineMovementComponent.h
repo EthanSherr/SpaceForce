@@ -20,7 +20,7 @@ public:
 	// End UActorComponentInterface
 
 	// Begin UMovementComponent
-	virtual float GetMaxSpeed() const override { return speed; }
+	virtual float GetMaxSpeed() const override { return Speed; }
 	virtual void InitializeComponent() override;
 	virtual void UpdateTickRegistration() override;
 	// End UMovementComponent Interface
@@ -34,14 +34,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASFFlightPath* GetFlightPath();
 
-	UPROPERTY(EditAnywhere, BlueprintSetter=SetSpeed, BlueprintGetter=GetSpeed)
-	float speed;
-
-	UFUNCTION(BlueprintCallable, BlueprintSetter)
-	void SetSpeed(float s);
-
-	UFUNCTION(BlueprintCallable, BlueprintGetter)
-	float GetSpeed();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float Speed;
 
 	UPROPERTY(EditAnywhere)
 	bool bOrientToSpline;
