@@ -28,9 +28,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetFlightPath(ASFFlightPath* FlightPath, float distanceAlongPath);
 
-	UFUNCTION(BlueprintCallable)
-	void SetNextFlightPath(ASFFlightPath* FlightPath);
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASFFlightPath* GetFlightPath();
 
@@ -52,7 +49,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	const FVector GetLocation() { return GetLocationAtDistanceAlongSpline(GetDistance(), false); }
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadWrite)
 	ASFFlightPath* NextFlightPath;
 
 	UFUNCTION()

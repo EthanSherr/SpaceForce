@@ -3,7 +3,11 @@
 
 #include "SFHandController.h"
 #include "Components/SphereComponent.h"
+#include "../Ship/SFSpringFlightMovementComponent.h"
 #include "../Environment/SFFlightPath.h"
+#include "SFPilotPawn.h"
+#include "SFShipPawn.h"
+#include "SpaceForce.h"
 
 USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	this->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -16,31 +20,56 @@ USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer
 	ShipScanner->SetupAttachment(this);
 	ShipScanner->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	ShipScanner->SetCollisionResponseToAllChannels(ECR_Ignore);
+	ShipScanner->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 
 	PathScanner = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("PathScanner"));
 	PathScanner->SetSphereRadius(1000.0f);
-	PathScanner->bHiddenInGame = false;
 	PathScanner->SetupAttachment(this);
-	PathScanner->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	PathScanner->SetCollisionResponseToAllChannels(ECR_Ignore);
+	PathScanner->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	PathScanner->SetCollisionResponseToAllChannels(ECR_Overlap);
 }
 
-ASFFlightPath* USFHandController::GetNearestFlightPath() {
+ASFFlightPath* USFHandController::GetNearestFlightPath(ASFFlightPath* PathToIgnore) {
 	TArray<AActor*> Overlapping;
 	PathScanner->GetOverlappingActors(Overlapping, ASFFlightPath::StaticClass());
-	float MinDistance;
+	float MinDistance = 0.0f;
 	ASFFlightPath* NearestFlightPath = NULL;
 	for (AActor* Actor : Overlapping) {
-		ASFFlightPath* FlightPath = Cast<ASFFlightPath>(Actor);
-		float NewDistance = FVector::Distance(this->GetComponentLocation(), FlightPath->GetActorLocation());
-		if (!NearestFlightPath || NewDistance < MinDistance) {
-			MinDistance = NewDistance;
-			NearestFlightPath = FlightPath;
+		if (PathToIgnore != Actor) {
+			ASFFlightPath* FlightPath = Cast<ASFFlightPath>(Actor);
+			float NewDistance = FVector::Distance(this->GetComponentLocation(), FlightPath->GetActorLocation());
+			if (!NearestFlightPath || NewDistance < MinDistance) {
+				MinDistance = NewDistance;
+				NearestFlightPath = FlightPath;
+			}
 		}
 	}
 	return NearestFlightPath;
 }
 
-void USFHandController::BeginDriving(AActor* Actor) {
-	HandState = EHandState::Driving;
+ASFPilotPawn* USFHandController::GetPilot() {
+	return Cast<ASFPilotPawn>(GetOwner());
+}
+
+ASFShipPawn* USFHandController::GetShip() {
+	auto Pilot = GetPilot();
+	if (!Pilot) {
+		return NULL;
+	}
+	return Cast<ASFShipPawn>(Pilot->Ship);
+}
+
+ASFShipPawn* USFHandController::GetOverlappingShip() {
+	TArray<AActor*> Overlapping;
+	ShipScanner->GetOverlappingActors(Overlapping, ASFShipPawn::StaticClass());
+	return Overlapping.Num() > 0 ? Cast<ASFShipPawn>(Overlapping[0]) : NULL;
+}
+
+TEnumAsByte<EHandState> USFHandController::GetHandState() {
+	return HandState;
+}
+
+void USFHandController::SetHandState(TEnumAsByte<EHandState> NewState) {
+	HandState = NewState;
+	PathScanner->SetCollisionEnabled(HandState == EHandState::Driving ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 }

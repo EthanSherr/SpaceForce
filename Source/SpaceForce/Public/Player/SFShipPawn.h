@@ -6,6 +6,10 @@
 #include "GameFramework/Pawn.h"
 #include "SFShipPawn.generated.h"
 
+class USFSplineMovementComponent;
+class USFSpringFlightMovementComponent;
+class ASFPilotPawn;
+
 UCLASS()
 class SPACEFORCE_API ASFShipPawn : public APawn
 {
@@ -15,15 +19,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ShipStaticMesh;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USFSpringFlightMovementComponent* FlightMovement;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ASFPilotPawn* GetOwnerPilot();
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	USFSplineMovementComponent* GetAssociatedSplineMovementComponent();
 
+private:
+	UPROPERTY()
+	USFSplineMovementComponent* AssociatedSplineMovementComponent;
 };

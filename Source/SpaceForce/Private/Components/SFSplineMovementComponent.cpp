@@ -40,11 +40,6 @@ void USFSplineMovementComponent::SetFlightPath(ASFFlightPath* FP, float distance
 	LastLocation = FlightPath->GetLocationAtDistance(distanceAlongPath);
 }
 
-void USFSplineMovementComponent::SetNextFlightPath(ASFFlightPath* FP)
-{
-	NextFlightPath = FP;
-}
-
 ASFFlightPath* USFSplineMovementComponent::GetFlightPath()
 {
 	return FlightPath;
@@ -87,6 +82,10 @@ void USFSplineMovementComponent::TickComponent(float DeltaTime, ELevelTick TickT
 
 	if (!FlightPath)
 	{
+		if (NextFlightPath) {
+			SetFlightPath(NextFlightPath, 0.0f);
+			NextFlightPath = NULL;
+		}
 		return;
 	}
 

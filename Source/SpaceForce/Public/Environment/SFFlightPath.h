@@ -8,6 +8,7 @@
 #include "SFFlightPath.generated.h"
 
 class USplineComponent;
+class USphereComponent;
 
 USTRUCT(BlueprintType)
 struct SPACEFORCE_API FSplineDistance {
@@ -56,6 +57,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	bool bPathForPlayer;
+
+	UPROPERTY(EditAnywhere)
+	USphereComponent* BeginSphere;
 
 private:
 

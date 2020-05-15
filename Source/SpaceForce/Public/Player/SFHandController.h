@@ -7,7 +7,10 @@
 #include "SFHandState.h"
 #include "SFHandController.generated.h"
 
+class USphereComponent;
 class ASFFlightPath;
+class ASFPilotPawn;
+class ASFShipPawn;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SPACEFORCE_API USFHandController : public UMotionControllerComponent
@@ -16,17 +19,30 @@ class SPACEFORCE_API USFHandController : public UMotionControllerComponent
 
 public:
 	UPROPERTY(EditDefaultsOnly)
-	class USphereComponent* ShipScanner;
+	USphereComponent* ShipScanner;
 
 	UPROPERTY(EditDefaultsOnly)
-	class USphereComponent* PathScanner;
+	USphereComponent* PathScanner;
 
-	UPROPERTY(BlueprintReadOnly)
-	TEnumAsByte<EHandState> HandState;
+	UFUNCTION(BlueprintSetter)
+	void SetHandState(TEnumAsByte<EHandState> NewState);
+
+	UFUNCTION(BlueprintGetter)
+	TEnumAsByte<EHandState> GetHandState();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ASFFlightPath* GetNearestFlightPath();
+	ASFFlightPath* GetNearestFlightPath(ASFFlightPath* PathToIgnore);
 
-	UFUNCTION(BlueprintCallable)
-	void BeginDriving(AActor* Ship);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ASFShipPawn* GetOverlappingShip();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ASFPilotPawn* GetPilot();
+	
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ASFShipPawn* GetShip();
+
+private:
+	UPROPERTY(BlueprintSetter = SetHandState, BlueprintGetter = GetHandState)
+	TEnumAsByte<EHandState> HandState;
 };

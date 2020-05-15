@@ -44,7 +44,7 @@ void USFSpringFlightMovementComponent::BeginPlay() {
 		LinearMaxSpeed, 
 		GetUpdatedPrimitiveComp()->GetMass());
 	if (InitialTarget) {
-		SetTargetActor(InitialTarget);
+		SetTargetComponent(InitialTarget->GetRootComponent());
 	}
 }
 
@@ -64,9 +64,9 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 
 void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
 {
-	if (TargetActor != NULL) {
-		Target = TargetActor->GetActorLocation();
-		TargetVelocity = TargetActor->GetVelocity();
+	if (TargetComponent != NULL) {
+		Target = TargetComponent->GetComponentLocation();
+		TargetVelocity = TargetComponent->GetComponentVelocity();
 	}
 	if (bCalculateVelocityOfTarget) {
 		TargetVelocity = (Target - LastTargetPosition) / DeltaTime;
@@ -119,10 +119,10 @@ void USFSpringFlightMovementComponent::SetTarget(FVector value) {
 	bHasTarget = true;
 }
 
-void USFSpringFlightMovementComponent::SetTargetActor(AActor* value) {
-	TargetActor = value;
-	if (value != NULL) {
-		LastTargetPosition = TargetActor->GetActorLocation();
+void USFSpringFlightMovementComponent::SetTargetComponent(USceneComponent* NewTargetComponent) {
+	TargetComponent = NewTargetComponent;
+	if (TargetComponent != NULL) {
+		LastTargetPosition = TargetComponent->GetComponentLocation();
 		bHasTarget = true;
 	} else {
 		bHasTarget = false;
@@ -141,13 +141,13 @@ FVector USFSpringFlightMovementComponent::GetTarget() {
 	return Target;
 }
 
-AActor* USFSpringFlightMovementComponent::GetTargetActor() {
-	return TargetActor;
+USceneComponent* USFSpringFlightMovementComponent::GetTargetComponent() {
+	return TargetComponent;
 }
 
 void USFSpringFlightMovementComponent::ClearTarget() {
 	LastTargetPosition = TargetVelocity = Target = FVector::ZeroVector;
-	TargetActor = NULL;
+	TargetComponent = NULL;
 	bHasTarget = false;
 }
 // End Targeting Methods

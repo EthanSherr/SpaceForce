@@ -31,7 +31,7 @@ void ASFFlightPath::OnConstruction(const FTransform& Transform)
 void ASFFlightPath::SetupStartSphere()
 {
 	FVector BeginSphereLocation = Spline->GetLocationAtDistanceAlongSpline(0.0f, ESplineCoordinateSpace::World);
-	USphereComponent* BeginSphere = NewObject<USphereComponent>(this, USphereComponent::StaticClass());
+	BeginSphere = NewObject<USphereComponent>(this, USphereComponent::StaticClass());
 	BeginSphere->SetSphereRadius(30.f);
 	BeginSphere->RegisterComponentWithWorld(GetWorld());
 	BeginSphere->CreationMethod = EComponentCreationMethod::UserConstructionScript;

@@ -4,9 +4,11 @@
 #include "SFPilotPawn.h"
 #include "Components/StaticMeshComponent.h"
 #include "../Components/SFSplineMovementComponent.h"
+#include "../Ship/SFSpringFlightMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "SFHandController.h"
 #include "SpaceForce.h"
+#include "SFShipPawn.h"
 #include "SteamVRChaperoneComponent.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
@@ -37,23 +39,63 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
 }
 
-// Called when the game starts or when spawned
 void ASFPilotPawn::BeginPlay() {
 	Super::BeginPlay();
-	
+	StartPilotingShip(RightHand, InitializeWithShip);
+	InitializeWithShip = NULL;
 }
 
-// Called every frame
 void ASFPilotPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (Ship) {
+		auto NextFlightPath = GetHandInState(EHandState::Driving)->GetNearestFlightPath(SplineMovement->GetFlightPath());
+		SplineMovement->NextFlightPath = NextFlightPath;
+	}
 }
 
-// Called to bind functionality to input
 void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+}
 
+USFHandController* ASFPilotPawn::GetHandInState(TEnumAsByte<EHandState> HandState) {
+	TArray<USFHandController*> Hands; Hands.Add(LeftHand); Hands.Add(RightHand);
+	for (auto Hand : Hands) {
+		if (Hand->GetHandState() == HandState) {
+			return Hand;
+		}
+	}
+	return NULL;
+}
+
+USFHandController* ASFPilotPawn::GetOtherHand(USFHandController* Hand) {
+	if (!Hand) {
+		return NULL;
+	}
+	return Hand == LeftHand ? RightHand : LeftHand;
+}
+
+void ASFPilotPawn::SetSpeed(float Speed) {
+	SplineMovement->Speed = Speed;
+}
+
+void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
+	if (GetHandInState(EHandState::Driving)) {
+		// fire
+	} else {
+		StartPilotingShip(Hand, Hand->GetOverlappingShip());
+	}
+}
+
+void ASFPilotPawn::StartPilotingShip(USFHandController* Hand, ASFShipPawn* NewShip) {
+	if (!NewShip) {
+		return;
+	}
+	Hand->SetHandState(EHandState::Driving);
+	GetOtherHand(Hand)->SetHandState(EHandState::Aiming);
+	NewShip->FlightMovement->SetTargetComponent(Hand);
+	NewShip->SetOwner(this);
+	Ship = NewShip;
 }
 

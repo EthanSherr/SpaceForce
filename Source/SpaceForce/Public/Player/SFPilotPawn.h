@@ -12,6 +12,7 @@ class USFHandController;
 class UCameraComponent;
 class USFSplineMovementComponent;
 class USteamVRChaperoneComponent;
+class ASFShipPawn;
 
 UCLASS()
 class SPACEFORCE_API ASFPilotPawn : public APawn
@@ -22,10 +23,10 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USceneComponent* HandsRoot;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USFHandController* LeftHand;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USFHandController* RightHand;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -36,14 +37,33 @@ public:
 
 	UPROPERTY(EditDefaultsOnly)
 	USteamVRChaperoneComponent* VRChaperone;
-public:
-	USFHandController* GetHandInState();
 
-protected:
-	// Called when the game starts or when spawned
+	UPROPERTY(EditAnywhere)
+	ASFShipPawn* InitializeWithShip;
+
+	// Gets set once ship is being piloted, one hand is now driving.
+	UPROPERTY(BlueprintReadOnly)
+	ASFShipPawn* Ship;
+public:
+	UFUNCTION(BlueprintPure, BlueprintCallable)
+	USFHandController* GetHandInState(TEnumAsByte<EHandState> HandState);
+
+	UFUNCTION(BlueprintPure, BlueprintCallable)
+	USFHandController* GetOtherHand(USFHandController* Hand);
+
+	UFUNCTION(BlueprintCallable)
+	void SetSpeed(float Speed);
+
+	UFUNCTION(BlueprintCallable)
+	void OnTriggerDown(USFHandController* Hand);
+
+	UFUNCTION(BlueprintCallable)
+	void StartPilotingShip(USFHandController* Hand, ASFShipPawn* NewShip);
+
+public:
+
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

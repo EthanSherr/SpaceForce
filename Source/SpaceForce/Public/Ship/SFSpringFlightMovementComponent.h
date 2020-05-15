@@ -73,8 +73,8 @@ public:
 	UPROPERTY(BlueprintGetter = GetTarget, BlueprintSetter = SetTarget)
 	FVector Target;
 
-	UPROPERTY(BlueprintGetter = GetTargetActor, BlueprintSetter = SetTargetActor)
-	AActor* TargetActor;
+	UPROPERTY(BlueprintGetter = GetTargetComponent, BlueprintSetter = SetTargetComponent)
+	USceneComponent* TargetComponent;
 
 	UFUNCTION(BlueprintGetter)
 	FVector GetTarget();
@@ -83,10 +83,10 @@ public:
 	void SetTarget(FVector value);
 
 	UFUNCTION(BlueprintGetter)
-	AActor* GetTargetActor();
+	USceneComponent* GetTargetComponent();
 
 	UFUNCTION(BlueprintSetter)
-	void SetTargetActor(AActor* value);
+	void SetTargetComponent(USceneComponent* NewComponent);
 
 	UFUNCTION(BlueprintCallable)
 	void SetSpeed(float Value);
