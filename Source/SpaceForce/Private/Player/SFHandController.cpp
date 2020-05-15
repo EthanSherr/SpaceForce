@@ -21,12 +21,14 @@ USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer
 	ShipScanner->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	ShipScanner->SetCollisionResponseToAllChannels(ECR_Ignore);
 	ShipScanner->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
+	ShipScanner->SetCollisionObjectType(ECC_Pawn);
 
 	PathScanner = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("PathScanner"));
 	PathScanner->SetSphereRadius(1000.0f);
 	PathScanner->SetupAttachment(this);
 	PathScanner->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	PathScanner->SetCollisionResponseToAllChannels(ECR_Overlap);
+	PathScanner->SetCollisionObjectType(ECC_Pawn);
 }
 
 ASFFlightPath* USFHandController::GetNearestFlightPath(ASFFlightPath* PathToIgnore) {

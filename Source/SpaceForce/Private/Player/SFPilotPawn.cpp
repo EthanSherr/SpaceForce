@@ -3,6 +3,7 @@
 
 #include "SFPilotPawn.h"
 #include "Components/StaticMeshComponent.h"
+#include "Components/InputComponent.h"
 #include "../Components/SFSplineMovementComponent.h"
 #include "../Ship/SFSpringFlightMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -10,6 +11,7 @@
 #include "SpaceForce.h"
 #include "SFShipPawn.h"
 #include "SteamVRChaperoneComponent.h"
+#include "DrawDebugHelpers.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
@@ -49,15 +51,23 @@ void ASFPilotPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (Ship) {
-		auto NextFlightPath = GetHandInState(EHandState::Driving)->GetNearestFlightPath(SplineMovement->GetFlightPath());
+		auto DrivingHand = GetHandInState(EHandState::Driving);
+		auto NextFlightPath = DrivingHand->GetNearestFlightPath(SplineMovement->GetFlightPath());
 		SplineMovement->NextFlightPath = NextFlightPath;
+
+		DrawDebugLine(GetWorld(), DrivingHand->GetComponentLocation(), DrivingHand->GetComponentLocation() + 350 * DrivingHand->GetUpVector(), FColor::Blue, false, 0.5f, 5, 1.0f);
 	}
 }
 
 void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	PlayerInputComponent->BindAction("LeftTrigger", IE_Pressed, this, &ASFPilotPawn::OnTriggerDownLeft);
+	PlayerInputComponent->BindAction("RightTrigger", IE_Pressed, this, &ASFPilotPawn::OnTriggerDownRight);
 }
+
+void ASFPilotPawn::OnTriggerDownLeft() { OnTriggerDown(LeftHand); }
+void ASFPilotPawn::OnTriggerDownRight() { OnTriggerDown(RightHand); }
 
 USFHandController* ASFPilotPawn::GetHandInState(TEnumAsByte<EHandState> HandState) {
 	TArray<USFHandController*> Hands; Hands.Add(LeftHand); Hands.Add(RightHand);
@@ -81,21 +91,30 @@ void ASFPilotPawn::SetSpeed(float Speed) {
 }
 
 void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
-	if (GetHandInState(EHandState::Driving)) {
-		// fire
-	} else {
-		StartPilotingShip(Hand, Hand->GetOverlappingShip());
+	switch (Hand->GetHandState()) {
+		case EHandState::Ready:
+			StartPilotingShip(Hand, Hand->GetOverlappingShip());
+			break;
+		case EHandState::Aiming:
+			Ship->Fire();
+			break;
+		case EHandState::Driving:
+			break;
 	}
 }
 
-void ASFPilotPawn::StartPilotingShip(USFHandController* Hand, ASFShipPawn* NewShip) {
+void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipPawn* NewShip) {
 	if (!NewShip) {
 		return;
 	}
-	Hand->SetHandState(EHandState::Driving);
-	GetOtherHand(Hand)->SetHandState(EHandState::Aiming);
-	NewShip->FlightMovement->SetTargetComponent(Hand);
+	NewDrivingHand->SetHandState(EHandState::Driving);
+	NewShip->FlightMovement->SetTargetComponent(NewDrivingHand);
+
+	auto NewAimingHand = GetOtherHand(NewDrivingHand);
+	NewAimingHand->SetHandState(EHandState::Aiming);
+
 	NewShip->SetOwner(this);
+	NewShip->AimTargetComponent = NewAimingHand;
 	Ship = NewShip;
 }
 

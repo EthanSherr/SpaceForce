@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	USphereComponent* ShipScanner;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	USphereComponent* PathScanner;
 
 	UFUNCTION(BlueprintSetter)

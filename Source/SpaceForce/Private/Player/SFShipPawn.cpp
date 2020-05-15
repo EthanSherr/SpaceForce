@@ -38,3 +38,7 @@ USFSplineMovementComponent* ASFShipPawn::GetAssociatedSplineMovementComponent() 
 	AssociatedSplineMovementComponent = Cast<USFSplineMovementComponent>(GetComponentByClass(USFSplineMovementComponent::StaticClass()));
 	return AssociatedSplineMovementComponent;
 }
+
+void ASFShipPawn::Tick(float DeltaTime) {
+	Super::Tick(DeltaTime);
+}

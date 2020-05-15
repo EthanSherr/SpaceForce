@@ -28,6 +28,16 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USFSplineMovementComponent* GetAssociatedSplineMovementComponent();
 
+	UPROPERTY(BlueprintReadWrite)
+	USceneComponent* AimTargetComponent;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void Fire();
+
+protected:
+
+	void Tick(float DeltaTime) override;
+
 private:
 	UPROPERTY()
 	USFSplineMovementComponent* AssociatedSplineMovementComponent;

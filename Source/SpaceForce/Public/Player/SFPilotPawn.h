@@ -13,6 +13,7 @@ class UCameraComponent;
 class USFSplineMovementComponent;
 class USteamVRChaperoneComponent;
 class ASFShipPawn;
+class UInputComponent;
 
 UCLASS()
 class SPACEFORCE_API ASFPilotPawn : public APawn
@@ -68,6 +69,10 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
+
+protected:
+	void OnTriggerDownLeft();
+	void OnTriggerDownRight();
 
 };

@@ -17,6 +17,9 @@ void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 {
 	for (AActor* MaybeResponder : PlayerTriggerResponders)
 	{
+		if (!MaybeResponder) {
+			UE_LOG(LogTemp, Error, TEXT("PlayerTrigger %s contains a NULL reference as responder."), *GetName())
+		} else 
 		if (MaybeResponder->GetClass()->ImplementsInterface(USFPlayerTriggerResponder::StaticClass()))
 		{
 			ISFPlayerTriggerResponder::Execute_PlayerEnteredRegion(MaybeResponder, OtherActor);
