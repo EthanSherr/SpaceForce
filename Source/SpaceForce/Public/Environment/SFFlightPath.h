@@ -49,16 +49,16 @@ public:
 	UFUNCTION(BlueprintPure)
 	FVector GetLocationAtDistance(float distance);
 
-	UPROPERTY(EditAnywhere)
-	float SplineStepSize;
-
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "CustomSmoothing")
 	bool bUseCustomInterpolation;
+
+	UPROPERTY(EditAnywhere, Category = "CustomSmoothing", meta = (EditCondition = "bUseCustomInterpolation"))
+	float SplineStepSize;
 
 	UPROPERTY(EditAnywhere)
 	bool bPathForPlayer;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY()
 	USphereComponent* BeginSphere;
 
 private:

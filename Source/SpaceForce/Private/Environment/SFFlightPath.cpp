@@ -20,6 +20,9 @@ void ASFFlightPath::OnConstruction(const FTransform& Transform)
 {
 	if (bPathForPlayer) {
 		SetupStartSphere();
+		Spline->EditorUnselectedSplineSegmentColor = FColor::Blue;
+		Spline->bShouldVisualizeScale = true;
+		Spline->ScaleVisualizationWidth = 10.0f;
 	}
 
 	Points.Empty();
