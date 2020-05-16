@@ -52,13 +52,22 @@ public:
 	float LinearMaxSpeed;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float AngularStiffness;
+	float AngularStiffnessPrimary;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
-	float AngularDamping;
+	float AngularDampingPrimary;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float AngularStiffnessSecondary;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	float AngularDampingSecondary;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	bool bMaintainMaxSpeed;
+
+	UPROPERTY(EditAnywhere, Category = "Movement")
+	bool bUseTargetOrientation;
 
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bDebug;
@@ -118,7 +127,9 @@ protected:
 private:
 	FVector CalculateForces(FVector P2, FVector P2Velocity);
 
-	FVector CalculateTorque(FVector forward);
+	FVector CalculateSpringDampingForces(FVector CurrentLocation, FVector TargetLocation, FVector CurrentVelocity, FVector TargetVelocity, float Ks, float Kd, float MaxExtension);
+
+	FVector CalculateSpringDampingTorque(FVector CurrentOrientation, FVector TargetOrientation, FVector AngularVelocity, float Ks, float Kd);
 
 	bool IsValid(bool logError = false);
 

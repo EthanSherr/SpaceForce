@@ -19,7 +19,8 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 
 	FlightMovement = ObjectInitializer.CreateDefaultSubobject<USFSpringFlightMovementComponent>(this, FName("FlightMovement"));
 	FlightMovement->LinearMaxSpeed = 0.0f;
-	FlightMovement->AngularStiffness = 70.0f;
+	FlightMovement->AngularStiffnessPrimary = 115.0f;
+	FlightMovement->AngularStiffnessSecondary = 275.0f;
 }
 
 ASFPilotPawn* ASFShipPawn::GetOwnerPilot() {

@@ -40,10 +40,10 @@ void ATorquePawn::Tick(float DeltaTime)
 
 	//auto T = SkeletalMesh->ScaleByMomentOfInertia(Torque);
 
-	UE_LOG(LogTemp, Warning, TEXT("Tensor %s T %s"), *Tensor.ToString(), *T.ToString())
+	//UE_LOG(LogTemp, Warning, TEXT("Tensor %s T %s"), *Tensor.ToString(), *T.ToString())
 	SkeletalMesh->AddTorqueInRadians(T, FName(), true);
 	
-	UE_LOG(LogTemp, Warning, TEXT("%s angular velocity %s"), *GetName(), *SkeletalMesh->GetPhysicsAngularVelocityInRadians().ToString())
+	//UE_LOG(LogTemp, Warning, TEXT("%s angular velocity %s"), *GetName(), *SkeletalMesh->GetPhysicsAngularVelocityInRadians().ToString())
 	//Tensor X=71787.094 Y=22917.242 Z=62477.676
 }
 

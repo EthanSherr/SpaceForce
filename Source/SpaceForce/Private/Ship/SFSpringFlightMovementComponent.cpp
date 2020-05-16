@@ -4,15 +4,17 @@
 #include "SFSpringFlightMovementComponent.h"
 #include "Components/PrimitiveComponent.h"
 #include "DrawDebugHelpers.h"
-
+#include "Engine/Engine.h"
 USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickGroup = ETickingGroup::TG_PrePhysics;
 	LinearStiffness = 25.0f;
 	LinearCriticalDamping = 0.7f;
 	LinearMaxSpeed = 40.0f;
-	AngularStiffness = 20.0f;
-	AngularDamping = 7.0f;
+	AngularStiffnessPrimary = 20.0f;
+	AngularStiffnessSecondary = 70.0f;
+	AngularDampingPrimary = 7.0f;
+	AngularDampingSecondary = 7.0f;
 	bMaintainMaxSpeed = false;
 }
 
@@ -55,11 +57,28 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 		return;
 	}
 
-	auto prim = GetUpdatedPrimitiveComp();
-	FVector forward = prim->GetComponentVelocity();
+	auto Prim = GetUpdatedPrimitiveComp();
 	UpdateTarget(DeltaTime);
-	prim->AddForce(CalculateForces(Target, TargetVelocity));
-	prim->AddTorqueInRadians(CalculateTorque(forward), FName(), true);
+
+	FVector ShipForward = Prim->GetForwardVector();
+	FVector ShipUp = Prim->GetUpVector();
+	FVector ShipRight = Prim->GetRightVector();
+	FVector ShipVelocity = Prim->GetComponentVelocity();
+	FVector ShipAngularVelocity = Prim->GetPhysicsAngularVelocityInRadians();
+
+	FVector TargetForward = ShipVelocity.GetSafeNormal();
+	FVector TargetUp = FRotationMatrix::MakeFromX(TargetForward).Rotator().RotateVector(FVector::UpVector);
+	if (bUseTargetOrientation && TargetComponent) {
+		FVector targetUp = TargetComponent->GetUpVector();
+		TargetUp = ShipUp * FVector::DotProduct(ShipUp, targetUp) + ShipRight * FVector::DotProduct(ShipRight, targetUp);
+	}
+
+	FVector Force = CalculateSpringDampingForces(Prim->GetComponentLocation(), Target, ShipVelocity, TargetVelocity, SpringConfig.Stiffness, SpringConfig.Damping, SpringConfig.MaxExtension);
+	FVector PrimaryTorque = CalculateSpringDampingTorque(ShipForward, TargetForward, ShipAngularVelocity, AngularStiffnessPrimary, AngularDampingPrimary);
+	FVector SecondaryTorque = CalculateSpringDampingTorque(ShipUp, TargetUp, ShipAngularVelocity, AngularStiffnessSecondary, AngularDampingSecondary);
+
+	Prim->AddForce(Force);
+	Prim->AddTorqueInRadians(PrimaryTorque + SecondaryTorque, FName(), true);
 }
 
 void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
@@ -93,23 +112,28 @@ FVector USFSpringFlightMovementComponent::CalculateForces(FVector P2, FVector P2
 	return Fs + Fd;
 }
 
-FVector USFSpringFlightMovementComponent::CalculateTorque(FVector forward) {
-	auto prim = GetUpdatedPrimitiveComp();
-
-	FVector L = prim->GetComponentLocation();
-	FVector vForward = forward.GetSafeNormal();
-	FVector vUp = FRotator(90, 0, 0).RotateVector(vForward);
-
-	FQuat rot = FQuat::FindBetween(prim->GetForwardVector(), vForward); // +FQuat::FindBetween(prim->GetUpVector(), vUp);
-	FVector Fr = AngularStiffness * FVector(rot.X, rot.Y, rot.Z);
-
-	if (bDebugRotation) {
-		DrawDebugLine(GetWorld(), L, L + vForward * 100, FColor::Red, false, 0, 0, 1);
-		DrawDebugLine(GetWorld(), L, L + GetUpdatedPrimitiveComp()->GetForwardVector() * 50, FColor::Purple, false, 0, 1, 1);
-		DrawDebugLine(GetWorld(), L, L + Fr, FColor::Yellow, false, 0, 2, 1);
+FVector USFSpringFlightMovementComponent::CalculateSpringDampingForces(FVector CurrentLocation, FVector TargetLocation, FVector CurrentVelocity, FVector TargetVelocity, float Ks, float Kd, float MaxExtension) {
+	FVector DLocation = TargetLocation - CurrentLocation;
+	FVector DVelocity = TargetVelocity - CurrentVelocity;
+	if (MaxExtension > 0.0f && (bMaintainMaxSpeed || DLocation.Size() > MaxExtension)) {
+		DLocation = DLocation.GetSafeNormal() * MaxExtension;
+		if (bDebug) {
+			DrawDebugLine(GetWorld(), CurrentLocation, CurrentLocation + DLocation, FColor::Green, false, 0, 0, 1);
+			DrawDebugLine(GetWorld(), CurrentLocation + DLocation, TargetLocation, FColor::Red, false, 0, 0, 1);
+		}
+	} else if (bDebug) {
+		DrawDebugLine(GetWorld(), CurrentLocation, TargetLocation, FColor::Blue, false, 0, 0, 1);
 	}
-	FVector Fd = -AngularDamping * prim->GetPhysicsAngularVelocityInRadians();
-	return Fr + Fd;
+	FVector Fs = Ks * DLocation;
+	FVector Fd = Kd * DVelocity;
+	return Fs + Fd;
+}
+
+FVector USFSpringFlightMovementComponent::CalculateSpringDampingTorque(FVector CurrentOrientation, FVector TargetOrientation, FVector AngularVelocity, float Ks, float Kd) {
+	FQuat rot = FQuat::FindBetween(CurrentOrientation, TargetOrientation);
+	FVector Fs = Ks * FVector(rot.X, rot.Y, rot.Z);
+	FVector Fd = -Kd * AngularVelocity;
+	return Fs + Fd;
 }
 
 // Begin Targeting Methods

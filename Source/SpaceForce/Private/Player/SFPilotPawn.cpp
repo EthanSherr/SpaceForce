@@ -51,11 +51,8 @@ void ASFPilotPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	if (Ship) {
-		auto DrivingHand = GetHandInState(EHandState::Driving);
-		auto NextFlightPath = DrivingHand->GetNearestFlightPath(SplineMovement->GetFlightPath());
+		auto NextFlightPath = GetHandInState(EHandState::Driving)->GetNearestFlightPath(SplineMovement->GetFlightPath());
 		SplineMovement->NextFlightPath = NextFlightPath;
-
-		DrawDebugLine(GetWorld(), DrivingHand->GetComponentLocation(), DrivingHand->GetComponentLocation() + 350 * DrivingHand->GetUpVector(), FColor::Blue, false, 0.5f, 5, 1.0f);
 	}
 }
 
