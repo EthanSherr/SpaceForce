@@ -5,6 +5,7 @@
 #include "SpaceForce.h"
 #include "Components/SplineComponent.h"
 #include "Components/SphereComponent.h"
+#include "Components/SplineComponent.h"
 #include "DrawDebugHelpers.h"
 #include "EngineUtils.h"
 

@@ -2,8 +2,10 @@
 
 
 #include "SFPilotPawn.h"
+#include "Components/SplineComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/InputComponent.h"
+#include "../Environment/SFFlightPath.h"
 #include "../Components/SFSplineMovementComponent.h"
 #include "../Ship/SFSpringFlightMovementComponent.h"
 #include "Camera/CameraComponent.h"
@@ -38,6 +40,9 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 	SplineMovement = ObjectInitializer.CreateDefaultSubobject<USFSplineMovementComponent>(this, FName("SplineMovement"));
 	SplineMovement->Speed = 500.0f;
 
+	HandExtension = 0.0f;
+	MaxHandExtension = 75.0f;
+
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
 }
 
@@ -54,6 +59,11 @@ void ASFPilotPawn::Tick(float DeltaTime)
 		auto NextFlightPath = GetHandInState(EHandState::Driving)->GetNearestFlightPath(SplineMovement->GetFlightPath());
 		SplineMovement->NextFlightPath = NextFlightPath;
 	}
+	auto FlightPath = SplineMovement->GetFlightPath();
+	if (FlightPath) {
+		FVector Tangent = FlightPath->Spline->GetDirectionAtDistanceAlongSpline(SplineMovement->GetDistance(), ESplineCoordinateSpace::World);
+		HandsRoot->SetRelativeLocation(MaxHandExtension * Tangent);
+	}  
 }
 
 void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
