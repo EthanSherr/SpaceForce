@@ -36,6 +36,14 @@ USFSplineMovementComponent* ASFShipPawn::GetAssociatedSplineMovementComponent() 
 		AssociatedSplineMovementComponent = Pilot->SplineMovement;
 		return AssociatedSplineMovementComponent;
 	}
+	auto TargetComponent = FlightMovement->TargetComponent;
+	if (TargetComponent) {
+		auto TargetOwner = TargetComponent->GetOwner();
+		AssociatedSplineMovementComponent = Cast<USFSplineMovementComponent>(TargetOwner->GetComponentByClass(USFSplineMovementComponent::StaticClass()));
+		if (AssociatedSplineMovementComponent) {
+			return AssociatedSplineMovementComponent;
+		}
+	}
 	AssociatedSplineMovementComponent = Cast<USFSplineMovementComponent>(GetComponentByClass(USFSplineMovementComponent::StaticClass()));
 	return AssociatedSplineMovementComponent;
 }

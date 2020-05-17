@@ -40,8 +40,7 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 	SplineMovement = ObjectInitializer.CreateDefaultSubobject<USFSplineMovementComponent>(this, FName("SplineMovement"));
 	SplineMovement->Speed = 500.0f;
 
-	HandExtension = 0.0f;
-	MaxHandExtension = 75.0f;
+	HandExtension = 75.0f;
 
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
 }
@@ -62,7 +61,7 @@ void ASFPilotPawn::Tick(float DeltaTime)
 	auto FlightPath = SplineMovement->GetFlightPath();
 	if (FlightPath) {
 		FVector Tangent = FlightPath->Spline->GetDirectionAtDistanceAlongSpline(SplineMovement->GetDistance(), ESplineCoordinateSpace::World);
-		HandsRoot->SetRelativeLocation(MaxHandExtension * Tangent);
+		HandsRoot->SetRelativeLocation(HandExtension * Tangent);
 	}  
 }
 

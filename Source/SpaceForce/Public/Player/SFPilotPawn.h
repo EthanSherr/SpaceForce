@@ -30,7 +30,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USFHandController* RightHand;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	UCameraComponent* Camera;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
@@ -45,9 +45,6 @@ public:
 	// Gets set once ship is being piloted, one hand is now driving.
 	UPROPERTY(BlueprintReadOnly)
 	ASFShipPawn* Ship;
-
-	UPROPERTY(EditAnywhere)
-	float MaxHandExtension;
 public:
 	UFUNCTION(BlueprintPure, BlueprintCallable)
 	USFHandController* GetHandInState(TEnumAsByte<EHandState> HandState);
@@ -78,7 +75,7 @@ protected:
 	void OnTriggerDownLeft();
 	void OnTriggerDownRight();
 
-private:
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float HandExtension;
 
 };
