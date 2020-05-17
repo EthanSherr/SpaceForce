@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "../Ship/SFSpringFlightMovementComponent.h"
 #include "../Components/SFSplineMovementComponent.h"
+#include "../Components/SFHealthComponent.h"
 #include "../Environment/SFFlightPath.h"
 #include "SFPilotPawn.h"
 #include "SpaceForce.h"
@@ -21,10 +22,34 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	FlightMovement->LinearMaxSpeed = 0.0f;
 	FlightMovement->AngularStiffnessPrimary = 115.0f;
 	FlightMovement->AngularStiffnessSecondary = 275.0f;
+
+	HealthComponent = ObjectInitializer.CreateDefaultSubobject<USFHealthComponent>(this, FName("HealthComponent"));
+	HealthComponent->Health = 100.0f;
+}
+
+void ASFShipPawn::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	HealthComponent->OnDeath.AddDynamic(this, &ASFShipPawn::OnDeath);
+}
+
+void ASFShipPawn::OnDeath(float Health) {
+	FlightMovement->ClearTarget();
+}
+
+bool ASFShipPawn::IsAlive()
+{
+	return HealthComponent->IsAlive();
 }
 
 ASFPilotPawn* ASFShipPawn::GetOwnerPilot() {
 	return Cast<ASFPilotPawn>(GetOwner());
+}
+
+float ASFShipPawn::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	HealthComponent->ChangeHealth(-Damage);
+	return Damage;
 }
 
 USFSplineMovementComponent* ASFShipPawn::GetAssociatedSplineMovementComponent() {

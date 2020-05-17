@@ -41,7 +41,6 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 	SplineMovement->Speed = 500.0f;
 
 	HandExtension = 75.0f;
-
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
 }
 
