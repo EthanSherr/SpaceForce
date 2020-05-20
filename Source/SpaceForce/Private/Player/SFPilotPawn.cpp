@@ -121,5 +121,6 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	NewShip->SetOwner(this);
 	NewShip->AimTargetComponent = NewAimingHand;
 	Ship = NewShip;
+	Ship->OnShipPiloted.Broadcast();
 }
 
