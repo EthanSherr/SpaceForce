@@ -11,8 +11,6 @@ class USFSplineMovementComponent;
 class USFSpringFlightMovementComponent;
 class ASFPilotPawn;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShipPiloted);
-
 UCLASS()
 class SPACEFORCE_API ASFShipPawn : public APawn
 {
@@ -34,7 +32,7 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	USceneComponent* AimTargetComponent;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFHealthComponent* HealthComponent;
 
 	UFUNCTION(BlueprintImplementableEvent)
@@ -42,9 +40,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive();
-
-	UPROPERTY(BlueprintAssignable)
-	FOnShipPiloted OnShipPiloted;
 
 protected:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;

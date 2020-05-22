@@ -5,9 +5,11 @@
 #include "Components/SphereComponent.h"
 #include "../Ship/SFSpringFlightMovementComponent.h"
 #include "../Environment/SFFlightPath.h"
+#include "../UI/SFLevelDiorama.h"
 #include "SFPilotPawn.h"
 #include "SFShipPawn.h"
 #include "SpaceForce.h"
+#include "DrawDebugHelpers.h"
 
 USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	this->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -29,6 +31,60 @@ USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer
 	PathScanner->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	PathScanner->SetCollisionResponseToAllChannels(ECR_Overlap);
 	PathScanner->SetCollisionObjectType(ECC_Pawn);
+
+	bScanForInteractables = false;
+	ScanDistance = 1000.0f;
+}
+
+void USFHandController::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	if (bScanForInteractables) 
+	{
+		FocusInteractables();
+	}
+}
+
+void USFHandController::FocusInteractables()
+{
+	const FVector Start = GetComponentLocation();
+	const FVector End = Start + ScanDistance * GetForwardVector();
+	const auto LastFocusedActor = FocusedActor.Get();
+
+	FCollisionQueryParams QueryParams;
+	auto Pilot = GetPilot();
+	if (Pilot)
+		QueryParams.AddIgnoredActor(GetPilot());
+	auto Ship = GetShip();
+	if (Ship)
+		QueryParams.AddIgnoredActor(Ship);
+
+	FHitResult HitResult;
+	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams))
+	{
+		auto NewFocusedActor = Cast<ASFLevelDiorama>(HitResult.Actor);
+		if (NewFocusedActor != FocusedActor.Get())
+		{
+			if (FocusedActor.Get()) 
+			{
+				Cast<ASFLevelDiorama>(FocusedActor.Get())->SetFocused(false);
+				FocusedActor.Reset();
+			}
+
+			
+			//FocusedActor->SetFocus(false);
+			UE_LOG(LogTemp, Warning, TEXT("NewFocusedActor %s"), *NewFocusedActor->GetName())
+			NewFocusedActor->SetFocused(true);
+			FocusedActor = TWeakObjectPtr<AActor>(NewFocusedActor);
+		}
+		DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Green, false, 0.0f, 2, 0.5f);
+	} 
+	else if (FocusedActor.Get())
+	{
+		DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 0.0f, 2, 0.5f);
+		Cast<ASFLevelDiorama>(FocusedActor.Get())->SetFocused(false);
+		FocusedActor.Reset();
+	}
 }
 
 ASFFlightPath* USFHandController::GetNearestFlightPath(ASFFlightPath* PathToIgnore) {
@@ -74,4 +130,22 @@ TEnumAsByte<EHandState> USFHandController::GetHandState() {
 void USFHandController::SetHandState(TEnumAsByte<EHandState> NewState) {
 	HandState = NewState;
 	PathScanner->SetCollisionEnabled(HandState == EHandState::Driving ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+}
+
+bool USFHandController::RecievesInput() 
+{
+	return bScanForInteractables;
+}
+
+void USFHandController::OnTriggerDown(bool& OutbCapturesInput)
+{
+	if (FocusedActor.Get()) {
+		Cast<ASFLevelDiorama>(FocusedActor.Get())->SetSelected(true);
+	}
+	OutbCapturesInput = true;
+}
+
+EControllerHand USFHandController::HandTypeFromMotionSource()
+{
+	return Hand_DEPRECATED;
 }

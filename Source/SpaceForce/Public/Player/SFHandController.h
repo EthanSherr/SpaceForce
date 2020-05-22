@@ -7,10 +7,10 @@
 #include "SFHandState.h"
 #include "SFHandController.generated.h"
 
-class USphereComponent;
 class ASFFlightPath;
 class ASFPilotPawn;
 class ASFShipPawn;
+class USphereComponent;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SPACEFORCE_API USFHandController : public UMotionControllerComponent
@@ -23,6 +23,12 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	USphereComponent* PathScanner;
+
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	bool bScanForInteractables;
+
+	UPROPERTY(EditAnywhere, Category = "Interaction")
+	float ScanDistance;
 
 	UFUNCTION(BlueprintSetter)
 	void SetHandState(TEnumAsByte<EHandState> NewState);
@@ -42,7 +48,22 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASFShipPawn* GetShip();
 
+	UFUNCTION()
+	bool RecievesInput();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	EControllerHand HandTypeFromMotionSource();
+
+	UFUNCTION()
+	void OnTriggerDown(bool& OutbCapturesInput);
+protected:
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	void FocusInteractables();
+
 private:
 	UPROPERTY(BlueprintSetter = SetHandState, BlueprintGetter = GetHandState)
 	TEnumAsByte<EHandState> HandState;
+
+	TWeakObjectPtr<AActor> FocusedActor;
 };

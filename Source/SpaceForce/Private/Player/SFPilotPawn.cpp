@@ -96,6 +96,13 @@ void ASFPilotPawn::SetSpeed(float Speed) {
 }
 
 void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
+	if (Hand->RecievesInput())
+	{
+		bool bCapturesInput;
+		Hand->OnTriggerDown(bCapturesInput);
+		if (bCapturesInput)
+			return;
+	}
 	switch (Hand->GetHandState()) {
 		case EHandState::Ready:
 			StartPilotingShip(Hand, Hand->GetOverlappingShip());
@@ -121,6 +128,6 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	NewShip->SetOwner(this);
 	NewShip->AimTargetComponent = NewAimingHand;
 	Ship = NewShip;
-	Ship->OnShipPiloted.Broadcast();
+	ReceiveStartPilotingShip();
 }
 

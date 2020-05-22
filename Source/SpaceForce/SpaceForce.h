@@ -10,3 +10,4 @@
 #define COLLISION_PROFILE_TRIGGER FName("Trigger")
 #define COLLISION_PROFILE_PAWN FName("Pawn")
 #define COLLISION_PROFILE_GENERATOR FName("Generator")
+#define COLLISION_PROFILE_UI FName("UI")

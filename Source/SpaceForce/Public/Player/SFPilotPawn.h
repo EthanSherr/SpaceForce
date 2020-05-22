@@ -78,4 +78,7 @@ protected:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float HandExtension;
 
+	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "StartedPilotingShip"))
+	void ReceiveStartPilotingShip();
+
 };
