@@ -147,5 +147,10 @@ void USFHandController::OnTriggerDown(bool& OutbCapturesInput)
 
 EControllerHand USFHandController::HandTypeFromMotionSource()
 {
-	return Hand_DEPRECATED;
+	if (MotionSource == FName("Left"))
+		return EControllerHand::Left;
+	if (MotionSource == FName("Right"))
+		return EControllerHand::Right;
+
+	return EControllerHand::AnyHand;
 }
