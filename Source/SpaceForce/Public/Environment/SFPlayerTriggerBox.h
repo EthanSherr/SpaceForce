@@ -5,27 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
-#include "SFPlayerTriggerResponder.h"
+#include "SFTriggerableActor.h"
+#include "SFTriggerData.h"
 #include "SFPlayerTriggerBox.generated.h"
-
-UENUM(BlueprintType)
-enum EEventAction 
-{
-	BehaviorStart, BehaviorEnd, Exit, LevelExit,
-};
-
-USTRUCT(BlueprintType)
-struct SPACEFORCE_API FEventType {
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(BlueprintReadWrite)
-	AActor* Target;
-
-	UPROPERTY(BlueprintReadWrite)
-	TEnumAsByte<EEventAction> Status;
-
-	FEventType() {}
-};
 
 UCLASS()
 class SPACEFORCE_API ASFPlayerTriggerBox : public AActor
@@ -37,14 +19,9 @@ public:
 	UBoxComponent* TriggerBox;
 
 	UPROPERTY(EditAnywhere)
-	TArray<AActor*> PlayerTriggerResponders;
-
-	UPROPERTY(EditAnywhere)
-	TArray<FEventType> TargetData;
+	TArray<FSFTriggerData> TargetData;
 
 protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	virtual void PostLoad() override;
 };

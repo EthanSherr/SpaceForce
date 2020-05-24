@@ -14,21 +14,6 @@ ASFPlayerTriggerBox::ASFPlayerTriggerBox(const class FObjectInitializer& ObjectI
 	TriggerBox->SetCollisionProfileName(COLLISION_PROFILE_TRIGGER);
 }
 
-void ASFPlayerTriggerBox::PostLoad()
-{
-	Super::PostLoad();
-	if (PlayerTriggerResponders.Num()) 
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Fixing Data!"))
-		TargetData.Reset(PlayerTriggerResponders.Num());
-		for (int i = 0; i < PlayerTriggerResponders.Num(); i++)
-		{
-			TargetData[i].Target = PlayerTriggerResponders[i];
-		}
-		PlayerTriggerResponders.Empty();
-	}
-}
-
 void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto* ShipPawn = Cast<ASFShipPawn>(OtherActor);
@@ -36,14 +21,14 @@ void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 		return;
 	}
 
-	for (AActor* MaybeResponder : PlayerTriggerResponders)
+	for (FSFTriggerData& Data : TargetData)
 	{
+		auto* MaybeResponder = Data.Target;
 		if (!MaybeResponder) {
 			UE_LOG(LogTemp, Error, TEXT("PlayerTrigger %s contains a NULL reference as responder."), *GetName())
-		} else 
-		if (MaybeResponder->GetClass()->ImplementsInterface(USFPlayerTriggerResponder::StaticClass()))
+		} else if (MaybeResponder->GetClass()->ImplementsInterface(USFTriggerableActor::StaticClass()))
 		{
-			ISFPlayerTriggerResponder::Execute_PlayerEnteredRegion(MaybeResponder, OtherActor);
+			ISFTriggerableActor::Execute_RespondToTrigger(MaybeResponder, OtherActor, Data);
 		}
 	}
 }
