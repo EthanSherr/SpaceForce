@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SFPlayerTriggerBox.h"
+#include "../Player/SFShipPawn.h"
 #include "SpaceForce.h"
 
 ASFPlayerTriggerBox::ASFPlayerTriggerBox(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -13,8 +14,28 @@ ASFPlayerTriggerBox::ASFPlayerTriggerBox(const class FObjectInitializer& ObjectI
 	TriggerBox->SetCollisionProfileName(COLLISION_PROFILE_TRIGGER);
 }
 
+void ASFPlayerTriggerBox::PostLoad()
+{
+	Super::PostLoad();
+	if (PlayerTriggerResponders.Num()) 
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Fixing Data!"))
+		TargetData.Reset(PlayerTriggerResponders.Num());
+		for (int i = 0; i < PlayerTriggerResponders.Num(); i++)
+		{
+			TargetData[i].Target = PlayerTriggerResponders[i];
+		}
+		PlayerTriggerResponders.Empty();
+	}
+}
+
 void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	auto* ShipPawn = Cast<ASFShipPawn>(OtherActor);
+	if (!ShipPawn || !ShipPawn->GetOwnerPilot()) {
+		return;
+	}
+
 	for (AActor* MaybeResponder : PlayerTriggerResponders)
 	{
 		if (!MaybeResponder) {
