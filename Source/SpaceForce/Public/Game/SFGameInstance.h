@@ -14,14 +14,14 @@ class SPACEFORCE_API USFGameInstance : public UGameInstance
 	GENERATED_UCLASS_BODY()
 public:
     UFUNCTION(BlueprintCallable)
-    void UnlockLevel(FString LevelName);
+    void UnlockLevel(const FName& LevelName);
 
     UFUNCTION(BlueprintCallable)
-    void GetUnlockedLevels(TMap<FString, bool>& OutLevels);
+    void GetUnlockedLevels(TMap<FName, bool>& OutLevels);
 
     UPROPERTY(BlueprintReadWrite)
     FString Slot;
 
 private:
-    USFCampaignSaveGame* GetCampaignForSlot(FString InSlot);
+    USFCampaignSaveGame* GetCampaignForSlot(const FString& InSlot);
 };

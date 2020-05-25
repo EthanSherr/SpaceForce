@@ -16,5 +16,5 @@ class SPACEFORCE_API USFCampaignSaveGame : public USaveGame
 
 public:
 	UPROPERTY()
-	TMap<FString, bool> UnlockedLevels;
+	TMap<FName, bool> UnlockedLevels;
 };

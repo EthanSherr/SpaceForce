@@ -9,20 +9,25 @@ USFGameInstance::USFGameInstance(const FObjectInitializer& ObjectInitializer) : 
 	Slot = FString("MySaveSlot");
 }
 
-void USFGameInstance::UnlockLevel(FString LevelName)
+void USFGameInstance::UnlockLevel(const FName& LevelName)
 {
+	if (LevelName == FName()) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("LevelName is None, cannot unlock level."))
+		return;
+	}
 	auto* CampaignSaveGame = GetCampaignForSlot(Slot);
 	CampaignSaveGame->UnlockedLevels.Add(LevelName, true);
 	UGameplayStatics::SaveGameToSlot(CampaignSaveGame, *Slot, 0);
 }
 
-void USFGameInstance::GetUnlockedLevels(TMap<FString, bool>& OutLevels)
+void USFGameInstance::GetUnlockedLevels(TMap<FName, bool>& OutLevels)
 {
 	auto* CampaignSaveGame = GetCampaignForSlot(Slot);
 	OutLevels = CampaignSaveGame->UnlockedLevels;
 }
 
-USFCampaignSaveGame* USFGameInstance::GetCampaignForSlot(FString InSlot)
+USFCampaignSaveGame* USFGameInstance::GetCampaignForSlot(const FString& InSlot)
 {
 	auto* Campaign = Cast<USFCampaignSaveGame>(UGameplayStatics::LoadGameFromSlot(Slot, 0));
 	if (!Campaign)

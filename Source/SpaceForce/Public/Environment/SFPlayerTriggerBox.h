@@ -7,21 +7,42 @@
 #include "Components/BoxComponent.h"
 #include "SFTriggerableActor.h"
 #include "SFTriggerData.h"
+#include "Engine/TriggerBox.h"
 #include "SFPlayerTriggerBox.generated.h"
 
+class UTriggerVisComponent;
+
 UCLASS()
-class SPACEFORCE_API ASFPlayerTriggerBox : public AActor
+class SPACEFORCE_API ASFPlayerTriggerBox : public ATriggerBox
 {
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
-	UBoxComponent* TriggerBox;
 
 	UPROPERTY(EditAnywhere)
-	TArray<FSFTriggerData> TargetData;
+	TArray<AActor*> Targets;
 
 protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+#if WITH_EDITORONLY_DATA
+protected:
+	UPROPERTY(Transient)
+	UTriggerVisComponent* TriggerVisComponent;
+public:
+	UPROPERTY(Transient, EditAnywhere)
+	uint8 bKeepDebugDisplayOn : 1;
+#endif //WITH_EDITORONLY_DATA
+};
+
+UCLASS()
+class SPACEFORCE_API UTriggerVisComponent : public USceneComponent
+{
+	GENERATED_BODY()
+
+public:
+	UTriggerVisComponent();
+
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };
