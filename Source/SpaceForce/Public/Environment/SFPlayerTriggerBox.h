@@ -19,7 +19,7 @@ class SPACEFORCE_API ASFPlayerTriggerBox : public ATriggerBox
 
 public:
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<AActor*> Targets;
 
 protected:
