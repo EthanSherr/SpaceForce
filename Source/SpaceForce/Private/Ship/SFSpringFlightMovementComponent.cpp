@@ -112,9 +112,9 @@ FVector USFSpringFlightMovementComponent::CalculateForces(FVector P2, FVector P2
 	return Fs + Fd;
 }
 
-FVector USFSpringFlightMovementComponent::CalculateSpringDampingForces(FVector CurrentLocation, FVector TargetLocation, FVector CurrentVelocity, FVector TargetVelocity, float Ks, float Kd, float MaxExtension) {
+FVector USFSpringFlightMovementComponent::CalculateSpringDampingForces(FVector CurrentLocation, FVector TargetLocation, FVector CurrentVelocity, FVector InTargetVelocity, float Ks, float Kd, float MaxExtension) {
 	FVector DLocation = TargetLocation - CurrentLocation;
-	FVector DVelocity = TargetVelocity - CurrentVelocity;
+	FVector DVelocity = InTargetVelocity - CurrentVelocity;
 	if (MaxExtension > 0.0f && (bMaintainMaxSpeed || DLocation.Size() > MaxExtension)) {
 		DLocation = DLocation.GetSafeNormal() * MaxExtension;
 		if (bDebug) {

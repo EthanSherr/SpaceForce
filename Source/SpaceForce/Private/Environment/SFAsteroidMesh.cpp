@@ -1,7 +1,8 @@
+#include "SFAsteroidMesh.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/ArrowComponent.h"
 #include "SpaceForce.h"
-#include "SFAsteroidMesh.h"
+#include "UObject/ConstructorHelpers.h"
 #if WITH_EDITORONLY_DATA
 #include "DrawDebugHelpers.h"
 #endif
@@ -14,6 +15,8 @@ ASFAsteroidMesh::ASFAsteroidMesh(const FObjectInitializer& ObjectInitializer) : 
 	AsteroidMesh->SetCollisionProfileName(COLLISION_PROFILE_BLOCK_ALL_DYNAMIC);
 	AsteroidMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	AsteroidMesh->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Mesh(TEXT("StaticMesh'/Game/Assets/mesh/rocks/SM_Rock_01.SM_Rock_01'"));
+	AsteroidMesh->SetStaticMesh(Mesh.Object);
 
 	DirectionTarget = ObjectInitializer.CreateDefaultSubobject<UArrowComponent>(this, FName("VelocityArrow"));
 	DirectionTarget->SetupAttachment(RootComponent);
@@ -45,19 +48,31 @@ void ASFAsteroidMesh::PostInitializeComponents()
 
 void ASFAsteroidMesh::SetActive(bool InActivate)
 {
+	UE_LOG(LogTemp, Warning, TEXT("SetActive %s"), *GetName())
 	AsteroidMesh->SetSimulatePhysics(InActivate);
 	if (InActivate)
 	{
 		AsteroidMesh->SetPhysicsLinearVelocity(LinearVelocity);
-		AsteroidMesh->SetPhysicsAngularVelocity(AngularVelocity);
+		AsteroidMesh->SetPhysicsAngularVelocityInDegrees(AngularVelocity);
 	}
+}
+
+void ASFAsteroidMesh::SetVelocity(FVector InVelocity)
+{
+	FVector Direction = InVelocity.GetSafeNormal();
+	float Magnitude = InVelocity.Size();
+
+	FRotator r = FRotationMatrix::MakeFromX(Direction).Rotator();
+	DirectionTarget->SetWorldRotation(r);
+	DirectionTargetMagnitudeScale = Magnitude;
+	LinearVelocity = InVelocity;
 }
 
 void ASFAsteroidMesh::OnConstruction(const FTransform& Transform)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OnConstruction c++"))
 	Super::OnConstruction(Transform);
-	LinearVelocity = DirectionTargetMagnitudeScale * DirectionTarget->ArrowSize * DirectionTarget->GetComponentRotation().Vector();
+	LinearVelocity = DirectionTargetMagnitudeScale * DirectionTarget->GetForwardVector();
 }
 
 void ASFAsteroidMesh::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -76,6 +91,11 @@ void ASFAsteroidMesh::PostEditChangeProperty(FPropertyChangedEvent& PropertyChan
 	UE_LOG(LogTemp, Warning, TEXT("MemberPropertyName %s"), *MemberPropertyName.ToString())
 
 	Super::PostEditChangeProperty(PropertyChangedEvent);
+}
+
+void ASFAsteroidMesh::RespondToTrigger_Implementation(class AActor* Source, class ASFPlayerTriggerBox* TriggerBox)
+{
+	SetActive(true);
 }
 
 #if WITH_EDITORONLY_DATA

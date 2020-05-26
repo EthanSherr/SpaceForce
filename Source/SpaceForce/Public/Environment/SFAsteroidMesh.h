@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "../SFTriggerableActor.h"
 #include "SFAsteroidMesh.generated.h"
 
 class UArrowComponent;
@@ -11,7 +12,7 @@ class UStaticMeshComponent;
 class UAsteroidVisComponent;
 
 UCLASS()
-class SPACEFORCE_API ASFAsteroidMesh : public AActor
+class SPACEFORCE_API ASFAsteroidMesh : public AActor, public ISFTriggerableActor
 {
 	GENERATED_UCLASS_BODY()
 	
@@ -37,6 +38,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetActive(bool InActive);
 
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "RespondToTrigger")
+	void RespondToTrigger(class AActor* Source, class ASFPlayerTriggerBox* TriggerBox);
+
 #if WITH_EDITORONLY_DATA
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	uint8 bKeepDebugDisplayOn : 1;
@@ -52,6 +56,8 @@ public:
 
 	UPROPERTY()
 	UAsteroidVisComponent* VisComponent;
+
+	void SetVelocity(FVector InVelocity);
 #endif
 
 protected:

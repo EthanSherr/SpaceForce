@@ -16,6 +16,6 @@ class SPACEFORCE_API ISFTriggerableActor
 	GENERATED_IINTERFACE_BODY()
 
 public:
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "RespondToTrigger")
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "RespondToTrigger")
 	void RespondToTrigger(class AActor* Source, ASFPlayerTriggerBox* TriggerBox);
 };

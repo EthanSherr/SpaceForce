@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "Components/StaticMeshComponent.h"
 #include "SFTransformGenerator.h"
-#include "SFMeshBrushGenerator.generated.h"
+#include "SFMeshBrushGenComponent.generated.h"
 
 class UStaticMeshComponent;
 class UStaticMesh;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SPACEFORCE_API USFMeshBrushGenerator : public UStaticMeshComponent, public ISFTransformGenerator
+class SPACEFORCE_API USFMeshBrushGenComponent : public UStaticMeshComponent, public ISFTransformGenerator
 {
 	GENERATED_UCLASS_BODY()
 

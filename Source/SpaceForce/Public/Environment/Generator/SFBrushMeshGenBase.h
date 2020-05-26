@@ -6,22 +6,26 @@
 #include "GameFramework/Actor.h"
 #include "SFTransformGenerator.h"
 #include "SFPhysicsGenerator.h"
-#include "SFMeshGenerator.generated.h"
+#include "SFBrushMeshGenBase.generated.h"
 
-class USFMeshBrushGenerator;
+class USFMeshBrushGenComponent;
+class USceneComponent;
 class UStaticMesh;
 
 UCLASS()
-class SPACEFORCE_API ASFMeshGenerator : public AActor, public ISFPhysicsGenerator
+class SPACEFORCE_API ASFBrushMeshGenBase : public AActor, public ISFPhysicsGenerator
 {
 	GENERATED_UCLASS_BODY()
 	
 public:	
+	UPROPERTY(EditAnywhere)
+	USceneComponent* Root;
+
 	UPROPERTY(EditAnywhere, Category = "Generation")
 	FRandomStream Stream;
 
 	UPROPERTY(EditAnywhere)
-	USFMeshBrushGenerator* BrushGenerator;
+	USFMeshBrushGenComponent* BrushGenerator;
 
 	UPROPERTY(EditAnywhere, Category = "Generation")
 	int Count;
@@ -38,6 +42,9 @@ protected:
 
 	void GenerateTemplates();
 
-	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	virtual void InstantiateMesh(const FTransform& Transform, const FVector& Velocity, const FVector& AngularVelocity);
+
+	UPROPERTY(EditAnywhere)
+	bool bGenerateOnConstruction;
 };
+

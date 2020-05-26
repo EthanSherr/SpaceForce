@@ -1,8 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
-#include "SFGameInstance.h"
 #include "SFCampaignGameMode.h"
+#include "SFGameInstance.h"
 
 void ASFCampaignGameMode::BeginPlay()
 {

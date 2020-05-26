@@ -21,6 +21,9 @@ class SPACEFORCE_API ASFPilotPawn : public APawn
 	GENERATED_UCLASS_BODY()
 
 public:
+	UPROPERTY(EditAnywhere)
+	bool bSpectateDebug;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	USceneComponent* HandsRoot;
 
@@ -62,13 +65,12 @@ public:
 	void StartPilotingShip(USFHandController* Hand, ASFShipPawn* NewShip);
 
 public:
-
 	virtual void BeginPlay() override;
 
-	// Called every frame
+	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
+
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 protected:

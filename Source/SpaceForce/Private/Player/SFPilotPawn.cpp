@@ -44,6 +44,39 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
 }
 
+void ASFPilotPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
+{
+	Super::PostEditChangeProperty(PropertyChangedEvent);
+	if (!PropertyChangedEvent.Property)
+		return;
+
+	FName PropertyName = PropertyChangedEvent.Property->GetFName();
+	if (PropertyName == GET_MEMBER_NAME_CHECKED(ASFPilotPawn, bSpectateDebug))
+	{
+		if (bSpectateDebug)
+		{
+			AutoPossessPlayer = EAutoReceiveInput::Disabled;
+			FCollisionShape MyColShape = FCollisionShape::MakeSphere(200.0f);
+			TArray<FHitResult> OutHits;
+			DrawDebugSphere(GetWorld(), GetActorLocation(), MyColShape.GetSphereRadius(), 100, FColor::Red, false, 0, 3.0f);
+			GetWorld()->SweepMultiByChannel(OutHits, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_WorldStatic, MyColShape);
+			for (FHitResult Hit : OutHits)
+			{
+				if (ASFShipPawn* Ship = Cast<ASFShipPawn>(Hit.GetActor()))
+				{
+					InitializeWithShip = Ship;
+					break;
+				}
+			}
+		} 
+		else
+		{
+			AutoPossessPlayer = EAutoReceiveInput::Player0;
+			InitializeWithShip = NULL;
+		}
+	}
+}
+
 void ASFPilotPawn::BeginPlay() {
 	Super::BeginPlay();
 	StartPilotingShip(RightHand, InitializeWithShip);

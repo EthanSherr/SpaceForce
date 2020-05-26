@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "SFMeshGenerator.h"
+#include "SFBrushMeshGenBase.h"
 #include "SFPhysMeshGenerator.generated.h"
 
 UCLASS()
-class SPACEFORCE_API ASFPhysMeshGenerator : public ASFMeshGenerator
+class SPACEFORCE_API ASFPhysMeshGenerator : public ASFBrushMeshGenBase
 {
 	GENERATED_BODY()
 

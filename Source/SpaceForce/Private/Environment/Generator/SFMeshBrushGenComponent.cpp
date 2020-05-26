@@ -1,11 +1,13 @@
+#include "SFMeshBrushGenComponent.h"
 #include "DrawDebugHelpers.h"
 #include "SpaceForce.h"
-#include "SFMeshBrushGenerator.h"
 
-// Sets default values for this component's properties
-USFMeshBrushGenerator::USFMeshBrushGenerator(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
+USFMeshBrushGenComponent::USFMeshBrushGenComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
+
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> Mesh(TEXT("StaticMesh'/Game/Assets/mesh/MeshGenerators/SM_CylinderSolidified.SM_CylinderSolidified'"));
+	SetStaticMesh(Mesh.Object);
 
 	SetCollisionProfileName(FName(COLLISION_PROFILE_GENERATOR));
 	SetHiddenInGame(true);
@@ -17,7 +19,7 @@ USFMeshBrushGenerator::USFMeshBrushGenerator(const FObjectInitializer& ObjectIni
 	MaxIterations = 10;
 }
 
-bool USFMeshBrushGenerator::GenerateTransform_Implementation(FTransform& OutTransform)
+bool USFMeshBrushGenComponent::GenerateTransform_Implementation(FTransform& OutTransform)
 {
 	FVector Extent = Bounds.BoxExtent;
 	FVector Origin = Bounds.Origin;
@@ -42,7 +44,7 @@ bool USFMeshBrushGenerator::GenerateTransform_Implementation(FTransform& OutTran
 	return true;
 }
 
-int USFMeshBrushGenerator::Intersections(FVector Interior, FVector End) {
+int USFMeshBrushGenComponent::Intersections(FVector Interior, FVector End) {
 	FVector Beginning = Interior;
 	int TotalHits = 0;
 	FCollisionQueryParams Params;
