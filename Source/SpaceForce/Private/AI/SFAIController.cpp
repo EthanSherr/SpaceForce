@@ -24,8 +24,15 @@ void ASFAIController::OnPossess(APawn* InPawn) {
 		}
 
 		EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
+		CanAttackKeyID = BlackboardComp->GetKeyID("CanAttack");
 		BehaviorComp->StartTree(*(Bot->BehaviorTree));
 	}
+}
+
+void ASFAIController::SetCanAttackInBlackboard(bool InValue)
+{
+	if (BlackboardComp)
+		BlackboardComp->SetValue<UBlackboardKeyType_Bool>(CanAttackKeyID, InValue);
 }
 
 void ASFAIController::SetEnemyInBlackboard(AActor* Enemy) {

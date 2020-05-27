@@ -18,6 +18,7 @@ protected:
     virtual void OnPossess(class APawn* InPawn) override;
 
     int32 EnemyKeyID;
+    int32 CanAttackKeyID;
 
 private:
     UPROPERTY(transient)
@@ -33,7 +34,10 @@ public:
     UFUNCTION(BlueprintCallable)
     void MoveToVector(FVector vector);
 
-    UFUNCTION(BlueprintCallable)
+    UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
     void SetEnemyInBlackboard(AActor* Enemy);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
+    void SetCanAttackInBlackboard(bool InValue);
 
 };

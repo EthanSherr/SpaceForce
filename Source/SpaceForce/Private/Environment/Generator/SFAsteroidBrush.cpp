@@ -1,6 +1,6 @@
+#include "SFAsteroidBrush.h"
 #include "Engine/World.h"
 #include "../SFAsteroidMesh.h"
-#include "SFAsteroidBrush.h"
 
 ASFAsteroidBrush::ASFAsteroidBrush(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
