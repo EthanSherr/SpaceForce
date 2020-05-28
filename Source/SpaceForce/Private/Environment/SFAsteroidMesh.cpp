@@ -3,6 +3,7 @@
 #include "Components/ArrowComponent.h"
 #include "SpaceForce.h"
 #include "UObject/ConstructorHelpers.h"
+#include "../Components/SFDynamicPrimitiveRegistration.h"
 #if WITH_EDITORONLY_DATA
 #include "DrawDebugHelpers.h"
 #endif
@@ -21,6 +22,8 @@ ASFAsteroidMesh::ASFAsteroidMesh(const FObjectInitializer& ObjectInitializer) : 
 	DirectionTarget = ObjectInitializer.CreateDefaultSubobject<UArrowComponent>(this, FName("VelocityArrow"));
 	DirectionTarget->SetupAttachment(RootComponent);
 
+	DynamicPulse = ObjectInitializer.CreateDefaultSubobject<USFDynamicPrimitiveRegistration>(this, FName("DynamicCollision"));
+
 	bActivateOnBegin = false;
 	DebugTotalSteps = 25;
 	DebugAtTime = DebugTotalSteps / 2.0f;
@@ -35,25 +38,26 @@ ASFAsteroidMesh::ASFAsteroidMesh(const FObjectInitializer& ObjectInitializer) : 
 
 void ASFAsteroidMesh::BeginPlay()
 {
-	UE_LOG(LogTemp, Warning, TEXT("BeginPlay c++"))
 	Super::BeginPlay();
 }
 
 void ASFAsteroidMesh::PostInitializeComponents()
 {
-	UE_LOG(LogTemp, Warning, TEXT("PostInitializeComponents c++"))
 	Super::PostInitializeComponents();
 	SetActive(bActivateOnBegin);
 }
 
 void ASFAsteroidMesh::SetActive(bool InActivate)
 {
-	UE_LOG(LogTemp, Warning, TEXT("SetActive %s"), *GetName())
 	AsteroidMesh->SetSimulatePhysics(InActivate);
 	if (InActivate)
 	{
 		AsteroidMesh->SetPhysicsLinearVelocity(LinearVelocity);
 		AsteroidMesh->SetPhysicsAngularVelocityInDegrees(AngularVelocity);
+		if (bDynamicCollisionRegistration)
+		{
+			DynamicPulse->BeginDynamicPulse();
+		}
 	}
 }
 

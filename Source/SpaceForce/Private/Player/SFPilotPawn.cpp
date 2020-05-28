@@ -62,9 +62,9 @@ void ASFPilotPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 			GetWorld()->SweepMultiByChannel(OutHits, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_WorldStatic, MyColShape);
 			for (FHitResult Hit : OutHits)
 			{
-				if (ASFShipPawn* Ship = Cast<ASFShipPawn>(Hit.GetActor()))
+				if (ASFShipPawn* HitShip = Cast<ASFShipPawn>(Hit.GetActor()))
 				{
-					InitializeWithShip = Ship;
+					InitializeWithShip = HitShip;
 					break;
 				}
 			}

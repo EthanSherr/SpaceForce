@@ -10,6 +10,7 @@
 class UArrowComponent;
 class UStaticMeshComponent;
 class UAsteroidVisComponent;
+class USFDynamicPrimitiveRegistration;
 
 UCLASS()
 class SPACEFORCE_API ASFAsteroidMesh : public AActor, public ISFTriggerableActor
@@ -28,6 +29,9 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	UArrowComponent* DirectionTarget;
+
+	UPROPERTY(EditAnywhere)
+	bool bDynamicCollisionRegistration;
 
 	UPROPERTY(EditAnywhere)
 	float DirectionTargetMagnitudeScale = 100.0f;
@@ -68,6 +72,9 @@ protected:
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
+
+	UPROPERTY(EditAnywhere)
+	USFDynamicPrimitiveRegistration* DynamicPulse;
 };
 
 #if WITH_EDITORONLY_DATA
