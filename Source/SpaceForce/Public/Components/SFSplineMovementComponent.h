@@ -31,7 +31,10 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASFFlightPath* GetFlightPath();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float BaseSpeed;
+
+	UPROPERTY(BlueprintReadWrite)
 	float Speed;
 
 	UPROPERTY(EditAnywhere)

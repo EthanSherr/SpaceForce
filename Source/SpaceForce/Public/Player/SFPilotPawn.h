@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "SFHandState.h"
+#include "Components/TimelineComponent.h"
 #include "SFPilotPawn.generated.h"
 
 class USceneComponent;
@@ -14,6 +15,8 @@ class USFSplineMovementComponent;
 class USteamVRChaperoneComponent;
 class ASFShipPawn;
 class UInputComponent;
+class UTimelineComponent;
+class UCurveFloat;
 
 UCLASS()
 class SPACEFORCE_API ASFPilotPawn : public APawn
@@ -21,7 +24,7 @@ class SPACEFORCE_API ASFPilotPawn : public APawn
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditInstanceOnly)
 	bool bSpectateDebug;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -77,10 +80,47 @@ protected:
 	void OnTriggerDownLeft();
 	void OnTriggerDownRight();
 
+	void OnLeftGripDown();
+	void OnLeftGripUp();
+	void OnRightGripDown();
+	void OnRightGripUp();
+
+	void OnGrip(USFHandController* Hand, bool bIsPressed);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float HandExtension;
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "StartedPilotingShip"))
 	void ReceiveStartPilotingShip();
 
+// Boost
+protected:
+
+	UFUNCTION()
+	void SetBoostSpeed(float NewBoosterSpeed);
+
+	UTimelineComponent* BoostTimeline;
+
+	UPROPERTY(Transient)
+	float LastBoostTimelineSpeedDelta;
+
+	UPROPERTY(Transient)
+	bool bIsBoosting;
+
+	FOnTimelineFloat BoostTimelineSpeedUpdateDelegate;
+
+	FOnTimelineEvent BoostTimelineFinishedDelegate;
+
+	UFUNCTION()
+	void BoostTimelineSpeedUpdate(float Value);
+
+	UFUNCTION()
+	void BoostTimelineFinished();
+public:
+
+	UPROPERTY(EditAnywhere)
+	UCurveFloat* BoostSpeedCurve;
+
+	UPROPERTY(EditAnywhere)
+	float BoostEndDrag;
 };

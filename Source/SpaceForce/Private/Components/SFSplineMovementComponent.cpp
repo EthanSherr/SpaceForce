@@ -9,6 +9,7 @@
 USFSplineMovementComponent::USFSplineMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
+	BaseSpeed = 400.0f;
 }
 
 void USFSplineMovementComponent::InitializeComponent()
@@ -26,6 +27,7 @@ void USFSplineMovementComponent::UpdateTickRegistration()
 void USFSplineMovementComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	Speed = BaseSpeed;
 	//UE_LOG(LogTemp, Warning, TEXT("BeginPlay %s"), *UpdatedComponent->GetName())
 	SetFlightPath(FlightPath, initialOffset);
 }

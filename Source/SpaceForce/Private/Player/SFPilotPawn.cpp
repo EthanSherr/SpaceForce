@@ -5,6 +5,7 @@
 #include "Components/SplineComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/TimelineComponent.h"
 #include "../Environment/SFFlightPath.h"
 #include "../Components/SFSplineMovementComponent.h"
 #include "../Ship/SFSpringFlightMovementComponent.h"
@@ -42,6 +43,12 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 
 	HandExtension = 75.0f;
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
+
+	BoostTimeline = ObjectInitializer.CreateDefaultSubobject<UTimelineComponent>(this, TEXT("BoostTimeline"));
+	BoostTimelineSpeedUpdateDelegate.BindDynamic(this, &ASFPilotPawn::BoostTimelineSpeedUpdate);
+	BoostTimelineFinishedDelegate.BindDynamic(this, &ASFPilotPawn::BoostTimelineFinished);
+
+	BoostEndDrag = 0.9f;
 }
 
 void ASFPilotPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -81,6 +88,12 @@ void ASFPilotPawn::BeginPlay() {
 	Super::BeginPlay();
 	StartPilotingShip(RightHand, InitializeWithShip);
 	InitializeWithShip = NULL;
+
+	if (BoostSpeedCurve)
+	{
+		BoostTimeline->AddInterpFloat(BoostSpeedCurve, BoostTimelineSpeedUpdateDelegate, FName("Speed"));
+		BoostTimeline->SetTimelineFinishedFunc(BoostTimelineFinishedDelegate);
+	}
 }
 
 void ASFPilotPawn::Tick(float DeltaTime)
@@ -95,6 +108,14 @@ void ASFPilotPawn::Tick(float DeltaTime)
 		FVector Tangent = FlightPath->Spline->GetDirectionAtDistanceAlongSpline(SplineMovement->GetDistance(), ESplineCoordinateSpace::World);
 		HandsRoot->SetRelativeLocation(HandExtension * Tangent);
 	}  
+	if (!bIsBoosting && LastBoostTimelineSpeedDelta != 0.0f)
+	{
+		float NextBoostTimelineSpeedDelta = LastBoostTimelineSpeedDelta * BoostEndDrag;
+		if (NextBoostTimelineSpeedDelta < 0.1) 
+			NextBoostTimelineSpeedDelta = 0.0f;
+
+		SetBoostSpeed(NextBoostTimelineSpeedDelta);
+	}
 }
 
 void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -102,10 +123,58 @@ void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("LeftTrigger", IE_Pressed, this, &ASFPilotPawn::OnTriggerDownLeft);
 	PlayerInputComponent->BindAction("RightTrigger", IE_Pressed, this, &ASFPilotPawn::OnTriggerDownRight);
+	PlayerInputComponent->BindAction("LeftGrip", IE_Pressed, this, &ASFPilotPawn::OnLeftGripDown);
+	PlayerInputComponent->BindAction("LeftGrip", IE_Released, this, &ASFPilotPawn::OnLeftGripUp);
+	PlayerInputComponent->BindAction("RightGrip", IE_Pressed, this, &ASFPilotPawn::OnRightGripDown);
+	PlayerInputComponent->BindAction("RightGrip", IE_Released, this, &ASFPilotPawn::OnRightGripUp);
 }
 
-void ASFPilotPawn::OnTriggerDownLeft() { OnTriggerDown(LeftHand); }
+void ASFPilotPawn::OnTriggerDownLeft()  { OnTriggerDown(LeftHand); }
 void ASFPilotPawn::OnTriggerDownRight() { OnTriggerDown(RightHand); }
+
+void ASFPilotPawn::OnLeftGripDown()	 { OnGrip(LeftHand, true); }
+void ASFPilotPawn::OnLeftGripUp()	 { OnGrip(LeftHand, false); }
+void ASFPilotPawn::OnRightGripDown() { OnGrip(RightHand, true); }
+void ASFPilotPawn::OnRightGripUp()	 { OnGrip(RightHand, false); }
+
+void ASFPilotPawn::OnGrip(USFHandController* Hand, bool bIsPressed)
+{
+	if (Hand->GetHandState() == EHandState::Driving)
+	{
+		if (bIsPressed)
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("LastBoostTimelineSpeedDelta START"))
+			BoostTimeline->PlayFromStart();
+			bIsBoosting = true;
+		}
+		else
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("LastBoostTimelineSpeedDelta STOP"))
+			BoostTimeline->Stop();
+			bIsBoosting = false;
+		}
+	}
+}
+
+void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
+	if (Hand->RecievesInput())
+	{
+		bool bCapturesInput;
+		Hand->OnTriggerDown(bCapturesInput);
+		if (bCapturesInput)
+			return;
+	}
+	switch (Hand->GetHandState()) {
+	case EHandState::Ready:
+		StartPilotingShip(Hand, Hand->GetOverlappingShip());
+		break;
+	case EHandState::Aiming:
+		Ship->Fire();
+		break;
+	case EHandState::Driving:
+		break;
+	}
+}
 
 USFHandController* ASFPilotPawn::GetHandInState(TEnumAsByte<EHandState> HandState) {
 	TArray<USFHandController*> Hands; Hands.Add(LeftHand); Hands.Add(RightHand);
@@ -128,26 +197,6 @@ void ASFPilotPawn::SetSpeed(float Speed) {
 	SplineMovement->Speed = Speed;
 }
 
-void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
-	if (Hand->RecievesInput())
-	{
-		bool bCapturesInput;
-		Hand->OnTriggerDown(bCapturesInput);
-		if (bCapturesInput)
-			return;
-	}
-	switch (Hand->GetHandState()) {
-		case EHandState::Ready:
-			StartPilotingShip(Hand, Hand->GetOverlappingShip());
-			break;
-		case EHandState::Aiming:
-			Ship->Fire();
-			break;
-		case EHandState::Driving:
-			break;
-	}
-}
-
 void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipPawn* NewShip) {
 	if (!NewShip) {
 		return;
@@ -164,3 +213,25 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	ReceiveStartPilotingShip();
 }
 
+// Booster Business
+void ASFPilotPawn::SetBoostSpeed(float NewBoostSpeed)
+{
+	SplineMovement->Speed = SplineMovement->Speed - LastBoostTimelineSpeedDelta + NewBoostSpeed;
+	LastBoostTimelineSpeedDelta = NewBoostSpeed;
+	UE_LOG(LogTemp, Warning, TEXT("LastBoostTimelineSpeedDelta 500 +%f = %f"), NewBoostSpeed, SplineMovement->Speed)
+}
+
+void ASFPilotPawn::BoostTimelineSpeedUpdate(float Value)
+{
+	SetBoostSpeed(Value);
+}
+
+void ASFPilotPawn::BoostTimelineFinished()
+{
+	UE_LOG(LogTemp, Warning, TEXT("BoostTimelineFinished"))
+	if (BoostTimeline->GetPlaybackPosition() == 0.0f)
+	{
+
+	}
+}
+// Booster business end
