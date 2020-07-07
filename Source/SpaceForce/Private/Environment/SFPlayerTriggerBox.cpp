@@ -32,10 +32,13 @@ void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 	{
 		if (!Target) {
 			UE_LOG(LogTemp, Error, TEXT("PlayerTrigger %s contains a NULL reference as responder."), *GetName())
-		} else if (Target->GetClass()->ImplementsInterface(USFTriggerableActor::StaticClass()))
+			return;
+		} else if (!Target->GetClass()->ImplementsInterface(USFTriggerableActor::StaticClass()))
 		{
-			ISFTriggerableActor::Execute_RespondToTrigger(Target, OtherActor, this);
+			UE_LOG(LogTemp, Warning, TEXT("PlayerTrigger %s references non null target %s which doesn't implement ISFTriggerableActor"), *GetName(), *Target->GetName())
+			return;
 		}
+		ISFTriggerableActor::Execute_RespondToTrigger(Target, OtherActor, this);
 	}
 }
 

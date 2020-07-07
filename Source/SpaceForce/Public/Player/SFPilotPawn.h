@@ -87,6 +87,8 @@ protected:
 
 	void OnGrip(USFHandController* Hand, bool bIsPressed);
 
+	void TrySetIsBoosting(bool bNewIsBoosting);
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float HandExtension;
 
@@ -97,30 +99,67 @@ protected:
 protected:
 
 	UFUNCTION()
-	void SetBoostSpeed(float NewBoosterSpeed);
+	void SetSpeedBoostDelta(float NewSpeedBoostDelta);
+
+	UFUNCTION()
+	void SetLinearStiffnessBoostDelta(float NewLinearStiffnessBoostDelta);
 
 	UTimelineComponent* BoostTimeline;
 
 	UPROPERTY(Transient)
-	float LastBoostTimelineSpeedDelta;
+	float SpeedBoostSpeedDelta;
+
+	UPROPERTY(Transient)
+	float LinearStiffnessBoostDelta;
 
 	UPROPERTY(Transient)
 	bool bIsBoosting;
 
-	FOnTimelineFloat BoostTimelineSpeedUpdateDelegate;
-
+	FOnTimelineFloat SpeedBoostTimelineUpdateDelegate;
+	FOnTimelineFloat LinearStiffnessBoostTimelineUpdateDelegate;
 	FOnTimelineEvent BoostTimelineFinishedDelegate;
 
 	UFUNCTION()
-	void BoostTimelineSpeedUpdate(float Value);
+	void SpeedBoostTimelineUpdate(float Value);
+
+	UFUNCTION()
+	void LinearStiffnessBoostTimelineUpdate(float Value);
 
 	UFUNCTION()
 	void BoostTimelineFinished();
 public:
 
-	UPROPERTY(EditAnywhere)
-	UCurveFloat* BoostSpeedCurve;
+	UPROPERTY(EditAnywhere, Category = "Boost")
+	UCurveFloat* SpeedBoostCurve;
 
-	UPROPERTY(EditAnywhere)
-	float BoostEndDrag;
+	UPROPERTY(EditAnywhere, Category = "Boost")
+	UCurveFloat* LinearStiffnessBoostCurve;
+
+	UPROPERTY(EditInstanceOnly, Category = "Boost")
+	float SpeedBoostDecay;
+
+	UPROPERTY(EditInstanceOnly, Category = "Boost")
+	float LinearStiffnessBoostDecay;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Boost|Energy")
+	float BoosterEnergy;
+
+	UPROPERTY(BlueprintReadOnly, EditInstanceOnly, Category = "Boost|Energy")
+	float MaximumBoosterEnergy;
+
+	UPROPERTY(EditInstanceOnly, Category = "Boost|Energy")
+	float MinimumEnergyToStartBoost;
+
+	UPROPERTY(EditInstanceOnly, Category = "Boost|Energy")
+	float BoostEnergyDecayRate;
+
+	UPROPERTY(EditInstanceOnly, Category = "Boost|Energy")
+		float BoostEnergyRegenRate;
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnBoostStart(bool& bSuccess);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnBoostStop();
+//End Boost
 };

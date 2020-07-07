@@ -45,10 +45,17 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
 
 	BoostTimeline = ObjectInitializer.CreateDefaultSubobject<UTimelineComponent>(this, TEXT("BoostTimeline"));
-	BoostTimelineSpeedUpdateDelegate.BindDynamic(this, &ASFPilotPawn::BoostTimelineSpeedUpdate);
+	SpeedBoostTimelineUpdateDelegate.BindDynamic(this, &ASFPilotPawn::SpeedBoostTimelineUpdate);
+	LinearStiffnessBoostTimelineUpdateDelegate.BindDynamic(this, &ASFPilotPawn::LinearStiffnessBoostTimelineUpdate);
 	BoostTimelineFinishedDelegate.BindDynamic(this, &ASFPilotPawn::BoostTimelineFinished);
 
-	BoostEndDrag = 0.9f;
+	SpeedBoostDecay = 200.0f;
+	LinearStiffnessBoostDecay = 50.0f;
+
+	MaximumBoosterEnergy = 100.0f;
+	MinimumEnergyToStartBoost = 25.0f;
+	BoostEnergyDecayRate = 25.0f;
+	BoostEnergyRegenRate = 5.0f;
 }
 
 void ASFPilotPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -89,11 +96,16 @@ void ASFPilotPawn::BeginPlay() {
 	StartPilotingShip(RightHand, InitializeWithShip);
 	InitializeWithShip = NULL;
 
-	if (BoostSpeedCurve)
+	if (SpeedBoostCurve)
 	{
-		BoostTimeline->AddInterpFloat(BoostSpeedCurve, BoostTimelineSpeedUpdateDelegate, FName("Speed"));
+		BoostTimeline->AddInterpFloat(SpeedBoostCurve, SpeedBoostTimelineUpdateDelegate, FName("Speed"));
 		BoostTimeline->SetTimelineFinishedFunc(BoostTimelineFinishedDelegate);
 	}
+
+	if (LinearStiffnessBoostCurve)
+		BoostTimeline->AddInterpFloat(LinearStiffnessBoostCurve, LinearStiffnessBoostTimelineUpdateDelegate, FName("Handling"));
+	
+	BoosterEnergy = MaximumBoosterEnergy;
 }
 
 void ASFPilotPawn::Tick(float DeltaTime)
@@ -108,13 +120,32 @@ void ASFPilotPawn::Tick(float DeltaTime)
 		FVector Tangent = FlightPath->Spline->GetDirectionAtDistanceAlongSpline(SplineMovement->GetDistance(), ESplineCoordinateSpace::World);
 		HandsRoot->SetRelativeLocation(HandExtension * Tangent);
 	}  
-	if (!bIsBoosting && LastBoostTimelineSpeedDelta != 0.0f)
+	// Boost Speed / Handling Decay
+	if (!bIsBoosting)
 	{
-		float NextBoostTimelineSpeedDelta = LastBoostTimelineSpeedDelta * BoostEndDrag;
-		if (NextBoostTimelineSpeedDelta < 0.1) 
-			NextBoostTimelineSpeedDelta = 0.0f;
+		if (SpeedBoostSpeedDelta != 0.0)
+		{
+			float NextBoostTimelineSpeedDelta = SpeedBoostSpeedDelta - SpeedBoostDecay * DeltaTime;
+			if (NextBoostTimelineSpeedDelta < 0.1)
+				NextBoostTimelineSpeedDelta = 0.0f;
 
-		SetBoostSpeed(NextBoostTimelineSpeedDelta);
+			SetSpeedBoostDelta(NextBoostTimelineSpeedDelta);
+		}
+		if (LinearStiffnessBoostDelta)
+		{
+			float NextBoostTimelineHandlingDelta = LinearStiffnessBoostDelta - LinearStiffnessBoostDecay * DeltaTime;
+			if (NextBoostTimelineHandlingDelta < 0.1)
+				NextBoostTimelineHandlingDelta = 0.0f;
+
+			SetLinearStiffnessBoostDelta(NextBoostTimelineHandlingDelta);
+		}
+	}
+
+	const float BoosterEnergyDelta = (bIsBoosting ? -BoostEnergyDecayRate : BoostEnergyRegenRate) * DeltaTime;
+	BoosterEnergy = FMath::Clamp(BoosterEnergyDelta + BoosterEnergy, 0.0f, MaximumBoosterEnergy);
+	if (bIsBoosting && BoosterEnergy == 0.0f)
+	{
+		TrySetIsBoosting(false);
 	}
 }
 
@@ -139,21 +170,33 @@ void ASFPilotPawn::OnRightGripUp()	 { OnGrip(RightHand, false); }
 
 void ASFPilotPawn::OnGrip(USFHandController* Hand, bool bIsPressed)
 {
-	if (Hand->GetHandState() == EHandState::Driving)
+	const EHandState HandState = Hand->GetHandState();
+	if (HandState == EHandState::Driving)
+		TrySetIsBoosting(bIsPressed);
+	else if (HandState == EHandState::Ready)
+		StartPilotingShip(Hand, Hand->GetOverlappingShip());
+}
+
+void ASFPilotPawn::TrySetIsBoosting(bool bNewIsBoosting)
+{
+	bool bSuccess = true;
+	if (bNewIsBoosting)
 	{
-		if (bIsPressed)
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("LastBoostTimelineSpeedDelta START"))
+		bSuccess = BoosterEnergy > MinimumEnergyToStartBoost;
+		if (bSuccess)
 			BoostTimeline->PlayFromStart();
-			bIsBoosting = true;
-		}
-		else
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("LastBoostTimelineSpeedDelta STOP"))
-			BoostTimeline->Stop();
-			bIsBoosting = false;
-		}
+
+		OnBoostStart(bSuccess);
 	}
+	else
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("LastBoostTimelineSpeedDelta STOP"))
+		BoostTimeline->Stop();
+		OnBoostStop();
+	}
+
+	if (bSuccess)
+		bIsBoosting = bNewIsBoosting;
 }
 
 void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
@@ -214,16 +257,33 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 }
 
 // Booster Business
-void ASFPilotPawn::SetBoostSpeed(float NewBoostSpeed)
+void ASFPilotPawn::SetSpeedBoostDelta(float NewBoostSpeed)
 {
-	SplineMovement->Speed = SplineMovement->Speed - LastBoostTimelineSpeedDelta + NewBoostSpeed;
-	LastBoostTimelineSpeedDelta = NewBoostSpeed;
+	SplineMovement->Speed = SplineMovement->Speed - SpeedBoostSpeedDelta + NewBoostSpeed;
+	SpeedBoostSpeedDelta = NewBoostSpeed;
 	UE_LOG(LogTemp, Warning, TEXT("LastBoostTimelineSpeedDelta 500 +%f = %f"), NewBoostSpeed, SplineMovement->Speed)
 }
 
-void ASFPilotPawn::BoostTimelineSpeedUpdate(float Value)
+void ASFPilotPawn::SetLinearStiffnessBoostDelta(float NewBoostHandling)
 {
-	SetBoostSpeed(Value);
+	if (!Ship)
+		return;
+
+	const float NewLinearStiffness = Ship->FlightMovement->LinearStiffness - LinearStiffnessBoostDelta + NewBoostHandling;
+	Ship->FlightMovement->SetLinearStiffness(NewLinearStiffness);
+	GEngine->AddOnScreenDebugMessage(-1, 1, FColor::Yellow, FString::Printf(TEXT("NewLinearStiffness = %f"), NewLinearStiffness));
+	LinearStiffnessBoostDelta = NewBoostHandling;
+}
+
+void ASFPilotPawn::SpeedBoostTimelineUpdate(float Value)
+{
+	SetSpeedBoostDelta(Value);
+}
+
+void ASFPilotPawn::LinearStiffnessBoostTimelineUpdate(float Value)
+{
+	UE_LOG(LogTemp, Warning, TEXT("SetTimelineHandlingUpdate %f"), Value)
+	SetLinearStiffnessBoostDelta(Value);
 }
 
 void ASFPilotPawn::BoostTimelineFinished()

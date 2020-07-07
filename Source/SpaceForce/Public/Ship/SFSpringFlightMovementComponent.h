@@ -98,7 +98,13 @@ public:
 	void SetTargetComponent(USceneComponent* NewComponent);
 
 	UFUNCTION(BlueprintCallable)
-	void SetSpeed(float Value);
+	void SetSpeed(float NewLinearMaxSpeed);
+
+	UFUNCTION(BlueprintCallable)
+	void SetLinearStiffness(float NewLinearStiffness);
+
+	UFUNCTION(BlueprintCallable)
+	void RecomputeSpringConfig();
 
 	UFUNCTION(BlueprintCallable)
 	void ClearTarget();

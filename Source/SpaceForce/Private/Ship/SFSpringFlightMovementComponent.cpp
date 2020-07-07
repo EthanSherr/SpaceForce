@@ -37,17 +37,13 @@ void USFSpringFlightMovementComponent::AddInputVector(FVector WorldVector, bool 
 
 void USFSpringFlightMovementComponent::BeginPlay() {
 	Super::BeginPlay();
-	if (!IsValid(true)) {
+	if (!IsValid(true))
 		return;
-	}
-	SpringConfig = FSpringConfig::FromCriticalDampingAndMaxSpeed(
-		LinearStiffness, 
-		LinearCriticalDamping, 
-		LinearMaxSpeed, 
-		GetUpdatedPrimitiveComp()->GetMass());
-	if (InitialTarget) {
+	
+	RecomputeSpringConfig();
+
+	if (InitialTarget) 
 		SetTargetComponent(InitialTarget->GetRootComponent());
-	}
 }
 
 void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
@@ -153,12 +149,23 @@ void USFSpringFlightMovementComponent::SetTargetComponent(USceneComponent* NewTa
 	}
 }
 
-void USFSpringFlightMovementComponent::SetSpeed(float Speed) {
-	if (!IsValid(true)) {
+void USFSpringFlightMovementComponent::SetSpeed(float NewLinearMaxSpeed) 
+{
+	LinearMaxSpeed = NewLinearMaxSpeed;
+	RecomputeSpringConfig();
+}
+
+void USFSpringFlightMovementComponent::SetLinearStiffness(float NewLinearStiffness)
+{
+	LinearStiffness = NewLinearStiffness;
+	RecomputeSpringConfig();
+}
+
+void USFSpringFlightMovementComponent::RecomputeSpringConfig()
+{
+	if (!IsValid(true))
 		return;
-	}
-	LinearMaxSpeed = Speed;
-	SpringConfig = FSpringConfig::FromCriticalDampingAndMaxSpeed(LinearStiffness, LinearCriticalDamping, Speed, GetUpdatedPrimitiveComp()->GetMass());
+	SpringConfig = FSpringConfig::FromCriticalDampingAndMaxSpeed(LinearStiffness, LinearCriticalDamping, LinearMaxSpeed, GetUpdatedPrimitiveComp()->GetMass());
 }
 
 FVector USFSpringFlightMovementComponent::GetTarget() {
