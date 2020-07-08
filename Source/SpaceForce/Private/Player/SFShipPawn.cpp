@@ -33,7 +33,7 @@ void ASFShipPawn::PostInitializeComponents()
 	HealthComponent->OnDeath.AddDynamic(this, &ASFShipPawn::OnDeath);
 }
 
-void ASFShipPawn::OnDeath(float Health) {
+void ASFShipPawn::OnDeath(float Health, float MaxHealth) {
 	FlightMovement->ClearTarget();
 }
 

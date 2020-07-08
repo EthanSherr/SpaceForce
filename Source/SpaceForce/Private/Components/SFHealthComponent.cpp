@@ -8,7 +8,7 @@
 USFHealthComponent::USFHealthComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
-	Health = 100.0f;
+	MaxHealth = Health = 100.0f;
 }
 
 float USFHealthComponent::ChangeHealth(float DeltaHealth)
@@ -18,11 +18,11 @@ float USFHealthComponent::ChangeHealth(float DeltaHealth)
 	Health = UpdatedHealth;
 	if (OnHealthChanged.IsBound())
 	{
-		OnHealthChanged.Broadcast(Health);
+		OnHealthChanged.Broadcast(Health, MaxHealth);
 	}
 	if (!AlreadyDead && IsDead() && OnDeath.IsBound())
 	{
-		OnDeath.Broadcast(Health);
+		OnDeath.Broadcast(Health, MaxHealth);
 	}
 
 	return Health;
