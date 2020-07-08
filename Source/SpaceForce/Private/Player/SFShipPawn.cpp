@@ -3,6 +3,7 @@
 
 #include "SFShipPawn.h"
 #include "Components/StaticMeshComponent.h"
+#include "../Ship/SFBoosterManager.h"
 #include "../Ship/SFSpringFlightMovementComponent.h"
 #include "../Components/SFSplineMovementComponent.h"
 #include "../Components/SFHealthComponent.h"
@@ -22,6 +23,8 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	FlightMovement->LinearMaxSpeed = 0.0f;
 	FlightMovement->AngularStiffnessPrimary = 115.0f;
 	FlightMovement->AngularStiffnessSecondary = 275.0f;
+
+	BoosterComponent = ObjectInitializer.CreateDefaultSubobject<USFBoosterManager>(this, FName("BoosterManager"));
 
 	HealthComponent = ObjectInitializer.CreateDefaultSubobject<USFHealthComponent>(this, FName("HealthComponent"));
 	HealthComponent->Health = 100.0f;
@@ -71,6 +74,11 @@ USFSplineMovementComponent* ASFShipPawn::GetAssociatedSplineMovementComponent() 
 	}
 	AssociatedSplineMovementComponent = Cast<USFSplineMovementComponent>(GetComponentByClass(USFSplineMovementComponent::StaticClass()));
 	return AssociatedSplineMovementComponent;
+}
+
+void ASFShipPawn::TrySetIsBoosting(bool bNewIsBoosting)
+{
+	BoosterComponent->TrySetIsBoosting(bNewIsBoosting);
 }
 
 void ASFShipPawn::Tick(float DeltaTime) {

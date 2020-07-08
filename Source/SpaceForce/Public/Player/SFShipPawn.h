@@ -9,6 +9,7 @@
 class USFHealthComponent;
 class USFSplineMovementComponent;
 class USFSpringFlightMovementComponent;
+class USFBoosterManager;
 class ASFPilotPawn;
 
 UCLASS()
@@ -35,11 +36,17 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFHealthComponent* HealthComponent;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	USFBoosterManager* BoosterComponent;
+
 	UFUNCTION(BlueprintImplementableEvent)
 	void Fire();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive();
+
+	UFUNCTION(BlueprintCallable)
+	void TrySetIsBoosting(bool bNewIsBoosting);
 
 protected:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
