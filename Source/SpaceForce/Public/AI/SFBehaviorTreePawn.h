@@ -32,4 +32,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class ASFAIController* GetSFAIController() const;
 
+	//UFUNCTION(BlueprintCallable, BlueprintPure)
+	//bool GetTargetVelocity(AActor* TargetActor, FVector& Velocity) const;
+
 };

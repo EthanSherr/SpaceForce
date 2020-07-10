@@ -25,3 +25,9 @@ ASFAIController* ASFBehaviorTreePawn::GetSFAIController() const {
 void ASFBehaviorTreePawn::AddMovementInput(FVector WorldDirection, float ScaleValue, bool bForce) {
 	Super::AddMovementInput(WorldDirection, ScaleValue, bForce);
 }
+
+//bool ASFBehaviorTreePawn::GetTargetVelocity(AActor* TargetActor, FVector& Velocity) const
+//{
+//	FVector Velocity = TargetActor->GetVelocity()
+//	if (Velocity == )
+//}
