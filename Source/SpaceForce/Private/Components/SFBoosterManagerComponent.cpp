@@ -1,18 +1,18 @@
-#include "SFBoosterManager.h"
+#include "SFBoosterManagerComponent.h"
 #include "Components/TimelineComponent.h"
 #include "../Player/SFShipPawn.h"
 #include "../Player/SFPilotPawn.h"
 #include "../Components/SFSplineMovementComponent.h"
-#include "../Ship/SFSpringFlightMovementComponent.h"
+#include "../Components/SFSpringFlightMovementComponent.h"
 
-USFBoosterManager::USFBoosterManager(const FObjectInitializer& ObjectInitializer)
+USFBoosterManagerComponent::USFBoosterManagerComponent(const FObjectInitializer& ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = true;
 
 	BoostTimeline = ObjectInitializer.CreateDefaultSubobject<UTimelineComponent>(this, TEXT("BoostTimeline"));
-	SpeedBoostTimelineUpdateDelegate.BindDynamic(this, &USFBoosterManager::SpeedBoostTimelineUpdate);
-	LinearStiffnessBoostTimelineUpdateDelegate.BindDynamic(this, &USFBoosterManager::LinearStiffnessBoostTimelineUpdate);
-	BoostTimelineFinishedDelegate.BindDynamic(this, &USFBoosterManager::BoostTimelineFinished);
+	SpeedBoostTimelineUpdateDelegate.BindDynamic(this, &USFBoosterManagerComponent::SpeedBoostTimelineUpdate);
+	LinearStiffnessBoostTimelineUpdateDelegate.BindDynamic(this, &USFBoosterManagerComponent::LinearStiffnessBoostTimelineUpdate);
+	BoostTimelineFinishedDelegate.BindDynamic(this, &USFBoosterManagerComponent::BoostTimelineFinished);
 
 	SpeedBoostDecay = 200.0f;
 	LinearStiffnessBoostDecay = 50.0f;
@@ -23,7 +23,7 @@ USFBoosterManager::USFBoosterManager(const FObjectInitializer& ObjectInitializer
 	BoostEnergyRegenRate = 5.0f;
 }
 
-void USFBoosterManager::BeginPlay()
+void USFBoosterManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -39,7 +39,7 @@ void USFBoosterManager::BeginPlay()
 	BoosterEnergy = MaximumBoosterEnergy;
 }
 
-void USFBoosterManager::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void USFBoosterManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
@@ -77,7 +77,7 @@ void USFBoosterManager::TickComponent(float DeltaTime, ELevelTick TickType, FAct
 	}
 }
 
-void USFBoosterManager::TrySetIsBoosting(bool bNewIsBoosting)
+void USFBoosterManagerComponent::TrySetIsBoosting(bool bNewIsBoosting)
 {
 	bool bSuccess = true;
 	if (bNewIsBoosting)
@@ -95,7 +95,7 @@ void USFBoosterManager::TrySetIsBoosting(bool bNewIsBoosting)
 		bIsBoosting = bNewIsBoosting;
 }
 
-void USFBoosterManager::SetSpeedBoostDelta(float NewBoostSpeed)
+void USFBoosterManagerComponent::SetSpeedBoostDelta(float NewBoostSpeed)
 {
 	auto Ship = Cast<ASFShipPawn>(GetOwner());
 	if (!Ship || !Ship->GetOwnerPilot())
@@ -106,7 +106,7 @@ void USFBoosterManager::SetSpeedBoostDelta(float NewBoostSpeed)
 	SpeedBoostSpeedDelta = NewBoostSpeed;
 }
 
-void USFBoosterManager::SetLinearStiffnessBoostDelta(float NewBoostHandling)
+void USFBoosterManagerComponent::SetLinearStiffnessBoostDelta(float NewBoostHandling)
 {
 	auto Ship = Cast<ASFShipPawn>(GetOwner());
 	if (!Ship)
@@ -117,17 +117,17 @@ void USFBoosterManager::SetLinearStiffnessBoostDelta(float NewBoostHandling)
 	LinearStiffnessBoostDelta = NewBoostHandling;
 }
 
-void USFBoosterManager::SpeedBoostTimelineUpdate(float Value)
+void USFBoosterManagerComponent::SpeedBoostTimelineUpdate(float Value)
 {
 	SetSpeedBoostDelta(Value);
 }
 
-void USFBoosterManager::LinearStiffnessBoostTimelineUpdate(float Value)
+void USFBoosterManagerComponent::LinearStiffnessBoostTimelineUpdate(float Value)
 {
 	SetLinearStiffnessBoostDelta(Value);
 }
 
-void USFBoosterManager::BoostTimelineFinished()
+void USFBoosterManagerComponent::BoostTimelineFinished()
 {
 	if (BoostTimeline->GetPlaybackPosition() == 0.0f)
 	{

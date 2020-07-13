@@ -18,7 +18,7 @@ class SPACEFORCE_API USFHandController : public UMotionControllerComponent
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
 	USphereComponent* ShipScanner;
 
 	UPROPERTY(EditAnywhere)

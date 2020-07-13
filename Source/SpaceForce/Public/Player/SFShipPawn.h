@@ -9,7 +9,7 @@
 class USFHealthComponent;
 class USFSplineMovementComponent;
 class USFSpringFlightMovementComponent;
-class USFBoosterManager;
+class USFBoosterManagerComponent;
 class ASFPilotPawn;
 
 UCLASS()
@@ -36,8 +36,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFHealthComponent* HealthComponent;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
-	USFBoosterManager* BoosterComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	USFBoosterManagerComponent* BoosterManagerComponent;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void Fire();
