@@ -8,7 +8,7 @@
 #include "Components/TimelineComponent.h"
 #include "../Environment/SFFlightPath.h"
 #include "../Components/SFSplineMovementComponent.h"
-#include "../Ship/SFSpringFlightMovementComponent.h"
+#include "../Components/SFSpringFlightMovementComponent.h"
 #include "Camera/CameraComponent.h"
 #include "SFHandController.h"
 #include "SpaceForce.h"

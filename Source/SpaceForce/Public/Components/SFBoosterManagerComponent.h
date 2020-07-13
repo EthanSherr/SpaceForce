@@ -1,11 +1,9 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "Components/TimelineComponent.h"
-#include "SFBoosterManager.generated.h"
+#include "SFBoosterManagerComponent.generated.h"
 
 class UTimelineComponent;
 class UCurveFloat;
@@ -13,7 +11,7 @@ class UCurveFloat;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEnergyChanged, float, NewEnergy, float, MaxEnergy, float, OldEnergy);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
-class SPACEFORCE_API USFBoosterManager : public UActorComponent
+class SPACEFORCE_API USFBoosterManagerComponent : public UActorComponent
 {
 	GENERATED_UCLASS_BODY()
 

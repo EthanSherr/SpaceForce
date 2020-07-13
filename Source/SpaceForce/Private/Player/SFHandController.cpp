@@ -3,7 +3,7 @@
 
 #include "SFHandController.h"
 #include "Components/SphereComponent.h"
-#include "../Ship/SFSpringFlightMovementComponent.h"
+#include "../Components/SFSpringFlightMovementComponent.h"
 #include "../Environment/SFFlightPath.h"
 #include "../UI/SFLevelDiorama.h"
 #include "SFPilotPawn.h"
