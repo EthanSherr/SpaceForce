@@ -183,5 +183,6 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	NewShip->AimTargetComponent = NewAimingHand;
 	Ship = NewShip;
 	ReceiveStartPilotingShip();
+	NewShip->OnPossessed();
 }
 
