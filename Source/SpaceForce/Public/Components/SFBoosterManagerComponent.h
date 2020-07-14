@@ -9,6 +9,8 @@ class UTimelineComponent;
 class UCurveFloat;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnEnergyChanged, float, NewEnergy, float, MaxEnergy, float, OldEnergy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoosterActivate);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBoosterDeactivate);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEFORCE_API USFBoosterManagerComponent : public UActorComponent
@@ -53,6 +55,12 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnEnergyChanged OnBoosterEnergyChanged;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBoosterActivate OnBoosterActivate;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnBoosterDeactivate OnBoosterDeactivate;
 protected:
 
 	//UFUNCTION(BlueprintImplementableEvent)

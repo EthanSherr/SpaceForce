@@ -48,6 +48,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TrySetIsBoosting(bool bNewIsBoosting);
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void OnPossessed();
+
 protected:
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 

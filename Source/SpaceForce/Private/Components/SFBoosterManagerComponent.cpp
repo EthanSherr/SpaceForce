@@ -84,11 +84,15 @@ void USFBoosterManagerComponent::TrySetIsBoosting(bool bNewIsBoosting)
 	{
 		bSuccess = BoosterEnergy > MinimumEnergyToStartBoost;
 		if (bSuccess)
+		{
 			BoostTimeline->PlayFromStart();
+			OnBoosterActivate.Broadcast();
+		}
 	}
 	else
 	{
 		BoostTimeline->Stop();
+		OnBoosterDeactivate.Broadcast();
 	}
 
 	if (bSuccess)
