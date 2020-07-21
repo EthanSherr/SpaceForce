@@ -11,10 +11,6 @@ ASFBehaviorTreePawn::ASFBehaviorTreePawn(const FObjectInitializer& ObjectInitial
 }
 
 void ASFBehaviorTreePawn::BeginPlay() {
-	AAIController* aiController = Cast<AAIController>(GetController());
-	if (BehaviorTree != NULL && aiController != NULL) {
-		aiController->RunBehaviorTree(BehaviorTree);
-	}
 	Super::BeginPlay();
 }
 
