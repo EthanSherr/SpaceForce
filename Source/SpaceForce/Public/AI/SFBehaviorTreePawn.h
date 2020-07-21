@@ -20,6 +20,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* BehaviorTree;
 
+	UPROPERTY(EditAnywhere)
+	bool DebugDisabled;
+
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void AttackActor(AActor* actor);
 
@@ -31,7 +34,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class ASFAIController* GetSFAIController() const;
-
 	//UFUNCTION(BlueprintCallable, BlueprintPure)
 	//bool GetTargetVelocity(AActor* TargetActor, FVector& Velocity) const;
 

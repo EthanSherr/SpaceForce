@@ -121,8 +121,8 @@ bool ASFFlightPath::PointsForDistance(float Distance, FSplineDistance& OutStart,
 	OutStart = Points[distanceIndex];
 	OutEnd = Points[distanceIndex + 1];
 
-	DrawDebugPoint(GetWorld(), OutStart.Location, 25, FColor::Blue, false, 1);
-	DrawDebugPoint(GetWorld(), OutEnd.Location, 25, FColor::Red, false, 1);
+	//DrawDebugPoint(GetWorld(), OutStart.Location, 25, FColor::Blue, false, 1);
+	//DrawDebugPoint(GetWorld(), OutEnd.Location, 25, FColor::Red, false, 1);
 	return true;
 }
 

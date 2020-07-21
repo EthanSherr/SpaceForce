@@ -25,7 +25,10 @@ void ASFAIController::OnPossess(APawn* InPawn) {
 
 		EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
 		CanAttackKeyID = BlackboardComp->GetKeyID("CanAttack");
-		BehaviorComp->StartTree(*(Bot->BehaviorTree));
+		if (!Bot->DebugDisabled)
+		{
+			BehaviorComp->StartTree(*(Bot->BehaviorTree));
+		}
 	}
 }
 
