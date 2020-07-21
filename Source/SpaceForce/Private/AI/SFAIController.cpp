@@ -8,6 +8,8 @@
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Bool.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
+#include "DrawDebugHelpers.h"
+#include "Landscape.h"
 
 ASFAIController::ASFAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackBoardComp"));
@@ -56,5 +58,36 @@ void ASFAIController::MoveToVector(FVector vector) {
 	ASFBehaviorTreePawn* Bot = Cast<ASFBehaviorTreePawn>(GetPawn());
 	if (Bot) {
 		Bot->MoveTo(vector);
+	}
+}
+
+void ASFAIController::IsValidLocation(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug)
+{
+	bIsValid = true;
+	TArray<FHitResult> OutHits;
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(GetPawn());
+	GetWorld()->LineTraceMultiByChannel(OutHits, Vector + FVector::UpVector * 500, Vector, ECC_Visibility, Params);
+
+	if (!OutHits.Num())
+		return;
+
+	for (FHitResult Hit : OutHits)
+	{
+		bool bPointIsBellowLandscape = Hit.GetActor()->IsA(ALandscape::StaticClass());
+		if (bDebug)
+		{
+			DrawDebugPoint(GetWorld(), Hit.Location, 5, FColor::Red, false, 3, 10);
+		}
+		FString HitName = Hit.GetActor() ? Hit.GetActor()->GetName() : FString("None");
+		UE_LOG(LogTemp, Warning, TEXT("ground scan hit %s is landscape %d"), *HitName, bPointIsBellowLandscape)
+
+		if (bPointIsBellowLandscape)
+		{
+			const float BumpDistance = (Hit.Location - Vector).Size() + 50.0f;
+			OutBumpDirection = (Hit.Location - Vector).GetSafeNormal() * BumpDistance;
+			bIsValid = false;
+			return;
+		}
 	}
 }

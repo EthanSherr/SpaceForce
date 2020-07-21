@@ -40,4 +40,7 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
     void SetCanAttackInBlackboard(bool InValue);
 
+    UFUNCTION(BlueprintPUre, Category = "AI Helper")
+    void IsValidLocation(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug = false);
+
 };
