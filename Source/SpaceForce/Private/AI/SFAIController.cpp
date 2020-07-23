@@ -74,7 +74,7 @@ void ASFAIController::IsValidLocation(const FVector& Vector, bool& bIsValid, FVe
 
 	for (FHitResult Hit : OutHits)
 	{
-		bool bPointIsBellowLandscape = Hit.GetActor()->IsA(ALandscape::StaticClass());
+		bool bPointIsBellowLandscape = Cast<ALandscape>(Hit.GetActor()) != NULL;
 		if (bDebug)
 		{
 			DrawDebugPoint(GetWorld(), Hit.Location, 5, FColor::Red, false, 3, 10);
