@@ -92,6 +92,22 @@
 		{
 			"name": "/actions/main/in/RightGrip",
 			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/LeftTouch",
+			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/RightTouch",
+			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/MCLeft_X,MCLeft_Y X Y_axis2d",
+			"type": "vector2"
+		},
+		{
+			"name": "/actions/main/in/MCRight_X,MCRight_Y X Y_axis2d",
+			"type": "vector2"
 		}
 	],
 	"action_sets": [
@@ -212,6 +228,10 @@
 			"/actions/main/in/RightTrigger": "RightTrigger",
 			"/actions/main/in/LeftGrip": "LeftGrip",
 			"/actions/main/in/RightGrip": "RightGrip",
+			"/actions/main/in/LeftTouch": "LeftTouch",
+			"/actions/main/in/RightTouch": "RightTouch",
+			"/actions/main/in/MCLeft_X,MCLeft_Y X Y_axis2d": "MCLeft",
+			"/actions/main/in/MCRight_X,MCRight_Y X Y_axis2d": "MCRight",
 			"/actions/main": "Main Game Actions"
 		}
 	]

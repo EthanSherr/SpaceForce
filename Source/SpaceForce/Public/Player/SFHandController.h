@@ -11,6 +11,7 @@ class ASFFlightPath;
 class ASFPilotPawn;
 class ASFShipPawn;
 class USphereComponent;
+class USFRadialMenuComponent;
 
 UCLASS(ClassGroup = (Custom), meta = (BlueprintSpawnableComponent))
 class SPACEFORCE_API USFHandController : public UMotionControllerComponent
@@ -56,6 +57,10 @@ public:
 
 	UFUNCTION()
 	void OnTriggerDown(bool& OutbCapturesInput);
+
+	UPROPERTY(BlueprintReadonly)
+	USFRadialMenuComponent* RadialMenuComponent;
+
 protected:
 	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
