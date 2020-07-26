@@ -66,3 +66,16 @@ void USFRadialMenuComponent::SetAxisInput(FVector2D Vector)
 	FVector Location = FVector(0, Vector.X, Vector.Y) * CursorRadius;
 	CursorMesh->SetRelativeLocation(Location,  false);
 }
+
+void USFRadialMenuComponent::SelectFocusedIndex()
+{
+	const auto RadialMenu = GetRadialMenu();
+	if (!RadialMenu)
+		return;
+
+	const int FocusedIndex = RadialMenu->GetFocusedIndex();
+	if (FocusedIndex == -1)
+		return;
+
+	RadialMenu->SetSelectedIndex(FocusedIndex);
+}

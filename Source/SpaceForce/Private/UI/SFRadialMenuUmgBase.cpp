@@ -3,27 +3,66 @@
 
 #include "SFRadialMenuUmgBase.h"
 
-void USFRadialMenuUmgBase::SetData(int Number)
+void USFRadialMenuUmgBase::SetData(TArray<FSFRadialMenuOption> NewData)
 {
-	NumberOfItems = Number;
+	Data = NewData;
+	FocusedIndex = -1;
+	SelectedIndex = -1;
 	ReceiveOnSetData();
+}
+
+float USFRadialMenuUmgBase::GetAngleIncrement() const
+{
+	return 360.0f / Data.Num();
+}
+
+void USFRadialMenuUmgBase::GetStartAndEndAngleForIndex(const int& Index, float& OutStart, float& OutEnd)
+{
+	const float Increment = GetAngleIncrement();
+	OutStart = Increment * (Index - 0.5f) + 90.0f;
+	OutEnd = OutStart + Increment;
 }
 
 void USFRadialMenuUmgBase::SetAxisInput(FVector2D Input)
 {
-	if (Input.Size() < MinFocusRadius)
+	if (Input.Size() < MinFocusRadius || Data.Num() == 0)
 		return;
 
-	const float increment = 360.0f / NumberOfItems;
-	float angle = FMath::Atan2(Input.Y, Input.X) * 180/PI;
-	if (angle < 0)
-	{
-		angle = 360 + angle;
-	}
+	const float Increment = GetAngleIncrement();
+	float InputAngle = FMath::Atan2(Input.Y, Input.X) * 180/PI;
+	InputAngle = (InputAngle - 90.0f + Increment * 0.5f);
+	if (InputAngle < 0)
+		InputAngle += 360;
 
-	float index = (angle / increment);
-	UE_LOG(LogTemp, Warning, TEXT("angle = %f, increment = %f, index = %f"), angle, increment, index);
+	float NewFocusedIndex = (InputAngle / Increment);
+	//UE_LOG(LogTemp, Warning, TEXT("angle = %f, increment = %f, index = %f"), InputAngle, Increment, NewFocusedIndex);
+	SetFocusedIndex(NewFocusedIndex);
+} 
 
-	ReceiveFocusData(index);
+void USFRadialMenuUmgBase::SetFocusedIndex(int Index)
+{
+	if (Index == FocusedIndex) 
+		return;
+	const int OldIndex = FocusedIndex;
+	FocusedIndex = Index;
+	ReceiveOnFocusedIndexChanged(FocusedIndex, OldIndex);
+}
 
+int USFRadialMenuUmgBase::GetFocusedIndex()
+{
+	return FocusedIndex;
+}
+
+void USFRadialMenuUmgBase::SetSelectedIndex(int Index)
+{
+	if (Index == SelectedIndex)
+		return;
+	const int OldIndex = SelectedIndex;
+	SelectedIndex = Index;
+	ReceiveOnSelectedIndexChanged(SelectedIndex, OldIndex);
+}
+
+int USFRadialMenuUmgBase::GetSelectedIndex()
+{
+	return SelectedIndex;
 }

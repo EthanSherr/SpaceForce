@@ -94,6 +94,14 @@
 			"type": "boolean"
 		},
 		{
+			"name": "/actions/main/in/LeftTap",
+			"type": "boolean"
+		},
+		{
+			"name": "/actions/main/in/RightTap",
+			"type": "boolean"
+		},
+		{
 			"name": "/actions/main/in/LeftTouch",
 			"type": "boolean"
 		},
@@ -228,6 +236,8 @@
 			"/actions/main/in/RightTrigger": "RightTrigger",
 			"/actions/main/in/LeftGrip": "LeftGrip",
 			"/actions/main/in/RightGrip": "RightGrip",
+			"/actions/main/in/LeftTap": "LeftTap",
+			"/actions/main/in/RightTap": "RightTap",
 			"/actions/main/in/LeftTouch": "LeftTouch",
 			"/actions/main/in/RightTouch": "RightTouch",
 			"/actions/main/in/MCLeft_X,MCLeft_Y X Y_axis2d": "MCLeft",

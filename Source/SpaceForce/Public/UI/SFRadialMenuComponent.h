@@ -49,4 +49,7 @@ public:
 
 	UPROPERTY()
 	float CursorRadiusMax;
+
+	UFUNCTION(BlueprintCallable)
+	void SelectFocusedIndex();
 };
