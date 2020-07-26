@@ -8,18 +8,17 @@
 
 USFRadialMenuComponent::USFRadialMenuComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	PrimaryComponentTick.bCanEverTick = false;\
-
-	ConstructorHelpers::FClassFinder<USFRadialMenuUmgBase> UmgClassName(TEXT("/Game/Blueprints/UI/RadialMenuUmgTest"));
+	PrimaryComponentTick.bCanEverTick = false;
+	ConstructorHelpers::FClassFinder<USFRadialMenuUmgBase> UmgClassName(TEXT("/Game/Blueprints/UI/BP_RadialMenu"));
 	Widget = ObjectInitializer.CreateDefaultSubobject<UWidgetComponent>(this, TEXT("SphereComp"));
 	Widget->SetupAttachment(this);
 	Widget->SetWidgetClass(UmgClassName.Class);
 	Widget->SetRelativeScale3D(FVector::OneVector * 0.2f);
 	Widget->SetRelativeRotation(FRotator(0, 180, 0));
 	Widget->SetCollisionResponseToAllChannels(ECR_Ignore);
-	Widget->SetDrawSize(FVector2D(1, 1) * 1000.0f);
+	Widget->SetDrawSize(FVector2D(1, 1) * DrawSizeDim);
 
-	const float Scale = 0.2f;
+	const float Scale = 0.1f;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>MeshAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	CursorMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CursorComponent"));
 	CursorMesh->SetupAttachment(this);
@@ -27,8 +26,7 @@ USFRadialMenuComponent::USFRadialMenuComponent(const FObjectInitializer& ObjectI
 	CursorMesh->SetRelativeScale3D(FVector::OneVector * Scale);
 	CursorMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	CursorRadius = 400.0f * Scale;
-	CursorRadiusMax = 350.0f * Scale;
+	CursorRadius = DrawSizeDim/2 * Scale;
 }
 
 

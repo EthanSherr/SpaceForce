@@ -47,9 +47,15 @@ public:
 	UPROPERTY()
 	float CursorRadius;
 
-	UPROPERTY()
-	float CursorRadiusMax;
-
 	UFUNCTION(BlueprintCallable)
 	void SelectFocusedIndex();
+
+private:
+	UPROPERTY()
+	float DrawSizeDim = 500.0f;
+
+public:
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE float GetDrawSize() { return DrawSizeDim; }
+
 };
