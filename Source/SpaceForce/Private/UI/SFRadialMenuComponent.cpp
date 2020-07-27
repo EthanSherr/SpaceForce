@@ -68,6 +68,8 @@ void USFRadialMenuComponent::OnFocusedChanged(USFRadialMenuUmgBase* Menu, int Ne
 
 void USFRadialMenuComponent::OpenMenu(bool bOpen)
 {
+	if (GetData().Num() == 0)
+		return;
 	bMenuIsOpen = bOpen;
 	OnOpenMenu(bOpen);
 }

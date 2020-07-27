@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "SFHandState.h"
 #include "Components/TimelineComponent.h"
+#include "../UI/SFRadialMenuOption.h"
 #include "SFPilotPawn.generated.h"
 
 class USceneComponent;
@@ -24,10 +25,10 @@ class SPACEFORCE_API ASFPilotPawn : public APawn
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditInstanceOnly, Category = "Debug")
 	bool bSpectateDebug;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	USceneComponent* HandsRoot;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -45,8 +46,15 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	USteamVRChaperoneComponent* VRChaperone;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Init")
 	ASFShipPawn* InitializeWithShip;
+
+	UPROPERTY(EditAnywhere, Category = "Init")
+	TArray<FSFRadialMenuOption> OffensiveMenuOptions;
+
+	UPROPERTY(EditAnywhere, Category = "Init")
+	TArray<FSFRadialMenuOption> DefensiveMenuOptions;
+
 
 	// Gets set once ship is being piloted, one hand is now driving.
 	UPROPERTY(BlueprintReadOnly)

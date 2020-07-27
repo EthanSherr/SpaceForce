@@ -15,6 +15,7 @@
 #include "SFShipPawn.h"
 #include "SteamVRChaperoneComponent.h"
 #include "DrawDebugHelpers.h"
+#include "../UI/SFRadialMenuComponent.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
@@ -170,14 +171,16 @@ void ASFPilotPawn::SetSpeed(float Speed) {
 }
 
 void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipPawn* NewShip) {
-	if (!NewShip) {
+	if (!NewShip) 
 		return;
-	}
+	
 	NewDrivingHand->SetHandState(EHandState::Driving);
+	NewDrivingHand->RadialMenuComponent->SetData(DefensiveMenuOptions);
 	NewShip->FlightMovement->SetTargetComponent(NewDrivingHand);
 
 	auto NewAimingHand = GetOtherHand(NewDrivingHand);
 	NewAimingHand->SetHandState(EHandState::Aiming);
+	NewDrivingHand->RadialMenuComponent->SetData(OffensiveMenuOptions);
 
 	NewShip->SetOwner(this);
 	NewShip->AimTargetComponent = NewAimingHand;
