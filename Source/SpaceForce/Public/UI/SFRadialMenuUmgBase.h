@@ -13,13 +13,16 @@ class SPACEFORCE_API USFRadialMenuUmgBase : public UUserWidget
 public:
 
     UFUNCTION(BlueprintCallable)
+    void ReloadData();
+
+    UFUNCTION(BlueprintCallable)
     void SetAxisInput(FVector2D Vector);
 
     UFUNCTION(BlueprintCallable)
     void SetData(TArray<FSFRadialMenuOption> NewData);
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
-    void GetStartAndEndAngleForIndex(const int& Index, float& OutStart, float& OutEnd);
+    void GetSphericalCoordinatesForIndex(const int& Index, float& OutMax, float& OutMin, float& OutIncrement);
 
     // how far from the center (0,1) must I go to select something in SetAxisInput for focus to be called
     UPROPERTY(EditAnywhere)

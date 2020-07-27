@@ -11,16 +11,21 @@ void USFRadialMenuUmgBase::SetData(TArray<FSFRadialMenuOption> NewData)
 	ReceiveOnSetData();
 }
 
+void USFRadialMenuUmgBase::ReloadData()
+{
+	ReceiveOnSetData();
+}
+
 float USFRadialMenuUmgBase::GetAngleIncrement() const
 {
 	return 360.0f / Data.Num();
 }
 
-void USFRadialMenuUmgBase::GetStartAndEndAngleForIndex(const int& Index, float& OutStart, float& OutEnd)
+void USFRadialMenuUmgBase::GetSphericalCoordinatesForIndex(const int& Index, float& OutMax, float& OutMin, float& OutIncrement)
 {
-	const float Increment = GetAngleIncrement();
-	OutStart = Increment * (Index - 0.5f) + 90.0f;
-	OutEnd = OutStart + Increment;
+	OutIncrement = GetAngleIncrement();
+	OutMin = OutIncrement * (Index - 0.5f) + 90.0f;
+	OutMax = OutMin + OutIncrement;
 }
 
 void USFRadialMenuUmgBase::SetAxisInput(FVector2D Input)

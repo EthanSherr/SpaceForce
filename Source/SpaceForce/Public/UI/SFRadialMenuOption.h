@@ -11,8 +11,11 @@ struct FSFRadialMenuOption
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FString OptionName;
 
-	FSFRadialMenuOption(FString OptionName) : OptionName(OptionName) {}
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	UMaterialInterface* ImageMat;
 
-	FSFRadialMenuOption() : OptionName(FString("")) {}
+	FSFRadialMenuOption(FString _OptionName, UMaterialInterface* _ImageMat) : OptionName(_OptionName), ImageMat(_ImageMat) {}
+
+	FSFRadialMenuOption() : OptionName(FString("")), ImageMat(NULL) {}
 };
 
