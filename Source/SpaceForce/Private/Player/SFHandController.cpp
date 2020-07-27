@@ -40,6 +40,12 @@ USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer
 	ScanDistance = 1000.0f;
 }
 
+void USFHandController::BeginPlay()
+{
+	Super::BeginPlay();
+	RadialMenuComponent->HandController = this;
+}
+
 void USFHandController::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);

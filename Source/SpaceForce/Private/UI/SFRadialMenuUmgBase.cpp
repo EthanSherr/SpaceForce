@@ -11,6 +11,11 @@ void USFRadialMenuUmgBase::SetData(TArray<FSFRadialMenuOption> NewData)
 	ReceiveOnSetData();
 }
 
+TArray<FSFRadialMenuOption> USFRadialMenuUmgBase::GetData() const
+{
+	return Data;
+}
+
 void USFRadialMenuUmgBase::ReloadData()
 {
 	ReceiveOnSetData();
@@ -50,7 +55,8 @@ void USFRadialMenuUmgBase::SetFocusedIndex(int Index)
 		return;
 	const int OldIndex = FocusedIndex;
 	FocusedIndex = Index;
-	ReceiveOnFocusedIndexChanged(FocusedIndex, OldIndex);
+	OnFocusedChanged.Broadcast(this, FocusedIndex, OldIndex);
+	//ReceiveOnFocusedIndexChanged(FocusedIndex, OldIndex);
 }
 
 int USFRadialMenuUmgBase::GetFocusedIndex()
@@ -64,7 +70,7 @@ void USFRadialMenuUmgBase::SetSelectedIndex(int Index)
 		return;
 	const int OldIndex = SelectedIndex;
 	SelectedIndex = Index;
-	ReceiveOnSelectedIndexChanged(SelectedIndex, OldIndex);
+	OnSelectedChanged.Broadcast(this, SelectedIndex, OldIndex);
 }
 
 int USFRadialMenuUmgBase::GetSelectedIndex()

@@ -5,6 +5,9 @@
 #include "SFRadialMenuOption.h"
 #include "SFRadialMenuUmgBase.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnFocusChanged, USFRadialMenuUmgBase*, Menu, int, NewFocus, int, OldFocus);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnSelectedChanged, USFRadialMenuUmgBase*, Menu, int, NewSelected, int, OldSelected);
+
 UCLASS()
 class SPACEFORCE_API USFRadialMenuUmgBase : public UUserWidget
 {
@@ -20,6 +23,9 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void SetData(TArray<FSFRadialMenuOption> NewData);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    TArray<FSFRadialMenuOption> GetData() const;
 
     UFUNCTION(BlueprintCallable, BlueprintPure)
     void GetSphericalCoordinatesForIndex(const int& Index, float& OutMax, float& OutMin, float& OutIncrement);
@@ -40,13 +46,13 @@ protected:
     void ReceiveOnSetData();
 
 // Selected callbacks
-protected:
+public:
 
-    UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnSelectedIndexChanged"))
-    void ReceiveOnSelectedIndexChanged(int NewIndex, int OldIndex);
+    UPROPERTY(BlueprintAssignable)
+    FOnFocusChanged OnFocusedChanged;
 
-    UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "OnFocusedIndexChanged"))
-    void ReceiveOnFocusedIndexChanged(int NewIndex, int OldIndex);
+    UPROPERTY(BlueprintAssignable)
+    FOnSelectedChanged OnSelectedChanged;
 
 private:
     UPROPERTY(BlueprintSetter = SetSelectedIndex, BlueprintGetter = GetSelectedIndex)

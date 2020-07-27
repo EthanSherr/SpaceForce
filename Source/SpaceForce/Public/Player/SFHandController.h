@@ -19,6 +19,9 @@ class SPACEFORCE_API USFHandController : public UMotionControllerComponent
 	GENERATED_UCLASS_BODY()
 
 public:
+	UFUNCTION()
+	virtual void BeginPlay() override;
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
 	USphereComponent* ShipScanner;
 
@@ -58,7 +61,7 @@ public:
 	UFUNCTION()
 	void OnTriggerDown(bool& OutbCapturesInput);
 
-	UPROPERTY(BlueprintReadonly)
+	UPROPERTY(BlueprintReadonly, EditInstanceOnly)
 	USFRadialMenuComponent* RadialMenuComponent;
 
 protected:

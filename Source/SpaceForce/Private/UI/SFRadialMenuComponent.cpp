@@ -5,6 +5,8 @@
 #include "Components/WidgetComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "SFRadialMenuUmgBase.h"
+#include "../Player/SFHandController.h"
+#include "GameFramework/PlayerController.h"
 
 USFRadialMenuComponent::USFRadialMenuComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -29,18 +31,39 @@ USFRadialMenuComponent::USFRadialMenuComponent(const FObjectInitializer& ObjectI
 	CursorRadius = DrawSizeDim/2 * Scale;
 }
 
-
-// Called when the game starts
 void USFRadialMenuComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	auto RadialMenu = GetRadialMenu();
+	if (!RadialMenu)
+	{
+		UE_LOG(LogTemp, Error, TEXT("NO RADIAL MENU ON BEGINPLAY"))
+		return;
+	}
+
+	RadialMenu->OnSelectedChanged.AddDynamic(this, &USFRadialMenuComponent::OnSelectedChanged);
+	RadialMenu->OnFocusedChanged.AddDynamic(this, &USFRadialMenuComponent::OnFocusedChanged);
 }
 
-
-// Called every frame
-void USFRadialMenuComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+void USFRadialMenuComponent::SetData(TArray<FSFRadialMenuOption> Data)
 {
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	GetRadialMenu()->SetData(Data);
+}
+
+TArray<FSFRadialMenuOption> USFRadialMenuComponent::GetData()
+{
+	return GetRadialMenu()->GetData();
+}
+
+void USFRadialMenuComponent::OnSelectedChanged(USFRadialMenuUmgBase* Menu, int New, int Old)
+{
+	PlayHapticEffect();
+	OnMenuItemSelected.Broadcast(Menu->GetData()[New]);
+}
+
+void USFRadialMenuComponent::OnFocusedChanged(USFRadialMenuUmgBase* Menu, int New, int Old)
+{
+	PlayHapticEffect();
 }
 
 void USFRadialMenuComponent::OpenMenu(bool bOpen)
@@ -51,7 +74,13 @@ void USFRadialMenuComponent::OpenMenu(bool bOpen)
 
 USFRadialMenuUmgBase* USFRadialMenuComponent::GetRadialMenu() const
 {
-	return Cast<USFRadialMenuUmgBase>(Widget->GetUserWidgetObject());
+	auto Menu = Cast<USFRadialMenuUmgBase>(Widget->GetUserWidgetObject());
+	if (!Menu)
+	{
+		Widget->InitWidget();
+		Menu = Cast<USFRadialMenuUmgBase>(Widget->GetUserWidgetObject());
+	}
+	return Menu;
 }
 
 void USFRadialMenuComponent::SetAxisInput(FVector2D Vector)
@@ -76,4 +105,14 @@ void USFRadialMenuComponent::SelectFocusedIndex()
 		return;
 
 	RadialMenu->SetSelectedIndex(FocusedIndex);
+}
+
+void USFRadialMenuComponent::PlayHapticEffect()
+{
+	if (!UIHapticEffect || !HandController) { return; }
+	auto PawnOwner = Cast<APawn>(GetOwner());
+	if (!PawnOwner) { return; }
+	auto PC = PawnOwner->GetController<APlayerController>();
+	if (!PC) { return; }
+	PC->PlayHapticEffect(UIHapticEffect, HandController->HandTypeFromMotionSource(), 1.0f, false);
 }

@@ -4,24 +4,33 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
+#include "SFRadialMenuOption.h"
 #include "SFRadialMenuComponent.generated.h"
 
 class UWidgetComponent;
 class UUserWidget;
 class USFRadialMenuUmgBase;
+class USFHandController;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMenuItemSelected, FSFRadialMenuOption, Option);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEFORCE_API USFRadialMenuComponent : public USceneComponent
 {
 	GENERATED_UCLASS_BODY()
+public:
 
-protected:
-	// Called when the game starts
+	UFUNCTION()
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+	UPROPERTY(BlueprintReadonly)
+	USFHandController* HandController;
+
+	UFUNCTION(BlueprintCallable)
+	void SetData(TArray<FSFRadialMenuOption> Data);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	TArray<FSFRadialMenuOption> GetData();
 
 	UFUNCTION(BlueprintCallable)
 	void OpenMenu(bool bOpen);
@@ -58,4 +67,19 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE float GetDrawSize() { return DrawSizeDim; }
 
+	UPROPERTY(BlueprintReadonly)
+	FOnMenuItemSelected OnMenuItemSelected;
+
+	UFUNCTION(BlueprintCallable)
+	void PlayHapticEffect();
+
+	UPROPERTY(BlueprintReadWrite)
+	UHapticFeedbackEffect_Base* UIHapticEffect;
+
+public:
+	UFUNCTION()
+	void OnSelectedChanged(USFRadialMenuUmgBase* Menu, int New, int Old);
+
+	UFUNCTION()
+	void OnFocusedChanged(USFRadialMenuUmgBase* Menu, int New, int Old);
 };
