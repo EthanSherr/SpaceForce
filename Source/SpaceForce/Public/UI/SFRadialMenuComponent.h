@@ -67,7 +67,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE float GetDrawSize() { return DrawSizeDim; }
 
-	UPROPERTY(BlueprintReadonly)
+	UPROPERTY(BlueprintAssignable)
 	FOnMenuItemSelected OnMenuItemSelected;
 
 	UFUNCTION(BlueprintCallable)
