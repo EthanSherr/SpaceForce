@@ -15,6 +15,7 @@
 #include "SFShipPawn.h"
 #include "SteamVRChaperoneComponent.h"
 #include "DrawDebugHelpers.h"
+#include "../UI/SFRadialMenuComponent.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
@@ -82,21 +83,47 @@ void ASFPilotPawn::BeginPlay() {
 	Super::BeginPlay();
 	StartPilotingShip(RightHand, InitializeWithShip);
 	InitializeWithShip = NULL;
+	//hide the menus initially
+	OnLeftTouchUp();
+	OnRightTouchUp();
 }
 
 void ASFPilotPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	if (Ship) {
-		auto NextFlightPath = GetHandInState(EHandState::Driving)->GetNearestFlightPath(SplineMovement->GetFlightPath());
-		SplineMovement->NextFlightPath = NextFlightPath;
-	}
-	auto FlightPath = SplineMovement->GetFlightPath();
-	if (FlightPath) {
-		FVector Tangent = FlightPath->Spline->GetDirectionAtDistanceAlongSpline(SplineMovement->GetDistance(), ESplineCoordinateSpace::World);
-		HandsRoot->SetRelativeLocation(HandExtension * Tangent);
-	}
+	UpdateNextFlightPath();
+	UpdateHandsRoot();
+	UpdateThumbpadAxis();
 }
+
+void ASFPilotPawn::UpdateNextFlightPath()
+{
+	if (!Ship)
+		return;
+	auto NextFlightPath = GetHandInState(EHandState::Driving)->GetNearestFlightPath(SplineMovement->GetFlightPath());
+	SplineMovement->NextFlightPath = NextFlightPath;
+}
+
+void ASFPilotPawn::UpdateHandsRoot()
+{
+	auto FlightPath = SplineMovement->GetFlightPath();
+	if (!FlightPath) 
+		return;
+	const FVector Tangent = FlightPath->Spline->GetDirectionAtDistanceAlongSpline(SplineMovement->GetDistance(), ESplineCoordinateSpace::World);
+	HandsRoot->SetRelativeLocation(HandExtension * Tangent);
+}
+
+void ASFPilotPawn::UpdateThumbpadAxis()
+{
+	if (!Ship)
+		return;
+	const FVector2D LeftInput = FVector2D(GetInputAxisValue("MCLeft_X"), GetInputAxisValue("MCLeft_Y"));
+	const FVector2D RightInput = FVector2D(GetInputAxisValue("MCRight_X"), GetInputAxisValue("MCRight_Y"));
+	LeftHand->RadialMenuComponent->SetAxisInput(LeftInput);
+	RightHand->RadialMenuComponent->SetAxisInput(RightInput);
+}
+
+/** Start inputs */
 
 void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -107,6 +134,19 @@ void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAction("LeftGrip", IE_Released, this, &ASFPilotPawn::OnLeftGripUp);
 	PlayerInputComponent->BindAction("RightGrip", IE_Pressed, this, &ASFPilotPawn::OnRightGripDown);
 	PlayerInputComponent->BindAction("RightGrip", IE_Released, this, &ASFPilotPawn::OnRightGripUp);
+
+	PlayerInputComponent->BindAction("LeftTouch", IE_Pressed, this, &ASFPilotPawn::OnLeftTouchDown);
+	PlayerInputComponent->BindAction("LeftTouch", IE_Released, this, &ASFPilotPawn::OnLeftTouchUp);
+	PlayerInputComponent->BindAction("RightTouch", IE_Pressed, this, &ASFPilotPawn::OnRightTouchDown);
+	PlayerInputComponent->BindAction("RightTouch", IE_Released, this, &ASFPilotPawn::OnRightTouchUp);
+
+	PlayerInputComponent->BindAction("LeftTap", IE_Pressed, this, &ASFPilotPawn::OnLeftClickDown);
+	PlayerInputComponent->BindAction("RightTap", IE_Pressed, this, &ASFPilotPawn::OnRightClickDown);
+
+	PlayerInputComponent->BindAxis("MCLeft_X");
+	PlayerInputComponent->BindAxis("MCLeft_Y");
+	PlayerInputComponent->BindAxis("MCRight_X");
+	PlayerInputComponent->BindAxis("MCRight_Y");
 }
 
 void ASFPilotPawn::OnTriggerDownLeft()  { OnTriggerDown(LeftHand); }
@@ -116,6 +156,14 @@ void ASFPilotPawn::OnLeftGripDown()	 { OnGrip(LeftHand, true); }
 void ASFPilotPawn::OnLeftGripUp()	 { OnGrip(LeftHand, false); }
 void ASFPilotPawn::OnRightGripDown() { OnGrip(RightHand, true); }
 void ASFPilotPawn::OnRightGripUp()	 { OnGrip(RightHand, false); }
+
+void ASFPilotPawn::OnLeftTouchDown()  { OnThumbpadTouch(LeftHand, true); }
+void ASFPilotPawn::OnLeftTouchUp()    { OnThumbpadTouch(LeftHand, false); }
+void ASFPilotPawn::OnRightTouchDown() { OnThumbpadTouch(RightHand, true); }
+void ASFPilotPawn::OnRightTouchUp()   { OnThumbpadTouch(RightHand, false); }
+
+void ASFPilotPawn::OnLeftClickDown()  { OnThumbpadClick(LeftHand, true); }
+void ASFPilotPawn::OnRightClickDown() { OnThumbpadClick(RightHand, true); }
 
 void ASFPilotPawn::OnGrip(USFHandController* Hand, bool bIsPressed)
 {
@@ -148,6 +196,21 @@ void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
 	}
 }
 
+void ASFPilotPawn::OnThumbpadTouch(USFHandController* Hand, bool bIsPressed)
+{
+	if (bIsPressed && !Ship)
+		return;
+	Hand->RadialMenuComponent->SetVisibility(bIsPressed, true);
+	Hand->RadialMenuComponent->LookAt = bIsPressed ? Camera : NULL;
+}
+
+void ASFPilotPawn::OnThumbpadClick(USFHandController* Hand, bool bIsPressed)
+{
+	if (!Ship)
+		return;
+	Hand->RadialMenuComponent->SelectFocusedIndex();
+}
+
 USFHandController* ASFPilotPawn::GetHandInState(TEnumAsByte<EHandState> HandState) {
 	TArray<USFHandController*> Hands; Hands.Add(LeftHand); Hands.Add(RightHand);
 	for (auto Hand : Hands) {
@@ -157,6 +220,7 @@ USFHandController* ASFPilotPawn::GetHandInState(TEnumAsByte<EHandState> HandStat
 	}
 	return NULL;
 }
+/** End inputs */
 
 USFHandController* ASFPilotPawn::GetOtherHand(USFHandController* Hand) {
 	if (!Hand) {
@@ -170,14 +234,16 @@ void ASFPilotPawn::SetSpeed(float Speed) {
 }
 
 void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipPawn* NewShip) {
-	if (!NewShip) {
+	if (!NewShip) 
 		return;
-	}
+	
 	NewDrivingHand->SetHandState(EHandState::Driving);
+	NewDrivingHand->RadialMenuComponent->SetData(DefensiveMenuOptions);
 	NewShip->FlightMovement->SetTargetComponent(NewDrivingHand);
 
 	auto NewAimingHand = GetOtherHand(NewDrivingHand);
 	NewAimingHand->SetHandState(EHandState::Aiming);
+	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenuOptions);
 
 	NewShip->SetOwner(this);
 	NewShip->AimTargetComponent = NewAimingHand;

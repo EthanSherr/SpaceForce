@@ -6,6 +6,7 @@
 #include "GameFramework/Pawn.h"
 #include "SFHandState.h"
 #include "Components/TimelineComponent.h"
+#include "../UI/SFRadialMenuOption.h"
 #include "SFPilotPawn.generated.h"
 
 class USceneComponent;
@@ -24,10 +25,10 @@ class SPACEFORCE_API ASFPilotPawn : public APawn
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditInstanceOnly, Category = "Debug")
 	bool bSpectateDebug;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UPROPERTY(BlueprintReadOnly)
 	USceneComponent* HandsRoot;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
@@ -45,8 +46,15 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	USteamVRChaperoneComponent* VRChaperone;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditAnywhere, Category = "Init")
 	ASFShipPawn* InitializeWithShip;
+
+	UPROPERTY(EditAnywhere, Category = "Init", BlueprintReadWrite)
+	TArray<FSFRadialMenuOption> OffensiveMenuOptions;
+
+	UPROPERTY(EditAnywhere, Category = "Init", BlueprintReadWrite)
+	TArray<FSFRadialMenuOption> DefensiveMenuOptions;
+
 
 	// Gets set once ship is being piloted, one hand is now driving.
 	UPROPERTY(BlueprintReadOnly)
@@ -72,8 +80,18 @@ public:
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
+//update begin
+public:
 	virtual void Tick(float DeltaTime) override;
 
+protected:
+	void UpdateNextFlightPath();
+	void UpdateHandsRoot();
+	void UpdateThumbpadAxis();
+//update end
+
+//inputs begin
+public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 protected:
@@ -85,7 +103,18 @@ protected:
 	void OnRightGripDown();
 	void OnRightGripUp();
 
+	void OnLeftTouchDown();
+	void OnLeftTouchUp();
+	void OnRightTouchDown();
+	void OnRightTouchUp();
+
+	void OnRightClickDown();
+	void OnLeftClickDown();
+
 	void OnGrip(USFHandController* Hand, bool bIsPressed);
+	void OnThumbpadTouch(USFHandController* Hand, bool bIsPressed);
+	void OnThumbpadClick(USFHandController* Hand, bool bIsPressed);
+//inputs end
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	float HandExtension;

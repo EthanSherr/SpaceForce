@@ -10,6 +10,7 @@
 #include "SFShipPawn.h"
 #include "SpaceForce.h"
 #include "DrawDebugHelpers.h"
+#include "../UI/SFRadialMenuComponent.h"
 
 USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	this->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -32,8 +33,18 @@ USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer
 	PathScanner->SetCollisionResponseToAllChannels(ECR_Overlap);
 	PathScanner->SetCollisionObjectType(ECC_Pawn);
 
+	RadialMenuComponent = ObjectInitializer.CreateDefaultSubobject<USFRadialMenuComponent>(this, TEXT("RadialMenuComponent"));
+	RadialMenuComponent->SetupAttachment(this);
+	RadialMenuComponent->SetRelativeLocation(FVector(0, 0, 35));
+
 	bScanForInteractables = false;
 	ScanDistance = 1000.0f;
+}
+
+void USFHandController::BeginPlay()
+{
+	Super::BeginPlay();
+	RadialMenuComponent->HandController = this;
 }
 
 void USFHandController::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
