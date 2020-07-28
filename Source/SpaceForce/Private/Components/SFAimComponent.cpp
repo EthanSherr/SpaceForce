@@ -56,18 +56,6 @@ void USFAimComponent::AimAtActor(AActor* actor, bool withLead) {
 	bLeadTrackedActor = withLead;
 }
 
-//FRotator USFAimComponent::GetAimCallibration() {
-//	if (!bWasTargetSet) {
-//		return FRotator::ZeroRotator;
-//	}
-//
-//	UpdateTargetFromTrackedActor();
-//
-//	FTransform socketTransformWorld = BarrelSocket->GetSocketTransform(SkeletalMesh);
-//	FVector relativeTarget = GetOwner()->GetActorRotation().UnrotateVector(Target - socketTransformWorld.GetTranslation());
-//	return FRotationMatrix::MakeFromX(relativeTarget).Rotator();
-//}
-
 void USFAimComponent::Debug() 
 {
 	FTransform t = InitialBarrelTransformCS * SkeletalMesh->GetComponentTransform();
