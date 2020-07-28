@@ -52,6 +52,9 @@ public:
 	void OnPossessed();
 
 protected:
+	UFUNCTION()
+	void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
 	virtual void PostInitializeComponents() override;

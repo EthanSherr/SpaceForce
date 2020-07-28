@@ -17,6 +17,9 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	ShipStaticMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, FName("ShipStaticMesh"));
 	ShipStaticMesh->SetSimulatePhysics(true);
 	ShipStaticMesh->SetCollisionProfileName(COLLISION_PROFILE_PAWN);
+	ShipStaticMesh->OnComponentHit.AddDynamic(this, &ASFShipPawn::OnCollision);
+	ShipStaticMesh->SetNotifyRigidBodyCollision(true);
+
 	RootComponent = ShipStaticMesh;
 
 	FlightMovement = ObjectInitializer.CreateDefaultSubobject<USFSpringFlightMovementComponent>(this, FName("FlightMovement"));
@@ -35,6 +38,20 @@ void ASFShipPawn::PostInitializeComponents()
 	Super::PostInitializeComponents();
 	HealthComponent->OnDeath.AddDynamic(this, &ASFShipPawn::OnDeath);
 }
+
+void ASFShipPawn::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	FString Name = OtherActor ? OtherActor->GetName() : FString("NULL");
+	if (OtherActor && !OtherActor->IsRootComponentMovable())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Ship %s hit %s"), *GetName(), *Name)
+		float PointDamage = 100.0f;
+		TSubclassOf<UDamageType> DamageType = UDamageType::StaticClass();
+		FPointDamageEvent PointDmg(PointDamage, Hit, Hit.ImpactNormal, DamageType);
+		this->TakeDamage(PointDamage, PointDmg, Controller, this);
+	}
+}
+
 
 void ASFShipPawn::OnDeath(float Health, float MaxHealth) {
 	FlightMovement->ClearTarget();
