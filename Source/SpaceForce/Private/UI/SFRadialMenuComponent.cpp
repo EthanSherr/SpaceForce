@@ -7,25 +7,27 @@
 #include "SFRadialMenuUmgBase.h"
 #include "../Player/SFHandController.h"
 #include "GameFramework/PlayerController.h"
+#include "DrawDebugHelpers.h"
 
 USFRadialMenuComponent::USFRadialMenuComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	PrimaryComponentTick.bCanEverTick = false;
+	PrimaryComponentTick.bCanEverTick = true;
+	const float Scale = 0.05f;
 	ConstructorHelpers::FClassFinder<USFRadialMenuUmgBase> UmgClassName(TEXT("/Game/Blueprints/UI/BP_RadialMenu"));
 	Widget = ObjectInitializer.CreateDefaultSubobject<UWidgetComponent>(this, TEXT("SphereComp"));
 	Widget->SetupAttachment(this);
 	Widget->SetWidgetClass(UmgClassName.Class);
-	Widget->SetRelativeScale3D(FVector::OneVector * 0.2f);
+	Widget->SetRelativeScale3D(FVector::OneVector * Scale);
 	Widget->SetRelativeRotation(FRotator(0, 180, 0));
 	Widget->SetCollisionResponseToAllChannels(ECR_Ignore);
 	Widget->SetDrawSize(FVector2D(1, 1) * DrawSizeDim);
 
-	const float Scale = 0.1f;
+	const float CursorScale = 0.05f * Scale;
 	static ConstructorHelpers::FObjectFinder<UStaticMesh>MeshAsset(TEXT("StaticMesh'/Engine/BasicShapes/Sphere.Sphere'"));
 	CursorMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, TEXT("CursorComponent"));
 	CursorMesh->SetupAttachment(this);
 	CursorMesh->SetStaticMesh(MeshAsset.Object);
-	CursorMesh->SetRelativeScale3D(FVector::OneVector * Scale);
+	CursorMesh->SetRelativeScale3D(FVector::OneVector * CursorScale);
 	CursorMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	CursorRadius = DrawSizeDim/2 * Scale;
@@ -43,6 +45,18 @@ void USFRadialMenuComponent::BeginPlay()
 
 	RadialMenu->OnSelectedChanged.AddDynamic(this, &USFRadialMenuComponent::OnSelectedChanged);
 	RadialMenu->OnFocusedChanged.AddDynamic(this, &USFRadialMenuComponent::OnFocusedChanged);
+	RadialMenu->SetDrawSizeDim(DrawSizeDim);
+}
+
+void USFRadialMenuComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (!LookAt)
+		return;
+
+	const FRotator Rotation = (-LookAt->GetComponentLocation() + this->GetComponentLocation()).Rotation();
+	SetWorldRotation(Rotation);
 }
 
 void USFRadialMenuComponent::SetData(TArray<FSFRadialMenuOption> Data)

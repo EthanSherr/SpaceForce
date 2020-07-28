@@ -59,6 +59,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SelectFocusedIndex();
 
+	UPROPERTY(BlueprintReadonly)
+	USceneComponent* LookAt;
+
 private:
 	UPROPERTY()
 	float DrawSizeDim = 500.0f;
@@ -82,4 +85,8 @@ public:
 
 	UFUNCTION()
 	void OnFocusedChanged(USFRadialMenuUmgBase* Menu, int New, int Old);
+
+protected:
+
+	virtual void TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 };

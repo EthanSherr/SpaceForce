@@ -115,6 +115,8 @@ void ASFPilotPawn::UpdateHandsRoot()
 
 void ASFPilotPawn::UpdateThumbpadAxis()
 {
+	if (!Ship)
+		return;
 	const FVector2D LeftInput = FVector2D(GetInputAxisValue("MCLeft_X"), GetInputAxisValue("MCLeft_Y"));
 	const FVector2D RightInput = FVector2D(GetInputAxisValue("MCRight_X"), GetInputAxisValue("MCRight_Y"));
 	LeftHand->RadialMenuComponent->SetAxisInput(LeftInput);
@@ -196,11 +198,16 @@ void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
 
 void ASFPilotPawn::OnThumbpadTouch(USFHandController* Hand, bool bIsPressed)
 {
+	if (bIsPressed && !Ship)
+		return;
 	Hand->RadialMenuComponent->SetVisibility(bIsPressed, true);
+	Hand->RadialMenuComponent->LookAt = bIsPressed ? Camera : NULL;
 }
 
 void ASFPilotPawn::OnThumbpadClick(USFHandController* Hand, bool bIsPressed)
 {
+	if (!Ship)
+		return;
 	Hand->RadialMenuComponent->SelectFocusedIndex();
 }
 
@@ -236,7 +243,7 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 
 	auto NewAimingHand = GetOtherHand(NewDrivingHand);
 	NewAimingHand->SetHandState(EHandState::Aiming);
-	NewDrivingHand->RadialMenuComponent->SetData(OffensiveMenuOptions);
+	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenuOptions);
 
 	NewShip->SetOwner(this);
 	NewShip->AimTargetComponent = NewAimingHand;

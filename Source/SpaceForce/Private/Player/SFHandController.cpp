@@ -35,6 +35,7 @@ USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer
 
 	RadialMenuComponent = ObjectInitializer.CreateDefaultSubobject<USFRadialMenuComponent>(this, TEXT("RadialMenuComponent"));
 	RadialMenuComponent->SetupAttachment(this);
+	RadialMenuComponent->SetRelativeLocation(FVector(0, 0, 35));
 
 	bScanForInteractables = false;
 	ScanDistance = 1000.0f;

@@ -37,6 +37,9 @@ public:
     UFUNCTION(BlueprintPure, BlueprintCallable)
     float GetAngleIncrement() const;
 
+    UFUNCTION(BlueprintImplementableEvent)
+    void SetDrawSizeDim(float Dim);
+
 protected:
   
     UPROPERTY(BlueprintReadonly)
