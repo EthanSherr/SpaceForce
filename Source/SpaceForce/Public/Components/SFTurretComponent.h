@@ -4,11 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "Components/SceneComponent.h"
-#include "SFAimComponent.h"
 #include "SFTurretComponent.generated.h"
 
 class USkeletalMeshComponent;
 class USkeletalMeshSocket;
+
+USTRUCT(Blueprintable)
+struct SPACEFORCE_API FAimCallibration
+{
+	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	FRotator From;
+
+	UPROPERTY(BlueprintReadWrite)
+	FRotator To;
+
+	FAimCallibration() : From(FRotator::ZeroRotator), To(FRotator::ZeroRotator) {}
+	FAimCallibration(FRotator from, FRotator to) : From(from), To(to) {}
+};
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class USFTurretComponent : public USceneComponent
