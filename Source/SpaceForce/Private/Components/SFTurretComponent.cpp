@@ -129,14 +129,6 @@ bool USFTurretComponent::IsAimingAtTarget(float tolerance) {
 	return deltaRotator.Pitch <= tolerance && deltaRotator.Yaw <= tolerance;
 }
 
-bool USFTurretComponent::Fire() {
-	if (!GetOwner()->Implements<USFTurretDelegate>()) {
-		return false;
-	}
-	return false;
-//	return ISFTurretDelegate::Execute_Fire(GetOwner(), this);
-}
-
 FTransform USFTurretComponent::GetMuzzleTransform() {
 	return MuzzleSocket->GetSocketTransform(SkeletalMesh);
 }

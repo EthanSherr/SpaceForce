@@ -16,36 +16,37 @@ class USFTurretComponent : public USceneComponent
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditInstanceOnly, Category = "Init")
-	FName BarrelName;
+	UPROPERTY(EditDefaultsOnly, Category = "Aim Initialization")
+	bool bLeadTarget;
 
-	UPROPERTY(EditInstanceOnly, Category = "Init")
-	FName MuzzleName;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Init")
-	float AimSpeed;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Init")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Aim Initialization")
 	float ProjectileSpeed;
 
-	UPROPERTY(EditAnywhere)
+public:
+	UPROPERTY(EditDefaultsOnly, Category = "SKM Initialization")
+	FName BarrelName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "SKM Initialization")
+	FName MuzzleName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, BlueprintGetter = GetAimSpeed, Category = "SKM Initialization")
+	float AimSpeed;
+
+	UPROPERTY(EditDefaultsOnly)
 	USkeletalMeshComponent* SkeletalMesh;
 
 protected:
 	virtual void BeginPlay() override;
 
-public:
-
-	UFUNCTION(BlueprintCallable)
-	void Debug();
-
+	// grabs sockets from skeletalmesh
 	UFUNCTION(BlueprintCallable)
 	void Initialize();
 
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FORCEINLINE float GetAimSpeed() {
-		return AimSpeed;
-	}
+public:
+	UFUNCTION(BlueprintCallable)
+	void Debug();
+
+public: // turret interface
 
 	// Set target location to give AimComponent a target & valid responses from GetBarrelLookAtLocation
 	UFUNCTION(BlueprintCallable)
@@ -54,30 +55,25 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AimAtActor(AActor* actor, bool withLead = true);
 
-	//Gives you the desired pitch/yaw for the barrel in component space (used by anim bp)
-	UFUNCTION(BlueprintCallable)
-	FAimCallibration GetAimCallibration();
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FORCEINLINE	bool HasTarget() {
-		return bWasTargetSet;
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FORCEINLINE	FVector GetTarget() {
-		return Target;
-	}
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FORCEINLINE float GetBarrelLength() {
-		return BarrelLength;
-	}
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAimingAtTarget(float tolerance = 1);
 
 	UFUNCTION(BlueprintCallable)
-	bool Fire();
+	FAimCallibration GetAimCallibration();
+
+public: // getters
+	//Gives you the desired pitch/yaw for the barrel in component space (used by anim bp)
+	UFUNCTION(BlueprintCallable, BlueprintGetter)
+	FORCEINLINE float GetAimSpeed() { return AimSpeed; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE	bool HasTarget() { return bWasTargetSet; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE	FVector GetTarget() { return Target; }
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE float GetBarrelLength() { return BarrelLength; }
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FTransform GetMuzzleTransform();

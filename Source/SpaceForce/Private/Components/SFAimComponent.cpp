@@ -127,7 +127,8 @@ bool USFAimComponent::Fire() {
 	if (!GetOwner()->Implements<USFTurretDelegate>()) {
 		return false;
 	}
-	return ISFTurretDelegate::Execute_Fire(GetOwner(), this);
+	return false;
+	//return ISFTurretDelegate::Execute_Fire(GetOwner(), this);
 }
 
 FTransform USFAimComponent::GetMuzzleTransform() {
