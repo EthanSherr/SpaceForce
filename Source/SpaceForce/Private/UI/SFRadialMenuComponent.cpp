@@ -72,7 +72,7 @@ TArray<FSFRadialMenuOption> USFRadialMenuComponent::GetData()
 void USFRadialMenuComponent::OnSelectedChanged(USFRadialMenuUmgBase* Menu, int New, int Old)
 {
 	PlayHapticEffect();
-	OnMenuItemSelected.Broadcast(Menu->GetData()[New]);
+	OnMenuItemSelected.Broadcast(this, Menu->GetData()[New], New);
 }
 
 void USFRadialMenuComponent::OnFocusedChanged(USFRadialMenuUmgBase* Menu, int New, int Old)

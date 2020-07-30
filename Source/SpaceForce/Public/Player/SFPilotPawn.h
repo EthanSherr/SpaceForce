@@ -19,6 +19,7 @@ class UInputComponent;
 class UTimelineComponent;
 class UCurveFloat;
 class ASFTurretActor;
+class USFRadialMenuComponent;
 
 UCLASS()
 class SPACEFORCE_API ASFPilotPawn : public APawn
@@ -26,12 +27,6 @@ class SPACEFORCE_API ASFPilotPawn : public APawn
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TArray<TSubclassOf<class ASFTurretActor>> TurretClasses;
-
-	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
-	TArray<ASFTurretActor*> Turrets;
-
 	UPROPERTY(EditInstanceOnly, Category = "Debug")
 	bool bSpectateDebug;
 
@@ -85,6 +80,8 @@ public:
 public:
 	virtual void BeginPlay() override;
 
+	virtual void PostInitializeComponents() override;
+
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
 //update begin
@@ -121,6 +118,10 @@ protected:
 	void OnGrip(USFHandController* Hand, bool bIsPressed);
 	void OnThumbpadTouch(USFHandController* Hand, bool bIsPressed);
 	void OnThumbpadClick(USFHandController* Hand, bool bIsPressed);
+
+	UFUNCTION()
+	void MenuItemSelected(USFRadialMenuComponent* Menu, FSFRadialMenuOption Option, int Index);
+
 //inputs end
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -128,10 +129,4 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "StartedPilotingShip"))
 	void ReceiveStartPilotingShip();
-
-//inventory setup
-private:
-	void SpawnInventory();
-	void AddTurret(ASFTurretActor* Turret);
-//inventory end
 };

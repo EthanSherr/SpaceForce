@@ -1,13 +1,14 @@
 #include "SFTurretActor.h"
 #include "../Components/SFTurretComponent.h"
+#include "Components/SkeletalMeshComponent.h"
 
-// Sets default values
 ASFTurretActor::ASFTurretActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	RootComponent = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, "Root");
 
 	TurretComponent = ObjectInitializer.CreateDefaultSubobject<USFTurretComponent>(this, "Turret");
-	TurretComponent->SetupAttachment(GetRootComponent());
+	TurretComponent->SetupAttachment(RootComponent);
 }
 
 void ASFTurretActor::AimAt(FVector Target)

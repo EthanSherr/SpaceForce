@@ -17,6 +17,8 @@
 #include "DrawDebugHelpers.h"
 #include "../UI/SFRadialMenuComponent.h"
 #include "../Weapons/SFTurretActor.h"
+#include "../UI/SFRadialMenuOption.h"
+#include "../UI/SFRadialMenuComponent.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
@@ -45,6 +47,22 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 
 	HandExtension = 75.0f;
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
+}
+
+void ASFPilotPawn::PostInitializeComponents() 
+{
+	Super::PostInitializeComponents();
+
+	LeftHand->RadialMenuComponent->OnMenuItemSelected.AddDynamic(this, &ASFPilotPawn::MenuItemSelected);
+	RightHand->RadialMenuComponent->OnMenuItemSelected.AddDynamic(this, &ASFPilotPawn::MenuItemSelected);
+}
+
+void ASFPilotPawn::MenuItemSelected(USFRadialMenuComponent* Menu, FSFRadialMenuOption Option, int Index)
+{
+	if (Menu->HandController->GetHandState() == EHandState::Aiming)
+	{
+		Ship->ActivateTurret(Index);
+	}
 }
 
 void ASFPilotPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -87,8 +105,6 @@ void ASFPilotPawn::BeginPlay() {
 	//hide the menus initially
 	OnLeftTouchUp();
 	OnRightTouchUp();
-
-	SpawnInventory();
 }
 
 void ASFPilotPawn::Tick(float DeltaTime)
@@ -97,6 +113,10 @@ void ASFPilotPawn::Tick(float DeltaTime)
 	UpdateNextFlightPath();
 	UpdateHandsRoot();
 	UpdateThumbpadAxis();
+	if (Ship && Ship->GetActiveTurret())
+	{
+		Ship->GetActiveTurret()->AimAt(GetHandInState(EHandState::Aiming)->GetComponentLocation());
+	}
 }
 
 void ASFPilotPawn::UpdateNextFlightPath()
@@ -246,31 +266,22 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 
 	auto NewAimingHand = GetOtherHand(NewDrivingHand);
 	NewAimingHand->SetHandState(EHandState::Aiming);
-	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenuOptions);
 
 	NewShip->SetOwner(this);
 	NewShip->AimTargetComponent = NewAimingHand;
 	Ship = NewShip;
 	ReceiveStartPilotingShip();
 	NewShip->OnPossessed();
-}
 
-// inventory setup
-void ASFPilotPawn::SpawnInventory()
-{
-	for (int32 i = 0; i < TurretClasses.Num(); i++)
+	TArray<FSFRadialMenuOption> OffensiveMenu;
+	for (ASFTurretActor* TurretActor: Ship->Turrets)
 	{
-		FActorSpawnParameters SpawnInfo;
-		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		ASFTurretActor* NewTurret = GetWorld()->SpawnActor<ASFTurretActor>(TurretClasses[i], SpawnInfo);
-		AddTurret(NewTurret);
+		const FSFRadialMenuOption MenuOption(TurretActor->DisplayName, TurretActor->MaterialIcon);
+		OffensiveMenu.Add(MenuOption);
 	}
+	if (OffensiveMenu.Num() > 0)
+	{
+		Ship->ActivateTurret(0);
+	}
+	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenu);
 }
-
-void ASFPilotPawn::AddTurret(ASFTurretActor* Turret)
-{
-	Turrets.Add(Turret);
-	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-	Turret->AttachToActor(this, AttachmentRules, Turret->SocketName);
-}
-// end inventory setup

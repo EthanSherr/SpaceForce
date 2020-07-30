@@ -12,7 +12,7 @@
 // Sets default values for this component's properties
 USFTurretComponent::USFTurretComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
-	SkeletalMesh = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, "SkeletalMesh");
+	SkeletalMesh = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, "TurretSKM");
 	SkeletalMesh->SetupAttachment(this);
 
 	PrimaryComponentTick.bCanEverTick = false;

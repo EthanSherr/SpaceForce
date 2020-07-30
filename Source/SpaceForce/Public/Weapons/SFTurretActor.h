@@ -7,6 +7,7 @@
 #include "SFTurretActor.generated.h"
 
 class USFTurretComponent;
+class USkeletalMeshComponent;
 
 UCLASS()
 class SPACEFORCE_API ASFTurretActor : public AActor
@@ -14,7 +15,7 @@ class SPACEFORCE_API ASFTurretActor : public AActor
 	GENERATED_UCLASS_BODY()
 	
 protected:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	USFTurretComponent* TurretComponent;
 
 public:	
@@ -27,4 +28,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void AimAtActor(AActor* TargetActor);
 
+	// UI
+public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
+	FString DisplayName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
+	UMaterialInterface* MaterialIcon;
 };
