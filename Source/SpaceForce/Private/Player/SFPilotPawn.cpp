@@ -16,6 +16,7 @@
 #include "SteamVRChaperoneComponent.h"
 #include "DrawDebugHelpers.h"
 #include "../UI/SFRadialMenuComponent.h"
+#include "../Weapons/SFTurretActor.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
@@ -86,6 +87,8 @@ void ASFPilotPawn::BeginPlay() {
 	//hide the menus initially
 	OnLeftTouchUp();
 	OnRightTouchUp();
+
+	SpawnInventory();
 }
 
 void ASFPilotPawn::Tick(float DeltaTime)
@@ -252,3 +255,22 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	NewShip->OnPossessed();
 }
 
+// inventory setup
+void ASFPilotPawn::SpawnInventory()
+{
+	for (int32 i = 0; i < TurretClasses.Num(); i++)
+	{
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		ASFTurretActor* NewTurret = GetWorld()->SpawnActor<ASFTurretActor>(TurretClasses[i], SpawnInfo);
+		AddTurret(NewTurret);
+	}
+}
+
+void ASFPilotPawn::AddTurret(ASFTurretActor* Turret)
+{
+	Turrets.Add(Turret);
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+	Turret->AttachToActor(this, AttachmentRules, Turret->SocketName);
+}
+// end inventory setup

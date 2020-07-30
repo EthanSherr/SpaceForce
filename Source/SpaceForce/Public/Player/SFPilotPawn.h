@@ -18,6 +18,7 @@ class ASFShipPawn;
 class UInputComponent;
 class UTimelineComponent;
 class UCurveFloat;
+class ASFTurretActor;
 
 UCLASS()
 class SPACEFORCE_API ASFPilotPawn : public APawn
@@ -25,6 +26,12 @@ class SPACEFORCE_API ASFPilotPawn : public APawn
 	GENERATED_UCLASS_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TArray<TSubclassOf<class ASFTurretActor>> TurretClasses;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
+	TArray<ASFTurretActor*> Turrets;
+
 	UPROPERTY(EditInstanceOnly, Category = "Debug")
 	bool bSpectateDebug;
 
@@ -121,4 +128,10 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "StartedPilotingShip"))
 	void ReceiveStartPilotingShip();
+
+//inventory setup
+private:
+	void SpawnInventory();
+	void AddTurret(ASFTurretActor* Turret);
+//inventory end
 };

@@ -60,6 +60,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void Debug();
 
+	UPROPERTY(EditAnywhere)
+	bool bDebug;
+
+	void DebugTransform(FTransform transform, float time = 0.0f);
+
 public: // turret interface
 
 	// Set target location to give AimComponent a target & valid responses from GetBarrelLookAtLocation
@@ -67,13 +72,16 @@ public: // turret interface
 	void AimAt(FVector target);
 
 	UFUNCTION(BlueprintCallable)
-	void AimAtActor(AActor* actor, bool withLead = true);
+	void AimAtActor(AActor* actor);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAimingAtTarget(float tolerance = 1);
 
 	UFUNCTION(BlueprintCallable)
 	FAimCallibration GetAimCallibration();
+
+	UFUNCTION(BlueprintCallable)
+		FAimCallibration GetAimCallibrationOld();
 
 public: // getters
 	//Gives you the desired pitch/yaw for the barrel in component space (used by anim bp)
@@ -108,7 +116,6 @@ private:
 	FVector Target;
 
 	AActor* TrackedActor;
-	bool bLeadTrackedActor;
 
 	bool UpdateTargetFromTrackedActor();
 };
