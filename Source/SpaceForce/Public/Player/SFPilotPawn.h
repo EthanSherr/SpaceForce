@@ -72,7 +72,7 @@ public:
 	void SetSpeed(float Speed);
 
 	UFUNCTION(BlueprintCallable)
-	void OnTriggerDown(USFHandController* Hand);
+	void OnTrigger(USFHandController* Hand, bool bIsPressed);
 
 	UFUNCTION(BlueprintCallable)
 	void StartPilotingShip(USFHandController* Hand, ASFShipPawn* NewShip);
@@ -101,6 +101,8 @@ public:
 protected:
 	void OnTriggerDownLeft();
 	void OnTriggerDownRight();
+	void OnTriggerUpLeft();
+	void OnTriggerUpRight();
 
 	void OnLeftGripDown();
 	void OnLeftGripUp();

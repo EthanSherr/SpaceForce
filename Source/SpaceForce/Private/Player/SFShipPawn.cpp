@@ -123,10 +123,19 @@ void ASFShipPawn::AddTurret(ASFTurretActor* Turret)
 	Turrets.Add(Turret);
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 	Turret->AttachToActor(this, AttachmentRules, Turret->SocketName);
+	Turret->SetOwner(this);
 }
 
 void ASFShipPawn::ActivateTurret(int Index)
 {
 	ActiveTurret = Turrets[Index];
+}
+
+void ASFShipPawn::TriggerAction(bool bIsPressed)
+{
+	if (!ActiveTurret)
+		return;
+
+	ActiveTurret->TriggerAction(bIsPressed);
 }
 // end inventory setup

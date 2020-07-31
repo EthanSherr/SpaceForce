@@ -153,6 +153,9 @@ void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("LeftTrigger", IE_Pressed, this, &ASFPilotPawn::OnTriggerDownLeft);
 	PlayerInputComponent->BindAction("RightTrigger", IE_Pressed, this, &ASFPilotPawn::OnTriggerDownRight);
+	PlayerInputComponent->BindAction("LeftTrigger", IE_Released, this, &ASFPilotPawn::OnTriggerUpLeft);
+	PlayerInputComponent->BindAction("RightTrigger", IE_Released, this, &ASFPilotPawn::OnTriggerUpRight);
+
 	PlayerInputComponent->BindAction("LeftGrip", IE_Pressed, this, &ASFPilotPawn::OnLeftGripDown);
 	PlayerInputComponent->BindAction("LeftGrip", IE_Released, this, &ASFPilotPawn::OnLeftGripUp);
 	PlayerInputComponent->BindAction("RightGrip", IE_Pressed, this, &ASFPilotPawn::OnRightGripDown);
@@ -172,8 +175,10 @@ void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("MCRight_Y");
 }
 
-void ASFPilotPawn::OnTriggerDownLeft()  { OnTriggerDown(LeftHand); }
-void ASFPilotPawn::OnTriggerDownRight() { OnTriggerDown(RightHand); }
+void ASFPilotPawn::OnTriggerDownLeft()  { OnTrigger(LeftHand, true); }
+void ASFPilotPawn::OnTriggerDownRight() { OnTrigger(RightHand, true); }
+void ASFPilotPawn::OnTriggerUpLeft()    { OnTrigger(LeftHand, false); }
+void ASFPilotPawn::OnTriggerUpRight()   { OnTrigger(RightHand, false); }
 
 void ASFPilotPawn::OnLeftGripDown()	 { OnGrip(LeftHand, true); }
 void ASFPilotPawn::OnLeftGripUp()	 { OnGrip(LeftHand, false); }
@@ -188,22 +193,11 @@ void ASFPilotPawn::OnRightTouchUp()   { OnThumbpadTouch(RightHand, false); }
 void ASFPilotPawn::OnLeftClickDown()  { OnThumbpadClick(LeftHand, true); }
 void ASFPilotPawn::OnRightClickDown() { OnThumbpadClick(RightHand, true); }
 
-void ASFPilotPawn::OnGrip(USFHandController* Hand, bool bIsPressed)
-{
-	const EHandState HandState = Hand->GetHandState();
-	if (HandState == EHandState::Driving)
-	{
-		Ship->TrySetIsBoosting(bIsPressed);
-	}
-	else if (HandState == EHandState::Ready)
-		StartPilotingShip(Hand, Hand->GetOverlappingShip());
-}
-
-void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
+void ASFPilotPawn::OnTrigger(USFHandController* Hand, bool bIsPressed) {
 	if (Hand->RecievesInput())
 	{
 		bool bCapturesInput;
-		Hand->OnTriggerDown(bCapturesInput);
+		Hand->OnTrigger(bCapturesInput, bIsPressed);
 		if (bCapturesInput)
 			return;
 	}
@@ -212,10 +206,23 @@ void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
 		StartPilotingShip(Hand, Hand->GetOverlappingShip());
 		break;
 	case EHandState::Aiming:
-		Ship->Fire();
+		Ship->TriggerAction(bIsPressed);
 		break;
 	case EHandState::Driving:
 		break;
+	}
+}
+
+void ASFPilotPawn::OnGrip(USFHandController* Hand, bool bIsPressed)
+{
+	const EHandState HandState = Hand->GetHandState();
+	if (HandState == EHandState::Driving)
+	{
+		Ship->TrySetIsBoosting(bIsPressed);
+	}
+	else if (HandState == EHandState::Ready)
+	{
+		StartPilotingShip(Hand, Hand->GetOverlappingShip());
 	}
 }
 

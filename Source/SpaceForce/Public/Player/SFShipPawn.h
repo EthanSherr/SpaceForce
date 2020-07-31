@@ -46,9 +46,6 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFBoosterManagerComponent* BoosterManagerComponent;
 
-	UFUNCTION(BlueprintImplementableEvent)
-	void Fire();
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive();
 
@@ -91,5 +88,8 @@ public:
 public:
 	UFUNCTION(BlueprintCallable)
 	void ActivateTurret(int Index);
+
+	UFUNCTION(BlueprintCallable)
+	void TriggerAction(bool bIsPressed);
 // inventory end
 };
