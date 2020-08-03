@@ -71,6 +71,8 @@ TArray<FSFRadialMenuOption> USFRadialMenuComponent::GetData()
 
 void USFRadialMenuComponent::OnSelectedChanged(USFRadialMenuUmgBase* Menu, int New, int Old)
 {
+	if (Old == -1 || New == -1)
+		return;
 	PlayHapticEffect();
 	OnMenuItemSelected.Broadcast(this, Menu->GetData()[New], New);
 }
@@ -121,6 +123,11 @@ void USFRadialMenuComponent::SelectFocusedIndex()
 		return;
 
 	RadialMenu->SetSelectedIndex(FocusedIndex);
+}
+
+void USFRadialMenuComponent::SetSelectedIndex(int SelectedIndex)
+{
+	GetRadialMenu()->SetSelectedIndex(SelectedIndex);
 }
 
 void USFRadialMenuComponent::PlayHapticEffect()

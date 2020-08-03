@@ -269,6 +269,7 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	
 	NewDrivingHand->SetHandState(EHandState::Driving);
 	NewDrivingHand->RadialMenuComponent->SetData(DefensiveMenuOptions);
+	NewDrivingHand->RadialMenuComponent->SetSelectedIndex(0);
 	NewShip->FlightMovement->SetTargetComponent(NewDrivingHand);
 
 	auto NewAimingHand = GetOtherHand(NewDrivingHand);
@@ -291,4 +292,5 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 		Ship->ActivateTurret(0);
 	}
 	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenu);
+	NewAimingHand->RadialMenuComponent->SetSelectedIndex(0);
 }

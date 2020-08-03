@@ -35,18 +35,15 @@ float USFHealthComponent::ChangeHealth(float DeltaHealth)
 	{
 		OnHealthChanged.Broadcast(Health, MaxHealth);
 	}
-	if (!bActorRemoved)
+	if (!DeadBroadcasted && IsDead() && OnDeath.IsBound())
 	{
-		if (!DeadBroadcasted && IsDead() && OnDeath.IsBound())
-		{
-			OnDeath.Broadcast(Health, MaxHealth);
-			DeadBroadcasted = true;
-		}
-		if (!MegaDeadBroadcasted && IsMegaDead() && OnMegaDeath.IsBound())
-		{
-			OnMegaDeath.Broadcast(Health, MaxHealth);
-			MegaDeadBroadcasted = true;
-		}
+		OnDeath.Broadcast(Health, MaxHealth);
+		DeadBroadcasted = true;
+	}
+	if (!MegaDeadBroadcasted && IsMegaDead() && OnMegaDeath.IsBound())
+	{
+		OnMegaDeath.Broadcast(Health, MaxHealth);
+		MegaDeadBroadcasted = true;
 	}
 
 	return Health;
@@ -65,4 +62,10 @@ bool USFHealthComponent::IsDead()
 bool USFHealthComponent::IsAlive()
 {
 	return !IsDead();
+}
+
+void USFHealthComponent::UnbindAllDeathEvents(UObject* Target)
+{
+	OnMegaDeath.RemoveAll(Target);
+	OnDeath.RemoveAll(Target);
 }

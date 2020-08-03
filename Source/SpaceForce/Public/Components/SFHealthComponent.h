@@ -48,8 +48,8 @@ public:
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	float MegaDeathThreshold;
 
-	UPROPERTY(BlueprintReadWrite)
-	bool bActorRemoved;
+	UFUNCTION(BlueprintCallable)
+	void UnbindAllDeathEvents(UObject* Target);
 
 protected:
 	virtual void InitializeComponent() override;

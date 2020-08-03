@@ -59,6 +59,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SelectFocusedIndex();
 
+	UFUNCTION(BlueprintCallable)
+		void SetSelectedIndex(int SelectedIndex);
+
 	UPROPERTY(BlueprintReadonly)
 	USceneComponent* LookAt;
 
