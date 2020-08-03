@@ -11,6 +11,7 @@ class USFSplineMovementComponent;
 class USFSpringFlightMovementComponent;
 class USFBoosterManagerComponent;
 class ASFPilotPawn;
+class ASFTurretActor;
 
 UCLASS()
 class SPACEFORCE_API ASFShipPawn : public APawn
@@ -18,6 +19,12 @@ class SPACEFORCE_API ASFShipPawn : public APawn
 	GENERATED_UCLASS_BODY()
 
 public:
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TArray<TSubclassOf<class ASFTurretActor>> TurretClasses;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
+	TArray<ASFTurretActor*> Turrets;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ShipStaticMesh;
 
@@ -38,9 +45,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFBoosterManagerComponent* BoosterManagerComponent;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void Fire();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive();
@@ -67,4 +71,25 @@ protected:
 private:
 	UPROPERTY()
 	USFSplineMovementComponent* AssociatedSplineMovementComponent;
+
+
+// inventory setup
+private:
+	void SpawnInventory();
+	void AddTurret(ASFTurretActor* Turret);
+
+protected:
+	UPROPERTY(BlueprintGetter = GetActiveTurret)
+	ASFTurretActor* ActiveTurret;
+
+public:
+	UFUNCTION(BlueprintGetter)
+	FORCEINLINE ASFTurretActor* GetActiveTurret() { return ActiveTurret; }
+public:
+	UFUNCTION(BlueprintCallable)
+	void ActivateTurret(int Index);
+
+	UFUNCTION(BlueprintCallable)
+	void TriggerAction(bool bIsPressed);
+// inventory end
 };

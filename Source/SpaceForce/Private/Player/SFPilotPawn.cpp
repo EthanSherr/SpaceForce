@@ -16,6 +16,9 @@
 #include "SteamVRChaperoneComponent.h"
 #include "DrawDebugHelpers.h"
 #include "../UI/SFRadialMenuComponent.h"
+#include "../Weapons/SFTurretActor.h"
+#include "../UI/SFRadialMenuOption.h"
+#include "../UI/SFRadialMenuComponent.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
@@ -44,6 +47,22 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 
 	HandExtension = 75.0f;
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
+}
+
+void ASFPilotPawn::PostInitializeComponents() 
+{
+	Super::PostInitializeComponents();
+
+	LeftHand->RadialMenuComponent->OnMenuItemSelected.AddDynamic(this, &ASFPilotPawn::MenuItemSelected);
+	RightHand->RadialMenuComponent->OnMenuItemSelected.AddDynamic(this, &ASFPilotPawn::MenuItemSelected);
+}
+
+void ASFPilotPawn::MenuItemSelected(USFRadialMenuComponent* Menu, FSFRadialMenuOption Option, int Index)
+{
+	if (Menu->HandController->GetHandState() == EHandState::Aiming)
+	{
+		Ship->ActivateTurret(Index);
+	}
 }
 
 void ASFPilotPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent)
@@ -94,6 +113,10 @@ void ASFPilotPawn::Tick(float DeltaTime)
 	UpdateNextFlightPath();
 	UpdateHandsRoot();
 	UpdateThumbpadAxis();
+	if (Ship && Ship->GetActiveTurret())
+	{
+		Ship->GetActiveTurret()->AimAt(GetHandInState(EHandState::Aiming)->GetComponentLocation());
+	}
 }
 
 void ASFPilotPawn::UpdateNextFlightPath()
@@ -130,6 +153,9 @@ void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	PlayerInputComponent->BindAction("LeftTrigger", IE_Pressed, this, &ASFPilotPawn::OnTriggerDownLeft);
 	PlayerInputComponent->BindAction("RightTrigger", IE_Pressed, this, &ASFPilotPawn::OnTriggerDownRight);
+	PlayerInputComponent->BindAction("LeftTrigger", IE_Released, this, &ASFPilotPawn::OnTriggerUpLeft);
+	PlayerInputComponent->BindAction("RightTrigger", IE_Released, this, &ASFPilotPawn::OnTriggerUpRight);
+
 	PlayerInputComponent->BindAction("LeftGrip", IE_Pressed, this, &ASFPilotPawn::OnLeftGripDown);
 	PlayerInputComponent->BindAction("LeftGrip", IE_Released, this, &ASFPilotPawn::OnLeftGripUp);
 	PlayerInputComponent->BindAction("RightGrip", IE_Pressed, this, &ASFPilotPawn::OnRightGripDown);
@@ -149,8 +175,10 @@ void ASFPilotPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputCompone
 	PlayerInputComponent->BindAxis("MCRight_Y");
 }
 
-void ASFPilotPawn::OnTriggerDownLeft()  { OnTriggerDown(LeftHand); }
-void ASFPilotPawn::OnTriggerDownRight() { OnTriggerDown(RightHand); }
+void ASFPilotPawn::OnTriggerDownLeft()  { OnTrigger(LeftHand, true); }
+void ASFPilotPawn::OnTriggerDownRight() { OnTrigger(RightHand, true); }
+void ASFPilotPawn::OnTriggerUpLeft()    { OnTrigger(LeftHand, false); }
+void ASFPilotPawn::OnTriggerUpRight()   { OnTrigger(RightHand, false); }
 
 void ASFPilotPawn::OnLeftGripDown()	 { OnGrip(LeftHand, true); }
 void ASFPilotPawn::OnLeftGripUp()	 { OnGrip(LeftHand, false); }
@@ -165,22 +193,11 @@ void ASFPilotPawn::OnRightTouchUp()   { OnThumbpadTouch(RightHand, false); }
 void ASFPilotPawn::OnLeftClickDown()  { OnThumbpadClick(LeftHand, true); }
 void ASFPilotPawn::OnRightClickDown() { OnThumbpadClick(RightHand, true); }
 
-void ASFPilotPawn::OnGrip(USFHandController* Hand, bool bIsPressed)
-{
-	const EHandState HandState = Hand->GetHandState();
-	if (HandState == EHandState::Driving)
-	{
-		Ship->TrySetIsBoosting(bIsPressed);
-	}
-	else if (HandState == EHandState::Ready)
-		StartPilotingShip(Hand, Hand->GetOverlappingShip());
-}
-
-void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
+void ASFPilotPawn::OnTrigger(USFHandController* Hand, bool bIsPressed) {
 	if (Hand->RecievesInput())
 	{
 		bool bCapturesInput;
-		Hand->OnTriggerDown(bCapturesInput);
+		Hand->OnTrigger(bCapturesInput, bIsPressed);
 		if (bCapturesInput)
 			return;
 	}
@@ -189,10 +206,23 @@ void ASFPilotPawn::OnTriggerDown(USFHandController* Hand) {
 		StartPilotingShip(Hand, Hand->GetOverlappingShip());
 		break;
 	case EHandState::Aiming:
-		Ship->Fire();
+		Ship->TriggerAction(bIsPressed);
 		break;
 	case EHandState::Driving:
 		break;
+	}
+}
+
+void ASFPilotPawn::OnGrip(USFHandController* Hand, bool bIsPressed)
+{
+	const EHandState HandState = Hand->GetHandState();
+	if (HandState == EHandState::Driving)
+	{
+		Ship->TrySetIsBoosting(bIsPressed);
+	}
+	else if (HandState == EHandState::Ready)
+	{
+		StartPilotingShip(Hand, Hand->GetOverlappingShip());
 	}
 }
 
@@ -239,16 +269,28 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	
 	NewDrivingHand->SetHandState(EHandState::Driving);
 	NewDrivingHand->RadialMenuComponent->SetData(DefensiveMenuOptions);
+	NewDrivingHand->RadialMenuComponent->SetSelectedIndex(0);
 	NewShip->FlightMovement->SetTargetComponent(NewDrivingHand);
 
 	auto NewAimingHand = GetOtherHand(NewDrivingHand);
 	NewAimingHand->SetHandState(EHandState::Aiming);
-	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenuOptions);
 
 	NewShip->SetOwner(this);
 	NewShip->AimTargetComponent = NewAimingHand;
 	Ship = NewShip;
 	ReceiveStartPilotingShip();
 	NewShip->OnPossessed();
-}
 
+	TArray<FSFRadialMenuOption> OffensiveMenu;
+	for (ASFTurretActor* TurretActor: Ship->Turrets)
+	{
+		const FSFRadialMenuOption MenuOption(TurretActor->DisplayName, TurretActor->MaterialIcon);
+		OffensiveMenu.Add(MenuOption);
+	}
+	if (OffensiveMenu.Num() > 0)
+	{
+		Ship->ActivateTurret(0);
+	}
+	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenu);
+	NewAimingHand->RadialMenuComponent->SetSelectedIndex(0);
+}

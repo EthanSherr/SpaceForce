@@ -18,6 +18,8 @@ class ASFShipPawn;
 class UInputComponent;
 class UTimelineComponent;
 class UCurveFloat;
+class ASFTurretActor;
+class USFRadialMenuComponent;
 
 UCLASS()
 class SPACEFORCE_API ASFPilotPawn : public APawn
@@ -70,13 +72,15 @@ public:
 	void SetSpeed(float Speed);
 
 	UFUNCTION(BlueprintCallable)
-	void OnTriggerDown(USFHandController* Hand);
+	void OnTrigger(USFHandController* Hand, bool bIsPressed);
 
 	UFUNCTION(BlueprintCallable)
 	void StartPilotingShip(USFHandController* Hand, ASFShipPawn* NewShip);
 
 public:
 	virtual void BeginPlay() override;
+
+	virtual void PostInitializeComponents() override;
 
 	virtual void PostEditChangeProperty(FPropertyChangedEvent& PropertyChangedEvent) override;
 
@@ -97,6 +101,8 @@ public:
 protected:
 	void OnTriggerDownLeft();
 	void OnTriggerDownRight();
+	void OnTriggerUpLeft();
+	void OnTriggerUpRight();
 
 	void OnLeftGripDown();
 	void OnLeftGripUp();
@@ -114,6 +120,10 @@ protected:
 	void OnGrip(USFHandController* Hand, bool bIsPressed);
 	void OnThumbpadTouch(USFHandController* Hand, bool bIsPressed);
 	void OnThumbpadClick(USFHandController* Hand, bool bIsPressed);
+
+	UFUNCTION()
+	void MenuItemSelected(USFRadialMenuComponent* Menu, FSFRadialMenuOption Option, int Index);
+
 //inputs end
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)

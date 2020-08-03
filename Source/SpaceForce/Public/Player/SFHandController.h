@@ -59,7 +59,7 @@ public:
 	EControllerHand HandTypeFromMotionSource();
 
 	UFUNCTION()
-	void OnTriggerDown(bool& OutbCapturesInput);
+	void OnTrigger(bool& OutbCapturesInput, const bool& bIsPressed);
 
 	UPROPERTY(BlueprintReadonly, EditInstanceOnly)
 	USFRadialMenuComponent* RadialMenuComponent;

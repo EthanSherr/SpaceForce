@@ -16,5 +16,5 @@ class SPACEFORCE_API ISFTurretDelegate
 
 public:
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "TurretDelegate")
-	bool Fire(class USFAimComponent* AimComponent);
+	bool Fire(class USFTurretComponent* TurretComponent);
 };

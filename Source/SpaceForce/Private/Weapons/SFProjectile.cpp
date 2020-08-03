@@ -37,13 +37,15 @@ ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Supe
 	InitialLifeSpan = 7.0f;
 }
 
-void ASFProjectile::PreInitializeComponents() {
+void ASFProjectile::PreInitializeComponents() 
+{
 	Super::PreInitializeComponents();
 	MovementComp->InitialSpeed = Speed;
 	MovementComp->MaxSpeed = Speed;
 }
 
-void ASFProjectile::PostInitializeComponents() {
+void ASFProjectile::PostInitializeComponents() 
+{
 	Super::PostInitializeComponents();
 	MovementComp->OnProjectileStop.AddDynamic(this, &ASFProjectile::OnImpact);
 	CollisionComp->MoveIgnoreActors = IgnoreActors;

@@ -148,7 +148,7 @@ bool USFHandController::RecievesInput()
 	return bScanForInteractables;
 }
 
-void USFHandController::OnTriggerDown(bool& OutbCapturesInput)
+void USFHandController::OnTrigger(bool& OutbCapturesInput, const bool& bPressed)
 {
 	if (FocusedActor.Get()) {
 		Cast<ASFLevelDiorama>(FocusedActor.Get())->SetSelected(true);

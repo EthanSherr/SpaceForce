@@ -10,6 +10,7 @@
 #include "../Environment/SFFlightPath.h"
 #include "SFPilotPawn.h"
 #include "SpaceForce.h"
+#include "../Weapons/SFTurretActor.h"
 
 ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -37,6 +38,7 @@ void ASFShipPawn::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
 	HealthComponent->OnDeath.AddDynamic(this, &ASFShipPawn::OnDeath);
+	SpawnInventory();
 }
 
 void ASFShipPawn::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -101,3 +103,39 @@ void ASFShipPawn::TrySetIsBoosting(bool bNewIsBoosting)
 void ASFShipPawn::Tick(float DeltaTime) {
 	Super::Tick(DeltaTime);
 }
+
+// inventory setup
+void ASFShipPawn::SpawnInventory()
+{
+	for (int32 i = 0; i < TurretClasses.Num(); i++)
+	{
+		FActorSpawnParameters SpawnInfo;
+		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		ASFTurretActor* NewTurret = GetWorld()->SpawnActor<ASFTurretActor>(TurretClasses[i], SpawnInfo);
+		AddTurret(NewTurret);
+	}
+}
+
+void ASFShipPawn::AddTurret(ASFTurretActor* Turret)
+{
+	if (!Turret)
+		return;
+	Turrets.Add(Turret);
+	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
+	Turret->AttachToActor(this, AttachmentRules, Turret->SocketName);
+	Turret->SetOwner(this);
+}
+
+void ASFShipPawn::ActivateTurret(int Index)
+{
+	ActiveTurret = Turrets[Index];
+}
+
+void ASFShipPawn::TriggerAction(bool bIsPressed)
+{
+	if (!ActiveTurret)
+		return;
+
+	ActiveTurret->TriggerAction(bIsPressed);
+}
+// end inventory setup

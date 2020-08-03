@@ -12,7 +12,7 @@ class UUserWidget;
 class USFRadialMenuUmgBase;
 class USFHandController;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnMenuItemSelected, FSFRadialMenuOption, Option);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnMenuItemSelected, USFRadialMenuComponent*, Menu, FSFRadialMenuOption, Option, int, Index);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEFORCE_API USFRadialMenuComponent : public USceneComponent
@@ -58,6 +58,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void SelectFocusedIndex();
+
+	UFUNCTION(BlueprintCallable)
+		void SetSelectedIndex(int SelectedIndex);
 
 	UPROPERTY(BlueprintReadonly)
 	USceneComponent* LookAt;
