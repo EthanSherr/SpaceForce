@@ -70,6 +70,7 @@ void ASFProjectile::DisableAndDestroy() {
 
 	MovementComp->StopMovementImmediately();
 	SetLifeSpan(LifeSpanAfterImpact);
+	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 }
 
 void ASFProjectile::Explode(const FHitResult& Impact) {

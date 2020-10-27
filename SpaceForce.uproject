@@ -24,11 +24,27 @@
 		},
 		{
 			"Name": "ChaosEditor",
-			"Enabled": true
+			"Enabled": false
 		},
 		{
 			"Name": "ChaosSolverPlugin",
+			"Enabled": false
+		},
+		{
+			"Name": "ApexDestruction",
 			"Enabled": true
+		},
+		{
+			"Name": "ChaosClothEditor",
+			"Enabled": false
+		},
+		{
+			"Name": "ChaosCloth",
+			"Enabled": false
+		},
+		{
+			"Name": "ChaosNiagara",
+			"Enabled": false
 		}
 	]
 }
