@@ -30,7 +30,10 @@ bool USFSpringFlightMovementComponent::IsValid(bool logError) {
 }
 
 void USFSpringFlightMovementComponent::AddInputVector(FVector WorldVector, bool bForce) {
-	SetTarget(WorldVector + GetUpdatedPrimitiveComp()->GetComponentLocation());
+	const FVector Target = WorldVector + GetUpdatedPrimitiveComp()->GetComponentLocation();
+	//DrawDebugLine(GetWorld(), GetUpdatedPrimitiveComp()->GetComponentLocation(), Target, FColor::Yellow, false, 0.f, 10, 0.5f);
+	//DrawDebugPoint(GetWorld(), Target, 5.0f, FColor::Yellow, false, 0.f, 10);
+	SetTarget(Target);
 	//Super::AddInputVector(WorldVector, bForce);
 	//PendingInputVector grows until cleared with ConsumeInputVector().
 }

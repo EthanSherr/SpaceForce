@@ -42,6 +42,14 @@ class SPACEFORCE_API USFSpringFlightMovementComponent : public UPawnMovementComp
 	GENERATED_UCLASS_BODY()
 
 public:
+
+
+	inline float GetMaxSpeed() const override
+	{
+		//UE_LOG(LogTemp, WARNING, TEXT("Returning GetMaxSpeed %f", LinearMaxSpeed))
+		return LinearMaxSpeed;
+	}
+
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float LinearStiffness;
 

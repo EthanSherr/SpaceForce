@@ -85,6 +85,11 @@ FVector ASFFlightPath::GetLocationAtDistance(float distance)
 	}
 }
 
+bool ASFFlightPath::OffsetExceedsLength(float SplineOffset) 
+{
+	return Spline->GetSplineLength() < SplineOffset;
+}
+
 bool ASFFlightPath::PointsForDistance(float Distance, FSplineDistance& OutStart, FSplineDistance& OutEnd) {
 	if (Points.Num() == 0) {
 		UE_LOG(LogTemp, Error, TEXT("No points are computed, cannot return PointsForDistance"))
@@ -112,7 +117,7 @@ bool ASFFlightPath::PointsForDistance(float Distance, FSplineDistance& OutStart,
 		iterations++;
 	}
 	if (iterations > 0) {
-		UE_LOG(LogTemp, Warning, TEXT("Iterations %d"), iterations)
+		//UE_LOG(LogTemp, Warning, TEXT("Iterations %d"), iterations)
 	}
 	if (distanceIndex + 1 >= Points.Num()) {
 		return false;

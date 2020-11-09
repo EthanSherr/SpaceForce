@@ -10,6 +10,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "DrawDebugHelpers.h"
 #include "Landscape.h"
+#include "../Environment/SFFlightPath.h"
 
 ASFAIController::ASFAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackBoardComp"));
@@ -27,11 +28,18 @@ void ASFAIController::OnPossess(APawn* InPawn) {
 
 		EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
 		CanAttackKeyID = BlackboardComp->GetKeyID("CanAttack");
+		FlightPathKeyID = BlackboardComp->GetKeyID("FlightPath");
 		if (!Bot->DebugDisabled)
 		{
 			BehaviorComp->StartTree(*(Bot->BehaviorTree));
 		}
 	}
+}
+
+void ASFAIController::SetFlightPathInBlackboard(ASFFlightPath* FlightPath) 
+{
+	if (BlackboardComp)
+		BlackboardComp->SetValue<UBlackboardKeyType_Object>(FlightPathKeyID, FlightPath);
 }
 
 void ASFAIController::SetCanAttackInBlackboard(bool InValue)

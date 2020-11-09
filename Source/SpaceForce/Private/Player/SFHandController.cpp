@@ -31,6 +31,7 @@ USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer
 	PathScanner->SetupAttachment(this);
 	PathScanner->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	PathScanner->SetCollisionResponseToAllChannels(ECR_Overlap);
+	PathScanner->SetCollisionResponseToChannel(COLLISION_LANDSCAPE, ECR_Ignore);
 	PathScanner->SetCollisionObjectType(ECC_Pawn);
 
 	RadialMenuComponent = ObjectInitializer.CreateDefaultSubobject<USFRadialMenuComponent>(this, TEXT("RadialMenuComponent"));

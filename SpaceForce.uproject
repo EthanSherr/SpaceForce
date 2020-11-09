@@ -13,7 +13,8 @@
 				"CoreUObject",
 				"AIModule",
 				"HeadMountedDisplay",
-				"UMG"
+				"UMG",
+				"DonAINavigation"
 			]
 		}
 	],

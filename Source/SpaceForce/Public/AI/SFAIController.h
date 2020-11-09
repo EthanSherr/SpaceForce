@@ -9,6 +9,8 @@
 /**
  * 
  */
+class ASFFlightPath;
+
 UCLASS()
 class SPACEFORCE_API ASFAIController : public AAIController
 {
@@ -19,6 +21,7 @@ protected:
 
     int32 EnemyKeyID;
     int32 CanAttackKeyID;
+    int32 FlightPathKeyID;
 
 private:
     UPROPERTY(transient)
@@ -39,6 +42,9 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
     void SetCanAttackInBlackboard(bool InValue);
+
+    UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
+    void SetFlightPathInBlackboard(ASFFlightPath* FlightPath);
 
     UFUNCTION(BlueprintPUre, Category = "AI Helper")
     void IsValidLocation(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug = false);

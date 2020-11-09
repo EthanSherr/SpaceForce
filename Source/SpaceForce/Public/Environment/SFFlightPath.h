@@ -49,6 +49,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	FVector GetLocationAtDistance(float distance);
 
+	UFUNCTION(BlueprintPure)
+	bool OffsetExceedsLength(float SplineOffset);
+
 	UPROPERTY(EditAnywhere, Category = "CustomSmoothing")
 	bool bUseCustomInterpolation;
 
