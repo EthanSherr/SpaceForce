@@ -17,10 +17,9 @@ ASFNavigationManager::ASFNavigationManager(const FObjectInitializer& ObjectIniti
 	YGridSize = 57;
 	ZGridSize = 63;
 
-	ObstacleQueryChannels.Add(ECC_WorldStatic);
-	ObstacleQueryChannels.Add(ECC_WorldDynamic);
 	ObstacleQueryChannels.Add(ECC_Destructible);
 
+	AutoCorrectionGuessList = TArray<float>();
 	AutoCorrectionGuessList.Reserve(4);
 	AutoCorrectionGuessList.Add(200);
 	AutoCorrectionGuessList.Add(375);
