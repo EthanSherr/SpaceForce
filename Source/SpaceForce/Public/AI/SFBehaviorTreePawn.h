@@ -8,6 +8,7 @@
 
 class UBehaviorTree;
 class ASFFlightPath;
+class UFloatCurve;
 
 USTRUCT(BlueprintType)
 struct FSFBehaviorTreeState
@@ -23,15 +24,23 @@ struct FSFBehaviorTreeState
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
 	ASFFlightPath* FlightPath;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
 	bool bSpeedRelativeToEnemy = true;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
-	float MaxSpeed = 200;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
+	float MaxSpeed = 350.0f;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
-	float MinSpeed = 200;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
+	float MinSpeed = 200.0f;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
+	float MaxDistance = 600.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
+	float MinDistance = 200.0f;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
+	UCurveFloat* SpeedCurve;
 };
 
 UCLASS()
