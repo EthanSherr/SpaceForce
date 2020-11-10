@@ -10,6 +10,7 @@
  * 
  */
 class ASFFlightPath;
+class UBehaviorTree;
 
 UCLASS()
 class SPACEFORCE_API ASFAIController : public AAIController
@@ -48,5 +49,8 @@ public:
 
     UFUNCTION(BlueprintPUre, Category = "AI Helper")
     void IsValidLocation(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug = false);
+
+    UFUNCTION(BlueprintCallable, Category = "AI Helper")
+    void StartBehaviorTree(UBehaviorTree* BehaviorTree);
 
 };

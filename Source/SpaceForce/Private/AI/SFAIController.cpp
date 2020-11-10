@@ -99,3 +99,16 @@ void ASFAIController::IsValidLocation(const FVector& Vector, bool& bIsValid, FVe
 		}
 	}
 }
+
+void ASFAIController::StartBehaviorTree(UBehaviorTree* BehaviorTree)
+{
+	if (BehaviorTree->BlackboardAsset) {
+		BlackboardComp->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
+	}
+
+	EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
+	CanAttackKeyID = BlackboardComp->GetKeyID("CanAttack");
+	FlightPathKeyID = BlackboardComp->GetKeyID("FlightPath");
+
+	BehaviorComp->StartTree(*BehaviorTree);
+}

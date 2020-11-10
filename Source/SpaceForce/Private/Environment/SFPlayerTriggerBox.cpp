@@ -38,8 +38,13 @@ void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AA
 			UE_LOG(LogTemp, Warning, TEXT("PlayerTrigger %s references non null target %s which doesn't implement ISFTriggerableActor"), *GetName(), *Target->GetName())
 			return;
 		}
-		ISFTriggerableActor::Execute_RespondToTrigger(Target, OtherActor, this);
+		ReceiveTrigger(Target, OtherActor);
 	}
+}
+
+void ASFPlayerTriggerBox::ReceiveTrigger_Implementation(AActor* Target, AActor* Source)
+{
+	ISFTriggerableActor::Execute_RespondToTrigger(Target, Source, this);
 }
 
 UTriggerVisComponent::UTriggerVisComponent()

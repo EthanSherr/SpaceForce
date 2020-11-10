@@ -6,6 +6,34 @@
 #include "GameFramework/Pawn.h"
 #include "SFBehaviorTreePawn.generated.h"
 
+class UBehaviorTree;
+class ASFFlightPath;
+
+USTRUCT(BlueprintType)
+struct FSFBehaviorTreeState
+{
+	GENERATED_USTRUCT_BODY()
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors")
+	FString NextBehavior = FString("_Terminate");
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors")
+	UBehaviorTree* BehaviorTree;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
+	ASFFlightPath* FlightPath;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
+	bool bSpeedRelativeToEnemy = true;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
+	float MaxSpeed = 200;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
+	float MinSpeed = 200;
+
+};
+
 UCLASS()
 class SPACEFORCE_API ASFBehaviorTreePawn : public APawn
 {
@@ -19,6 +47,15 @@ protected:
 public:	
 	UPROPERTY(EditAnywhere)
 	class UBehaviorTree* BehaviorTree;
+
+	UPROPERTY(EditAnywhere, Category = "Behaviors")
+	TMap<FString, FSFBehaviorTreeState> BehaviorMap;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool CurrentBehaviorState(FSFBehaviorTreeState& State);
+
+	UFUNCTION(BlueprintCallable)
+	void ChangeBehavior(FString NextBehavior);
 
 	UPROPERTY(EditAnywhere)
 	bool DebugDisabled;
@@ -34,7 +71,14 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class ASFAIController* GetSFAIController() const;
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveDisable();
 	//UFUNCTION(BlueprintCallable, BlueprintPure)
 	//bool GetTargetVelocity(AActor* TargetActor, FVector& Velocity) const;
+
+private:
+	UPROPERTY()
+	FString Behavior;
 
 };
