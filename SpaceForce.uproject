@@ -46,6 +46,10 @@
 		{
 			"Name": "ChaosNiagara",
 			"Enabled": false
+		},
+		{
+			"Name": "TraceDataFilters",
+			"Enabled": true
 		}
 	]
 }
