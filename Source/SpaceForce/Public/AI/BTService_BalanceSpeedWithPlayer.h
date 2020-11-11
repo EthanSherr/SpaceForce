@@ -6,7 +6,6 @@
 #include "BehaviorTree/BTService.h"
 #include "BTService_BalanceSpeedWithPlayer.generated.h"
 
-class USFFlightAIParams;
 class AAIController;
 /**
  * 
@@ -33,8 +32,5 @@ public:
 
 protected:
     virtual void OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
-
-    UFUNCTION()
-    USFFlightAIParams* GetFlightParams(AAIController* Controller);
 
 };

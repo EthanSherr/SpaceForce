@@ -19,21 +19,6 @@ ASFAIController::ASFAIController(const FObjectInitializer& ObjectInitializer) : 
 
 void ASFAIController::OnPossess(APawn* InPawn) {
 	Super::OnPossess(InPawn);
-	ASFBehaviorTreePawn* Bot = Cast<ASFBehaviorTreePawn>(InPawn);
-
-	if (Bot && Bot->BehaviorTree) {
-		if (Bot->BehaviorTree->BlackboardAsset) {
-			BlackboardComp->InitializeBlackboard(*Bot->BehaviorTree->BlackboardAsset);
-		}
-
-		EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
-		CanAttackKeyID = BlackboardComp->GetKeyID("CanAttack");
-		FlightPathKeyID = BlackboardComp->GetKeyID("FlightPath");
-		if (!Bot->DebugDisabled)
-		{
-			BehaviorComp->StartTree(*(Bot->BehaviorTree));
-		}
-	}
 }
 
 void ASFAIController::SetFlightPathInBlackboard(ASFFlightPath* FlightPath) 

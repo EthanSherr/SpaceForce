@@ -2,7 +2,6 @@
 
 
 #include "BTService_BalanceSpeedWithPlayer.h"
-#include "SFFlightAIParams.h"
 #include "AIController.h"
 
 UBTService_BalanceSpeedWithPlayer::UBTService_BalanceSpeedWithPlayer()
@@ -23,9 +22,6 @@ UBTService_BalanceSpeedWithPlayer::UBTService_BalanceSpeedWithPlayer()
 void UBTService_BalanceSpeedWithPlayer::OnBecomeRelevant(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
     Super::OnBecomeRelevant(OwnerComp, NodeMemory);
-    auto Params = GetFlightParams(OwnerComp.GetAIOwner());
-    if (!Params) return;
-
 
 }
 
@@ -38,9 +34,4 @@ void UBTService_BalanceSpeedWithPlayer::TickNode(UBehaviorTreeComponent& OwnerCo
 uint16 UBTService_BalanceSpeedWithPlayer::GetInstanceMemorySize() const
 {
     return sizeof(FBT_BalanceSpeedWithPlayer);
-}
-
-USFFlightAIParams* UBTService_BalanceSpeedWithPlayer::GetFlightParams(AAIController* Controller)
-{
-    return Cast<USFFlightAIParams>(Controller->GetPawn()->GetComponentByClass(USFFlightAIParams::StaticClass()));
 }

@@ -9,21 +9,6 @@
 class USFSpringFlightMovementComponent;
 class USFHealthComponent;
 
-USTRUCT(BlueprintType)
-struct FSFAIFlightParams
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Stay Infront")
-	float MaxSpeed;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Stay Infront")
-	float MinSpeed;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Stay Infront")
-	bool bSpeedRelativeToShip;
-};
-
 UCLASS()
 class SPACEFORCE_API ASFFlyingAIPawn : public ASFBehaviorTreePawn
 {
@@ -38,7 +23,4 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFHealthComponent* HealthComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	FSFAIFlightParams FlightParams;
 };

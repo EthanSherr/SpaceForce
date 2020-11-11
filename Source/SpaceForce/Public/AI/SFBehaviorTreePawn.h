@@ -54,8 +54,6 @@ protected:
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
 
 public:	
-	UPROPERTY(EditAnywhere)
-	class UBehaviorTree* BehaviorTree;
 
 	UPROPERTY(EditAnywhere, Category = "Behaviors")
 	TMap<FString, FSFBehaviorTreeState> BehaviorMap;
