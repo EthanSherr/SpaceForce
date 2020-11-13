@@ -25,6 +25,9 @@ public:
 	UFUNCTION(BlueprintNativeEvent)
 	void ReceiveTrigger(AActor* Target, AActor* Source);
 
+	UFUNCTION()
+	virtual void BeginPlay() override;
+
 protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

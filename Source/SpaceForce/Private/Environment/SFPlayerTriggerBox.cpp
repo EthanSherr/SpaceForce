@@ -21,6 +21,14 @@ ASFPlayerTriggerBox::ASFPlayerTriggerBox(const class FObjectInitializer& ObjectI
 #endif
 }
 
+void ASFPlayerTriggerBox::BeginPlay()
+{
+	Super::BeginPlay();
+#if WITH_EDITORONLY_DATA
+	TriggerVisComponent->SetComponentTickEnabled(false);
+#endif
+}
+
 void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	auto* ShipPawn = Cast<ASFShipPawn>(OtherActor);
@@ -50,7 +58,8 @@ void ASFPlayerTriggerBox::ReceiveTrigger_Implementation(AActor* Target, AActor* 
 UTriggerVisComponent::UTriggerVisComponent()
 {
 	bTickInEditor = true;
-	PrimaryComponentTick.bStartWithTickEnabled = PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bCanEverTick = true;
+	PrimaryComponentTick.bStartWithTickEnabled = true;
 }
 
 void UTriggerVisComponent::TickComponent(float DeltaTime, enum ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)

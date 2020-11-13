@@ -8,7 +8,7 @@
 #include "../Environment/SFFlightPath.h"
 
 ASFBehaviorTreePawn::ASFBehaviorTreePawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 }
 
 void ASFBehaviorTreePawn::BeginPlay() {

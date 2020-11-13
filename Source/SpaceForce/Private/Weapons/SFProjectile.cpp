@@ -11,6 +11,7 @@
 
 ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
+	PrimaryActorTick.bCanEverTick = false;
 	CollisionComp = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(1.7f);
 	CollisionComp->bTraceComplexOnMove = true;

@@ -13,8 +13,22 @@
 #include "../Environment/SFFlightPath.h"
 
 ASFAIController::ASFAIController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
+	PrimaryActorTick.bCanEverTick = false;
+
 	BlackboardComp = ObjectInitializer.CreateDefaultSubobject<UBlackboardComponent>(this, TEXT("BlackBoardComp"));
 	BrainComponent = BehaviorComp = ObjectInitializer.CreateDefaultSubobject<UBehaviorTreeComponent>(this, TEXT("BehaviorComp"));
+}
+
+void ASFAIController::BeginPlay()
+{
+	Super::BeginPlay();
+	//Disable tick!
+	BrainComponent->PrimaryComponentTick.SetTickFunctionEnable(false);
+	UPathFollowingComponent* PathFollowingComp = FindComponentByClass<UPathFollowingComponent>();
+	if (PathFollowingComp)
+	{
+		PathFollowingComp->UnregisterComponent();
+	}
 }
 
 void ASFAIController::OnPossess(APawn* InPawn) {
@@ -95,5 +109,6 @@ void ASFAIController::StartBehaviorTree(UBehaviorTree* BehaviorTree)
 	CanAttackKeyID = BlackboardComp->GetKeyID("CanAttack");
 	FlightPathKeyID = BlackboardComp->GetKeyID("FlightPath");
 
+	BehaviorComp->PrimaryComponentTick.SetTickFunctionEnable(true);
 	BehaviorComp->StartTree(*BehaviorTree);
 }

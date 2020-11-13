@@ -63,8 +63,6 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
-	virtual void Tick(float DeltaTime) override;
-
 	UFUNCTION()
 	virtual void OnDeath(float Health, float MaxHealth);
 

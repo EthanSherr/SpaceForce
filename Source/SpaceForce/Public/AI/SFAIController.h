@@ -31,6 +31,8 @@ private:
     class UBehaviorTreeComponent* BehaviorComp;
 
 public:
+    UFUNCTION()
+    virtual void BeginPlay() override;
 
     UFUNCTION(BlueprintCallable)
     void AttackActor(AActor* actor);

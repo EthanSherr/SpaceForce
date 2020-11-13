@@ -100,10 +100,6 @@ void ASFShipPawn::TrySetIsBoosting(bool bNewIsBoosting)
 	BoosterManagerComponent->TrySetIsBoosting(bNewIsBoosting);
 }
 
-void ASFShipPawn::Tick(float DeltaTime) {
-	Super::Tick(DeltaTime);
-}
-
 // inventory setup
 void ASFShipPawn::SpawnInventory()
 {
