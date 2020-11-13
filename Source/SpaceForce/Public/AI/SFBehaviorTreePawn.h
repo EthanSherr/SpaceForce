@@ -1,5 +1,3 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
@@ -9,6 +7,9 @@
 class UBehaviorTree;
 class ASFFlightPath;
 class UFloatCurve;
+
+class USFSpeedParams;
+class USFPathParams;
 
 USTRUCT(BlueprintType)
 struct FSFBehaviorTreeState
@@ -21,26 +22,11 @@ struct FSFBehaviorTreeState
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors")
 	UBehaviorTree* BehaviorTree;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Flight")
-	ASFFlightPath* FlightPath;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Pathing")
+	USFSpeedParams* SpeedParams;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
-	bool bSpeedRelativeToEnemy = true;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
-	float MaxSpeed = 350.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
-	float MinSpeed = 200.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
-	float MaxDistance = 600.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
-	float MinDistance = 200.0f;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Speed Control")
-	UCurveFloat* SpeedCurve;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Pathing")
+	USFPathParams* PathParams;
 };
 
 UCLASS()

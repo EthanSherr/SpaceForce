@@ -26,8 +26,8 @@ void ASFBehaviorTreePawn::AddMovementInput(FVector WorldDirection, float ScaleVa
 void ASFBehaviorTreePawn::ChangeBehavior(FString NextBehavior)
 {
 	if (DebugDisabled) return;
-	ASFAIController* Controller = GetController<ASFAIController>();
-	if (!Controller)
+	ASFAIController* SFController = GetController<ASFAIController>();
+	if (!SFController)
 	{
 		UE_LOG(LogTemp, Error, TEXT("%s: ChangeBehavior(%s) failed: No SFAIController owner."), *GetName(), *NextBehavior)
 		return;
@@ -35,7 +35,7 @@ void ASFBehaviorTreePawn::ChangeBehavior(FString NextBehavior)
 
 	if (NextBehavior == FString("_Terminate")) 
 	{
-		Controller->UnPossess();
+		SFController->UnPossess();
 		ReceiveDisable();
 		return;
 	}
@@ -48,8 +48,8 @@ void ASFBehaviorTreePawn::ChangeBehavior(FString NextBehavior)
 	Behavior = NextBehavior;
 	FSFBehaviorTreeState BehaviorState = BehaviorMap[NextBehavior];
 
-	Controller->StartBehaviorTree(BehaviorState.BehaviorTree);
-	Controller->SetFlightPathInBlackboard(BehaviorState.FlightPath);
+	SFController->StartBehaviorTree(BehaviorState.BehaviorTree);
+	//SFController->SetFlightPathInBlackboard(BehaviorState.FlightPath);
 	//set some parameters?
 }
 

@@ -144,7 +144,7 @@ bool ASFNavigationManager::FindNearestNavigableVoxel(const FVector& Start, FVect
 		if (bSuccess)
 		{
 			OutLocation = CurrentVoxel->Location;
-			UE_LOG(LogTemp, Warning, TEXT("FindNearestNavigableVoxel finished in %d with bSuccess SUCCESS"), (MaxIterations - Iterations))
+			//UE_LOG(LogTemp, Warning, TEXT("FindNearestNavigableVoxel finished in %d with bSuccess SUCCESS"), (MaxIterations - Iterations))
 			return true;
 		}
 
