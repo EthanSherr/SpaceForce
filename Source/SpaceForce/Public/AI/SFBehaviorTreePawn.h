@@ -37,6 +37,7 @@ class SPACEFORCE_API ASFBehaviorTreePawn : public APawn
 protected:
 	virtual void BeginPlay() override;
 
+public:
 	virtual void AddMovementInput(FVector WorldDirection, float ScaleValue = 1.0f, bool bForce = false) override;
 
 public:	
@@ -61,6 +62,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement")
 	void SetSpeed(float Speed);
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "Movement")
+	float GetSpeed();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class ASFAIController* GetSFAIController() const;

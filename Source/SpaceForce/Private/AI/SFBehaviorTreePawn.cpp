@@ -53,6 +53,12 @@ void ASFBehaviorTreePawn::ChangeBehavior(FString NextBehavior)
 	//set some parameters?
 }
 
+float ASFBehaviorTreePawn::GetSpeed_Implementation()
+{
+	UE_LOG(LogTemp, Warning, TEXT("Base GetSpeed is being called."))
+	return 0.0f;
+}
+
 bool ASFBehaviorTreePawn::CurrentBehaviorState(FSFBehaviorTreeState& State)
 {
 	if (!BehaviorMap.Contains(Behavior))
