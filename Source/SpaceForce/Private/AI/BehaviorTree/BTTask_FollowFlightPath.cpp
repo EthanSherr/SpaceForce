@@ -59,7 +59,6 @@ EBTNodeResult::Type UBTTask_FollowFlightPath::ExecuteTask(UBehaviorTreeComponent
 				FBT_FollowFlightPath* Memory = (FBT_FollowFlightPath*)NodeMemory;
 				ASFFlightPath* FlightPath = StateParams.PathParams->FlightPath;
 				
-				Memory->PathParams = StateParams.PathParams;
 				Memory->PathOffset = 0.f;
 				Memory->Offset = BTPawn->GetActorLocation() - FlightPath->GetLocationAtDistance(0);
 
@@ -76,8 +75,11 @@ void UBTTask_FollowFlightPath::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 	FBT_FollowFlightPath* Memory = (FBT_FollowFlightPath*)NodeMemory;
 	ASFBehaviorTreePawn* Pawn = Cast<ASFBehaviorTreePawn>(OwnerComp.GetAIOwner()->GetPawn());
-	USFPathParams* PathParams = Memory->PathParams.Get();
-	ASFFlightPath* FlightPath = PathParams->FlightPath;
+
+	FSFBehaviorTreeState StateParams;
+	Pawn->CurrentBehaviorState(StateParams);
+	ASFFlightPath* FlightPath = StateParams.PathParams->FlightPath;
+
 	if (!Pawn || !FlightPath)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
@@ -98,13 +100,5 @@ void UBTTask_FollowFlightPath::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 
 void UBTTask_FollowFlightPath::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
 {
-	//FBT_FlyToTarget* myMemory = (FBT_FlyToTarget*)NodeMemory;
-
-	//UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
-	//if (ensure(BlackboardComp) && myMemory->BBObserverDelegateHandle.IsValid())
-	//	BlackboardComp->UnregisterObserver(FlightLocationKey.GetSelectedKeyID(), myMemory->BBObserverDelegateHandle);
-
-	//myMemory->BBObserverDelegateHandle.Reset();
-
 	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
 }

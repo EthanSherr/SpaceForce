@@ -2,12 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTTaskNode.h"
-#include "BTTask_FollowFlightPath.generated.h"
+#include "BTTask_NavigatePoints.generated.h"
 
-struct SPACEFORCE_API FBT_FollowFlightPath
+class USFPathParams;
+
+struct SPACEFORCE_API FBT_NavigatePoints
 {
-	FVector Offset;
-	float PathOffset;
+	int Index;
+	FVector DirectionTowardsPoint;
 
 	void Reset()
 	{
@@ -16,12 +18,12 @@ struct SPACEFORCE_API FBT_FollowFlightPath
 };
 
 UCLASS()
-class SPACEFORCE_API UBTTask_FollowFlightPath : public UBTTaskNode
+class SPACEFORCE_API UBTTask_NavigatePoints : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
 public:
-	UBTTask_FollowFlightPath(const FObjectInitializer& ObjectInitializer);
+	UBTTask_NavigatePoints(const FObjectInitializer& ObjectInitializer);
 	
 	uint16 GetInstanceMemorySize() const;
 	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
@@ -30,9 +32,11 @@ public:
 #if WITH_EDITOR
 	virtual FName GetNodeIconName() const override;
 #endif // WITH_EDITOR
-
 protected:
 	virtual void TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds) override;
-	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
 
+
+public:
+	class USFPathParams* GetPathParams(UBehaviorTreeComponent& OwnerComp);
+	bool GetTargetLocation(APawn* Pawn, USFPathParams* PathParams, int& Index, FVector& OutTarget);
 };

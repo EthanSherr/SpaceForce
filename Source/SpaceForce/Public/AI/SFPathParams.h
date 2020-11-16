@@ -17,4 +17,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TArray<AActor*> TargetsPoints;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool bUseNavigation;
 };
