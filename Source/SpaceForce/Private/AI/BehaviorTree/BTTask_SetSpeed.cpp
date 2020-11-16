@@ -1,15 +1,18 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
+#include "BehaviorTree/BlackboardComponent.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "BTTask_SetSpeed.h"
 #include "../SFAIController.h"
 #include "../SFBehaviorTreePawn.h"
 #include "../SFSpeedParams.h"
+#include "../../Player/SFShipPawn.h"
+#include "../../Components/SFSplineMovementComponent.h"
 
 UBTTask_SetSpeed::UBTTask_SetSpeed(const FObjectInitializer& ObjectInitializer)
 {
 	NodeName = "Set Speed";
 	bNotifyTick = false;
+
+	EnemyKey.AddObjectFilter(this, GET_MEMBER_NAME_CHECKED(UBTTask_SetSpeed, EnemyKey), AActor::StaticClass());
 }
 
 #if WITH_EDITOR
@@ -39,12 +42,13 @@ void UBTTask_SetSpeed::InitializeFromAsset(UBehaviorTree& Asset)
 	if (!blackboard)
 		return;
 
-//	FlightLocationKey.ResolveSelectedKey(*blackboard);
+	EnemyKey.ResolveSelectedKey(*blackboard);
 }
 
 EBTNodeResult::Type UBTTask_SetSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	AAIController* Controller = OwnerComp.GetAIOwner();
+	UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
 	if (Controller)
 	{
 		ASFBehaviorTreePawn* BTPawn = Cast<ASFBehaviorTreePawn>(Controller->GetPawn());
@@ -54,7 +58,22 @@ EBTNodeResult::Type UBTTask_SetSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerC
 			BTPawn->CurrentBehaviorState(StateParams);
 			if (StateParams.SpeedParams)
 			{
-				BTPawn->SetSpeed(StateParams.SpeedParams->MaxSpeed);
+				float Speed = StateParams.SpeedParams->MaxSpeed;
+				if (StateParams.SpeedParams->bSpeedRelativeToEnemy) {
+					AActor* Enemy = Cast<AActor>(Blackboard->GetValueAsObject(EnemyKey.SelectedKeyName));
+					ASFShipPawn* ShipPawn = Cast<ASFShipPawn>(Enemy);
+					if (ShipPawn) 
+					{
+						USFSplineMovementComponent* SplineMovement = ShipPawn->GetAssociatedSplineMovementComponent();
+						if (SplineMovement)
+						{
+							Speed += SplineMovement->GetMaxSpeed();
+						}
+					}
+				}
+
+				BTPawn->SetSpeed(Speed);
+
 				return EBTNodeResult::Succeeded;
 			}
 		}

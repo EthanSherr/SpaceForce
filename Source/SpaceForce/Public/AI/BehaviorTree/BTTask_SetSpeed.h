@@ -15,6 +15,10 @@ class SPACEFORCE_API UBTTask_SetSpeed : public UBTTaskNode
 	GENERATED_BODY()
 
 public:
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Params")
+	FBlackboardKeySelector EnemyKey;
+
 	UBTTask_SetSpeed(const FObjectInitializer& ObjectInitializer);
 
 

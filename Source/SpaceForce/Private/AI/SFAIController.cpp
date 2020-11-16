@@ -35,10 +35,15 @@ void ASFAIController::OnPossess(APawn* InPawn) {
 	Super::OnPossess(InPawn);
 }
 
-void ASFAIController::SetFlightPathInBlackboard(ASFFlightPath* FlightPath) 
+void ASFAIController::SetNavigationPathInBlackboard(UObject* Path)
 {
 	if (BlackboardComp)
-		BlackboardComp->SetValue<UBlackboardKeyType_Object>(FlightPathKeyID, FlightPath);
+		BlackboardComp->SetValue<UBlackboardKeyType_Object>(NavigationPathID, Path);
+}
+
+UObject* ASFAIController::GetNavigationPathInBlackboard() const
+{
+	return BlackboardComp ? BlackboardComp->GetValue<UBlackboardKeyType_Object>(NavigationPathID) : NULL;
 }
 
 void ASFAIController::SetCanAttackInBlackboard(bool InValue)
@@ -107,7 +112,7 @@ void ASFAIController::StartBehaviorTree(UBehaviorTree* BehaviorTree)
 
 	EnemyKeyID = BlackboardComp->GetKeyID("Enemy");
 	CanAttackKeyID = BlackboardComp->GetKeyID("CanAttack");
-	FlightPathKeyID = BlackboardComp->GetKeyID("FlightPath");
+	NavigationPathID = BlackboardComp->GetKeyID("NavigationPath");
 
 	BehaviorComp->PrimaryComponentTick.SetTickFunctionEnable(true);
 	BehaviorComp->StartTree(*BehaviorTree);
