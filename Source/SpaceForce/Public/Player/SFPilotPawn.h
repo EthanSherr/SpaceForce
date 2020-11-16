@@ -48,7 +48,7 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	USteamVRChaperoneComponent* VRChaperone;
 
-	UPROPERTY(EditAnywhere, Category = "Init")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Init")
 	ASFShipPawn* InitializeWithShip;
 
 	UPROPERTY(EditAnywhere, Category = "Init", BlueprintReadWrite)

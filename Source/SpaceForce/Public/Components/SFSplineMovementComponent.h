@@ -61,7 +61,7 @@ public:
 	UFUNCTION()
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, Category = "Debug")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
 	float initialOffset = 0.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Debug")
