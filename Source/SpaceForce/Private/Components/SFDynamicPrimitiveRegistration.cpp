@@ -33,14 +33,17 @@ void USFDynamicPrimitiveRegistration::Setup()
 	if (!DonNavigationManager)
 		return;
 
-	TArray<UActorComponent*> Primitives = GetOwner()->GetComponentsByClass(UPrimitiveComponent::StaticClass());
-	for (auto* P : Primitives)
+	if (AActor* Actor = GetOwner())
 	{
-		auto* Primitive = Cast<UPrimitiveComponent>(P);
-		if (Primitive->IsSimulatingPhysics())
+		if (USceneComponent* Root = Actor->GetRootComponent())
 		{
-			SimulatingPrimitive = Primitive;
-			break;
+			if (UPrimitiveComponent* Primitive = Cast<UPrimitiveComponent>(Root))
+			{
+				if (Primitive->IsSimulatingPhysics())
+				{
+					SimulatingPrimitive = Primitive;
+				}
+			}
 		}
 	}
 }

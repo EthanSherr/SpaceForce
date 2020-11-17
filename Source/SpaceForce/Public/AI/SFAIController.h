@@ -22,7 +22,6 @@ protected:
 
     int32 EnemyKeyID;
     int32 CanAttackKeyID;
-    int32 NavigationPathID;
 
 private:
     UPROPERTY(transient)
@@ -45,12 +44,6 @@ public:
 
     UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
     void SetCanAttackInBlackboard(bool InValue);
-
-    UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
-    void SetNavigationPathInBlackboard(UObject* NavigationPath);
-
-    UFUNCTION(BlueprintCallable, BlueprintPure, Category = "Blackboard Access")
-    UObject* GetNavigationPathInBlackboard() const;
 
     UFUNCTION(BlueprintPUre, Category = "AI Helper")
     void IsValidLocation(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug = false);

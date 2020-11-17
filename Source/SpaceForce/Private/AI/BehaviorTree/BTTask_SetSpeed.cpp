@@ -1,9 +1,9 @@
+#include "BTTask_SetSpeed.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
-#include "BTTask_SetSpeed.h"
 #include "../SFAIController.h"
-#include "../SFBehaviorTreePawn.h"
 #include "../SFSpeedParams.h"
+#include "../SFBehaviorTreePawn.h"
 #include "../../Player/SFShipPawn.h"
 #include "../../Components/SFSplineMovementComponent.h"
 
