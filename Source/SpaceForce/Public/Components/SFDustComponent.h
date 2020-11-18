@@ -7,8 +7,9 @@
 #include "SFDustComponent.generated.h"
 
 class UArrowComponent;
-class UParticleSystemComponent;
-class UParticleSystem;
+class UFXSystemComponent;
+class UNiagaraSystem;
+class UNiagaraComponent;
 
 UCLASS( Blueprintable, ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class SPACEFORCE_API USFDustComponent : public USceneComponent
@@ -22,10 +23,7 @@ public:
 	bool bDebug;
 
 	UPROPERTY(EditAnywhere)
-	UParticleSystem* DustFX;
-
-	UPROPERTY(Transient)
-	bool SystemPaused;
+	UNiagaraSystem* DustFX;
 
 	UPROPERTY(EditInstanceOnly)
 	UArrowComponent* ArrowComponent;
@@ -36,22 +34,18 @@ public:
 	UPROPERTY(EditAnywhere)
 	float TraceDistance;
 
-	UPROPERTY(BlueprintReadonly)
-	float Intensity;
-
 protected:
-	// Called when the game starts
-	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void SpawnNewDustEffect();
+	void SpawnNewDustEffect(UNiagaraSystem* System);
 
 	UPROPERTY(Transient)
-	UParticleSystemComponent* Particles;
+	UNiagaraComponent* GroundEffect;
+
+	UFUNCTION()
+	void SetGroundDistance(float Distance);
 
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
-		
 };
