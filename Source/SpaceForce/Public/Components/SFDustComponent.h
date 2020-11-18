@@ -25,7 +25,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* DustFX;
 
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditDefaultsOnly)
 	UArrowComponent* ArrowComponent;
 
 	UPROPERTY()

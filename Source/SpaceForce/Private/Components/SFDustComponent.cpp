@@ -15,9 +15,11 @@ USFDustComponent::USFDustComponent(const FObjectInitializer& ObjectInitializer) 
 	Ground = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, "Ground");
 	Ground->SetupAttachment(this);
 
+#ifdef WITH_EDITOR
 	ArrowComponent = ObjectInitializer.CreateDefaultSubobject<UArrowComponent>(this, "Arrow Component");
 	ArrowComponent->bHiddenInGame = true;
 	ArrowComponent->SetupAttachment(Ground);
+#endif
 }
 
 // Called every frame
