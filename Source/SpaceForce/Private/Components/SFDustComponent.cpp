@@ -23,6 +23,12 @@ USFDustComponent::USFDustComponent(const FObjectInitializer& ObjectInitializer) 
 #endif
 }
 
+void USFDustComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	PrimaryComponentTick.SetTickFunctionEnable(false);
+}
+
 // Called every frame
 void USFDustComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
@@ -36,7 +42,7 @@ void USFDustComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 
 	if (GetWorld()->LineTraceSingleByObjectType(HitResult, Start, End, ObjectParams, QueryParams))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("DustScan Hits: %s"), *ULoggingHelper::GetNameOrNull(HitResult.Actor.Get()));
+		//UE_LOG(LogTemp, Warning, TEXT("DustScan Hits: %s"), *ULoggingHelper::GetNameOrNull(HitResult.Actor.Get()));
 		float DistanceFromGround = (HitResult.Location - GetComponentLocation()).Size();
 		Ground->SetWorldLocation(HitResult.Location);
 		if (bDebug) DrawDebugPoint(GetWorld(), Ground->GetComponentLocation(), 10, FColor::Green, false, 0, 10);

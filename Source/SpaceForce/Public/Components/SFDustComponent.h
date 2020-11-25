@@ -23,6 +23,9 @@ public:
 	bool bDebug;
 
 	UPROPERTY(EditAnywhere)
+	bool bDisabled;
+
+	UPROPERTY(EditAnywhere)
 	UNiagaraSystem* DustFX;
 
 	UPROPERTY(EditDefaultsOnly)
@@ -48,4 +51,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
+	virtual void BeginPlay() override;
 };
