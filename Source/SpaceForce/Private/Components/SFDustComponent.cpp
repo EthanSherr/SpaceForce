@@ -26,7 +26,10 @@ USFDustComponent::USFDustComponent(const FObjectInitializer& ObjectInitializer) 
 void USFDustComponent::BeginPlay()
 {
 	Super::BeginPlay();
-	PrimaryComponentTick.SetTickFunctionEnable(false);
+	if (bDisabled)
+	{
+		PrimaryComponentTick.SetTickFunctionEnable(false);
+	}
 }
 
 // Called every frame
