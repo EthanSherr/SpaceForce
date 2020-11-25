@@ -9,6 +9,7 @@
 #include "GameFramework/DamageType.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
+#include "SFExplosionEffect.h"
 
 ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -111,7 +112,7 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 	}
 
 	if (ExplosionTemplate) {
-		AActor* const EffectActor = GetWorld()->SpawnActorDeferred<AActor>(ExplosionTemplate, SpawnTransform);
+		ASFExplosionEffect* const EffectActor = GetWorld()->SpawnActorDeferred<ASFExplosionEffect>(ExplosionTemplate, SpawnTransform);
 		if (EffectActor) {
 			//EffectActor->SurfaceHit = Impact;
 			UGameplayStatics::FinishSpawningActor(EffectActor, SpawnTransform);

@@ -10,6 +10,7 @@ class UProjectileMovementComponent;
 class USphereComponent;
 class UAudioComponent;
 class UNiagaraComponent;
+class ASFExplosionEffect;
 
 UCLASS()
 class SPACEFORCE_API ASFProjectile : public AActor
@@ -64,7 +65,7 @@ public:
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	TSubclassOf<class AActor> ExplosionTemplate;
+	TSubclassOf<ASFExplosionEffect> ExplosionTemplate;
 
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	TSubclassOf<class AActor> DecalTemplate;

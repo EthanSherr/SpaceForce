@@ -5,6 +5,7 @@
 #include "Components/ArrowComponent.h"
 #include "DrawDebugHelpers.h"
 #include "NiagaraComponent.h"
+#include "../Helpers/LoggingHelper.h"
 
 USFDustComponent::USFDustComponent(const FObjectInitializer& ObjectInitializer) : 
 	Super(ObjectInitializer)
@@ -34,8 +35,8 @@ void USFDustComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
 
 	if (GetWorld()->LineTraceSingleByObjectType(HitResult, Start, End, ObjectParams, QueryParams))
-	//if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility))
 	{
+		UE_LOG(LogTemp, Warning, TEXT("DustScan Hits: %s"), *ULoggingHelper::GetNameOrNull(HitResult.Actor.Get()));
 		float DistanceFromGround = (HitResult.Location - GetComponentLocation()).Size();
 		Ground->SetWorldLocation(HitResult.Location);
 		if (bDebug) DrawDebugPoint(GetWorld(), Ground->GetComponentLocation(), 10, FColor::Green, false, 0, 10);
