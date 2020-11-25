@@ -9,6 +9,7 @@
 class UProjectileMovementComponent;
 class USphereComponent;
 class UAudioComponent;
+class UNiagaraComponent;
 
 UCLASS()
 class SPACEFORCE_API ASFProjectile : public AActor
@@ -35,6 +36,9 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	float LifeSpanAfterImpact;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	UNiagaraComponent* ProjectileEffect;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
 	float ExplosionDamage;

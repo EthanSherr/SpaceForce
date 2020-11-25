@@ -29,7 +29,12 @@ void USFDustComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	const FVector Start = GetComponentLocation();
 	const FVector End = Start + TraceDistance * FVector::DownVector;
 	FHitResult HitResult;
-	if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility))
+	FCollisionObjectQueryParams ObjectParams;
+	FCollisionQueryParams QueryParams;
+	ObjectParams.AddObjectTypesToQuery(ECollisionChannel::ECC_WorldStatic);
+
+	if (GetWorld()->LineTraceSingleByObjectType(HitResult, Start, End, ObjectParams, QueryParams))
+	//if (GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECollisionChannel::ECC_Visibility))
 	{
 		float DistanceFromGround = (HitResult.Location - GetComponentLocation()).Size();
 		Ground->SetWorldLocation(HitResult.Location);

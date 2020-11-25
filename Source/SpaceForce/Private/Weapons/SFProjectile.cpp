@@ -8,10 +8,12 @@
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "GameFramework/DamageType.h"
 #include "Kismet/GameplayStatics.h"
+#include "NiagaraComponent.h"
 
 ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bStartWithTickEnabled = false;
 	CollisionComp = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("SphereComp"));
 	CollisionComp->InitSphereRadius(1.7f);
 	CollisionComp->bTraceComplexOnMove = true;
@@ -31,6 +33,9 @@ ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Supe
 	MovementComp->MaxSpeed = Speed;
 	AudioComp = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("AudioComp"));
 	AudioComp->SetupAttachment(RootComponent);
+
+	ProjectileEffect = ObjectInitializer.CreateDefaultSubobject<UNiagaraComponent>(this, TEXT("ProjectileEffect"));
+	ProjectileEffect->SetupAttachment(RootComponent);
 
 	PrimaryActorTick.bCanEverTick = true;
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
@@ -76,6 +81,7 @@ void ASFProjectile::DisableAndDestroy() {
 
 void ASFProjectile::Explode(const FHitResult& Impact) {
 	ReceiveOnExplode(Impact);
+	ProjectileEffect->SetVariableBool(FName("Exploded"), true);
 	const FVector ImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 0.2f;
 	const FTransform SpawnTransform(Impact.ImpactNormal.Rotation(), ImpactLocation);
 	AController* const Controller = Cast<AController>(GetOwner());
