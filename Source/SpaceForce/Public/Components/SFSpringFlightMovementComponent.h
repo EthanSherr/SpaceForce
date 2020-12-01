@@ -81,7 +81,13 @@ public:
 	bool bDebug;
 
 	UPROPERTY(EditAnywhere, Category = "Debug")
+	bool bDebugTarget;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
 	bool bDebugRotation;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
+	bool bDebugTorque;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	AActor* InitialTarget;

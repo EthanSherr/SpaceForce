@@ -9,17 +9,27 @@ UBTTask_NavigatePoints::UBTTask_NavigatePoints(const FObjectInitializer& ObjectI
 	bNotifyTick = true;
 }
 
-uint16 UBTTask_NavigatePoints::GetInstanceMemorySize() const
-{
-	return sizeof(FBT_NavigatePoints);
-}
-
 #if WITH_EDITOR
 FName UBTTask_NavigatePoints::GetNodeIconName() const
 {
 	return FName("BTEditor.Graph.BTNode.Task.MoveDirectlyToward.Icon");
 }
 #endif	// WITH_EDITOR
+
+FString UBTTask_NavigatePoints::GetStaticDescription() const
+{
+	return Super::GetStaticDescription();
+}
+
+uint16 UBTTask_NavigatePoints::GetInstanceMemorySize() const
+{
+	return sizeof(FBT_NavigatePoints);
+}
+
+void UBTTask_NavigatePoints::InitializeFromAsset(UBehaviorTree& Asset)
+{
+	Super::InitializeFromAsset(Asset);
+}
 
 EBTNodeResult::Type UBTTask_NavigatePoints::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
@@ -39,16 +49,6 @@ EBTNodeResult::Type UBTTask_NavigatePoints::ExecuteTask(UBehaviorTreeComponent& 
 	}
 	Memory->DirectionTowardsPoint = Target - Pawn->GetActorLocation();
 	return EBTNodeResult::InProgress;
-}
-
-FString UBTTask_NavigatePoints::GetStaticDescription() const
-{
-	return Super::GetStaticDescription();
-}
-
-void UBTTask_NavigatePoints::InitializeFromAsset(UBehaviorTree& Asset)
-{
-	Super::InitializeFromAsset(Asset);
 }
 
 void UBTTask_NavigatePoints::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)

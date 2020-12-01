@@ -72,12 +72,36 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 		TargetUp = ShipUp * FVector::DotProduct(ShipUp, targetUp) + ShipRight * FVector::DotProduct(ShipRight, targetUp);
 	}
 
+	//FString Message = FString::Printf(TEXT("TargetVelocity %s"), *TargetVelocity.ToString());
+	//GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Yellow, Message);
+
 	FVector Force = CalculateSpringDampingForces(Prim->GetComponentLocation(), Target, ShipVelocity, TargetVelocity, SpringConfig.Stiffness, SpringConfig.Damping, SpringConfig.MaxExtension);
 	FVector PrimaryTorque = CalculateSpringDampingTorque(ShipForward, TargetForward, ShipAngularVelocity, AngularStiffnessPrimary, AngularDampingPrimary);
 	FVector SecondaryTorque = CalculateSpringDampingTorque(ShipUp, TargetUp, ShipAngularVelocity, AngularStiffnessSecondary, AngularDampingSecondary);
 
+
+	FVector Start = Prim->GetComponentLocation();
+
+	if (bDebugRotation)
+	{
+		DrawDebugLine(GetWorld(), Start, Start + TargetUp * 100, FColor::Green, false, 0, 5, 4.0f);
+		DrawDebugLine(GetWorld(), Start, Start + ShipUp * 50, FColor::Yellow, false, 0, 7, 4.0f);
+	}
+
+	if (bDebugTorque)
+	{
+		DrawDebugLine(GetWorld(), Start, Start + PrimaryTorque * 100, FColor::Blue, false, 0, 5, 1.0f);
+		DrawDebugLine(GetWorld(), Start, Start + SecondaryTorque * 100, FColor::Purple, false, 0, 8, 1.0f);
+	}
+
+	if (bDebugTarget)
+	{
+		DrawDebugPoint(GetWorld(), Target, 10, FColor::Yellow, false, 0.0f, 5);
+	}
+
 	Prim->AddForce(Force);
 	Prim->AddTorqueInRadians(PrimaryTorque + SecondaryTorque, FName(), true);
+	LastTargetPosition = Target;
 }
 
 void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
@@ -86,6 +110,7 @@ void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
 		Target = TargetComponent->GetComponentLocation();
 		TargetVelocity = TargetComponent->GetComponentVelocity();
 	}
+
 	if (bCalculateVelocityOfTarget) {
 		TargetVelocity = (Target - LastTargetPosition) / DeltaTime;
 		LastTargetPosition = Target;
@@ -97,6 +122,7 @@ FVector USFSpringFlightMovementComponent::CalculateForces(FVector P2, FVector P2
 	auto Primitive = GetUpdatedPrimitiveComp();
 	FVector DeltaL = P2 - Primitive->GetComponentLocation();
 	FVector DeltaV = P2Velocity - Primitive->GetComponentVelocity();
+
 	if (SpringConfig.MaxExtension > 0.0f && (bMaintainMaxSpeed || SpringConfig.MaxExtension < DeltaL.Size())) {
 		DeltaL = DeltaL.GetSafeNormal() * SpringConfig.MaxExtension;
 		if (bDebug) {
@@ -138,8 +164,10 @@ FVector USFSpringFlightMovementComponent::CalculateSpringDampingTorque(FVector C
 // Begin Targeting Methods
 void USFSpringFlightMovementComponent::SetTarget(FVector value) {
 	Target = value;
-	LastTargetPosition = value;
-	bHasTarget = true;
+	if (!bHasTarget) {
+		LastTargetPosition = value;
+		bHasTarget = true;
+	}
 }
 
 void USFSpringFlightMovementComponent::SetTargetComponent(USceneComponent* NewTargetComponent) {
