@@ -8,6 +8,7 @@
 
 class UNiagaraSystem;
 class UNiagaraComponent;
+class USoundCue;
 
 UCLASS()
 class SPACEFORCE_API ASFExplosionEffect : public AActor
@@ -23,8 +24,14 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = Effect)
 	UNiagaraSystem* ExplosionFX;
 
+	UPROPERTY(EditDefaultsOnly, Category = Effect)
+	USoundCue* ExplosionSound;
+
 protected:
 	UPROPERTY(BlueprintReadonly)
 	UNiagaraComponent* NiagaraComponent;
+
+	UFUNCTION()
+	void BeginPlay() override;
 
 };
