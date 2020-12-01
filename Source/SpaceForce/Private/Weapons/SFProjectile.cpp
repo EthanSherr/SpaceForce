@@ -9,7 +9,9 @@
 #include "GameFramework/DamageType.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
+#include "NiagaraSystem.h"
 #include "SFExplosionEffect.h"
+#include "../Helpers/LoggingHelper.h"
 
 ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -57,6 +59,7 @@ void ASFProjectile::PostInitializeComponents()
 	MovementComp->OnProjectileStop.AddDynamic(this, &ASFProjectile::OnImpact);
 	CollisionComp->MoveIgnoreActors = IgnoreActors;
 	CollisionComp->MoveIgnoreActors.Add(GetInstigator());
+	ProjectileEffect->SetAsset(ProjectileTemplate);
 	DamageType = DamageType ? DamageType : TSubclassOf<UDamageType>(UDamageType::StaticClass());
 }
 

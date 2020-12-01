@@ -10,13 +10,49 @@ class UProjectileMovementComponent;
 class USphereComponent;
 class UAudioComponent;
 class UNiagaraComponent;
+class UNiagaraSystem;
 class ASFExplosionEffect;
 
 UCLASS()
 class SPACEFORCE_API ASFProjectile : public AActor
 {
 	GENERATED_UCLASS_BODY()
+public:
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	TSubclassOf<ASFExplosionEffect> ExplosionTemplate;
 
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	TSubclassOf<class AActor> DecalTemplate;
+
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UNiagaraSystem* ProjectileTemplate;
+
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	UAudioComponent* AudioComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	float LifeSpanAfterImpact;
+
+	UPROPERTY()
+	UNiagaraComponent* ProjectileEffect;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile", Meta = (ExposeOnSpawn = true))
+	float Speed;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	float ExplosionDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	float ExplosionRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	float PointDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	float Impulse;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	TSubclassOf<UDamageType> DamageType;
 public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "ProjectileOnExplode"), Category = "Projectile")
 	void ReceiveOnExplode(const FHitResult& HitResult);
@@ -33,42 +69,14 @@ protected:
 
 	void DisableAndDestroy();
 
+	UPROPERTY(Transient)
 	bool bExploded;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	float LifeSpanAfterImpact;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	UNiagaraComponent* ProjectileEffect;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
-	float ExplosionDamage;
-	
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
-	float ExplosionRadius;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
-	float PointDamage;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
-	float Impulse;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
-	TSubclassOf<UDamageType> DamageType;
 
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "Projectile", Meta = (ExposeOnSpawn = true))
 	TArray<AActor*> IgnoreActors;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile", Meta = (ExposeOnSpawn = true))
-	float Speed;
-
 private:
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	TSubclassOf<ASFExplosionEffect> ExplosionTemplate;
-
-	UPROPERTY(EditDefaultsOnly, Category = Effects)
-	TSubclassOf<class AActor> DecalTemplate;
 
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	UProjectileMovementComponent* MovementComp;
@@ -76,9 +84,6 @@ private:
 	/** collisions */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComp;
-
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
-	UAudioComponent* AudioComp;
 
 
 };
