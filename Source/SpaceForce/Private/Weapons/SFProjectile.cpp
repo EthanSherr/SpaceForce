@@ -12,6 +12,7 @@
 #include "NiagaraSystem.h"
 #include "SFExplosionEffect.h"
 #include "../Helpers/LoggingHelper.h"
+#include "DrawDebugHelpers.h"
 
 ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -44,6 +45,8 @@ ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Supe
 	PrimaryActorTick.TickGroup = TG_PrePhysics;
 	LifeSpanAfterImpact = 2.0f;
 	InitialLifeSpan = 7.0f;
+
+	ExplosionBump = 10.0f;
 }
 
 void ASFProjectile::PreInitializeComponents() 
@@ -86,8 +89,10 @@ void ASFProjectile::DisableAndDestroy() {
 void ASFProjectile::Explode(const FHitResult& Impact) {
 	ReceiveOnExplode(Impact);
 	ProjectileEffect->SetVariableBool(FName("Exploded"), true);
-	const FVector ImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * 0.2f;
-	const FTransform SpawnTransform(Impact.ImpactNormal.Rotation(), ImpactLocation);
+
+	const FVector BumpedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * ExplosionBump;
+	
+	const FTransform SpawnTransform(Impact.ImpactNormal.Rotation(), BumpedImpactLocation);
 	AController* const Controller = Cast<AController>(GetOwner());
 
 	if (Impact.GetActor()) {
@@ -111,7 +116,7 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 	}
 
 	if (ExplosionDamage > 0 && ExplosionRadius > 0) {
-		UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, ImpactLocation, ExplosionRadius, DamageType, TArray<AActor*>(), this, Controller);
+		UGameplayStatics::ApplyRadialDamage(this, ExplosionDamage, BumpedImpactLocation, ExplosionRadius, DamageType, TArray<AActor*>(), this, Controller);
 	}
 
 	if (ExplosionTemplate) {

@@ -18,6 +18,8 @@ class SPACEFORCE_API ASFProjectile : public AActor
 {
 	GENERATED_UCLASS_BODY()
 public:
+
+
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	TSubclassOf<ASFExplosionEffect> ExplosionTemplate;
 
@@ -29,6 +31,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	UAudioComponent* AudioComp;
+
+	UPROPERTY(EditDefaultsOnly, Category = Effects, AdvancedDisplay)
+	float ExplosionBump;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	float LifeSpanAfterImpact;
