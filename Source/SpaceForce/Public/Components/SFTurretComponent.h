@@ -113,9 +113,12 @@ private:
 
 	//AimAt variables
 	bool bWasTargetSet;
-	FVector Target;
 
 	AActor* TrackedActor;
 
 	bool UpdateTargetFromTrackedActor();
+
+public:
+	UPROPERTY(BlueprintReadonly)
+	FVector Target;
 };

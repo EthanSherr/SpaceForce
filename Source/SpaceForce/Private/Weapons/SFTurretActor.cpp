@@ -54,10 +54,10 @@ float ASFTurretActor::GetTriggetAxis()
 	return PC->GetInputAxisKeyValue("TriggerAxis");
 }
 
-void ASFTurretActor::SpawnProjectile(const FTransform& Transform)
+ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 {
 	if (!ProjectileClass)
-		return;
+		return NULL;
 	ASFProjectile* Projectile = GetWorld()->SpawnActorDeferred<ASFProjectile>(ProjectileClass, Transform);
 	// setup projectile configuration pre-spawn
 	TArray<AActor*> IgnoreActors;
@@ -79,4 +79,6 @@ void ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 	}
 
 	UGameplayStatics::FinishSpawningActor(Projectile, Transform);
+
+	return Projectile;
 }

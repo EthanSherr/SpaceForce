@@ -48,7 +48,19 @@ public:
 	float ExplosionDamage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
-	float ExplosionRadius;
+	float ExplosionOuterRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	float ExplosionInnerRadius;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	float ExplosionFalloff;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	float MinimumExplosionDamage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
+	bool bDebugExplosion;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
 	float PointDamage;
@@ -61,6 +73,10 @@ public:
 public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "ProjectileOnExplode"), Category = "Projectile")
 	void ReceiveOnExplode(const FHitResult& HitResult);
+
+	//Used to manually explode in place.
+	UFUNCTION(BlueprintCallable, Category = "Projectile")
+	void TriggerExplosion();
 
 protected:
 	UFUNCTION()

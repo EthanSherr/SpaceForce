@@ -49,7 +49,7 @@ public:
 	float GetTriggetAxis();
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnProjectile(const FTransform& Transform);
+	ASFProjectile* SpawnProjectile(const FTransform& Transform);
 
 	// UI
 public:
