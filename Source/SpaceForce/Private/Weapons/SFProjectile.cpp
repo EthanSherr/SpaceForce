@@ -139,8 +139,8 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 
 		if (bDebugExplosion)
 		{
-			DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionInnerRadius, 8, FColor::Red, false, 3, 1, 1.0f);
-			DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionOuterRadius, 8, FColor::Green, false, 3, 1, 1.0f);
+			DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionInnerRadius, 8, FColor::Red, false, 6.0f, 1, 2.0f);
+			DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionOuterRadius, 8, FColor::Green, false, 6.0f, 1, 2.0f);
 		}
 	}
 

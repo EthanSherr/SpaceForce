@@ -122,9 +122,10 @@ void ASFShipPawn::AddTurret(ASFTurretActor* Turret)
 	Turret->SetOwner(this);
 }
 
-void ASFShipPawn::ActivateTurret(int Index)
+ASFTurretActor* ASFShipPawn::ActivateTurret(int Index)
 {
 	ActiveTurret = Turrets[Index];
+	return ActiveTurret;
 }
 
 void ASFShipPawn::TriggerAction(bool bIsPressed)

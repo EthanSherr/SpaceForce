@@ -19,6 +19,7 @@
 #include "../Weapons/SFTurretActor.h"
 #include "../UI/SFRadialMenuOption.h"
 #include "../UI/SFRadialMenuComponent.h"
+#include "Helpers/LoggingHelper.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
@@ -61,7 +62,7 @@ void ASFPilotPawn::MenuItemSelected(USFRadialMenuComponent* Menu, FSFRadialMenuO
 {
 	if (Menu->HandController->GetHandState() == EHandState::Aiming)
 	{
-		Ship->ActivateTurret(Index);
+		ActivateTurret(Index);
 	}
 }
 
@@ -113,10 +114,10 @@ void ASFPilotPawn::Tick(float DeltaTime)
 	UpdateNextFlightPath();
 	UpdateHandsRoot();
 	UpdateThumbpadAxis();
-	if (Ship && Ship->GetActiveTurret())
-	{
-		Ship->GetActiveTurret()->AimAt(GetHandInState(EHandState::Aiming)->GetComponentLocation());
-	}
+	//if (Ship && Ship->GetActiveTurret())
+	//{
+	//	Ship->GetActiveTurret()->AimAt(GetHandInState(EHandState::Aiming)->GetComponentLocation());
+	//}
 }
 
 void ASFPilotPawn::UpdateNextFlightPath()
@@ -289,8 +290,34 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	}
 	if (OffensiveMenu.Num() > 0)
 	{
-		Ship->ActivateTurret(0);
+		ActivateTurret(0);
 	}
 	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenu);
 	NewAimingHand->RadialMenuComponent->SetSelectedIndex(0);
+}
+
+void ASFPilotPawn::ActivateTurret(int Index)
+{
+	USFHandController* Hand = GetHandInState(EHandState::Aiming);
+	if (!Ship || !Hand) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("ActivateTurret failed, null found Hand: %s, Ship: %s"), *ULoggingHelper::GetNameOrNull(Hand), *ULoggingHelper::GetNameOrNull(Ship))
+		return;
+	}
+	ASFTurretActor* Turret = Ship->GetActiveTurret();
+	if (Turret)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Deactivating previous turret %s"), *Turret->GetName())
+		Turret->AimAtComponent(NULL);
+		Turret->SetActivated(false);
+	}
+
+	Turret = Ship->ActivateTurret(Index);
+	if (!Turret) 
+	{
+		UE_LOG(LogTemp, Error, TEXT("ActivateTurret failed, NULL for index %d"), Index)
+		return;
+	}
+	Turret->AimAtComponent(Hand);
+	Turret->SetActivated(true);
 }

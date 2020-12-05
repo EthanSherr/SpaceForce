@@ -85,7 +85,7 @@ public:
 	FORCEINLINE ASFTurretActor* GetActiveTurret() { return ActiveTurret; }
 public:
 	UFUNCTION(BlueprintCallable)
-	void ActivateTurret(int Index);
+	ASFTurretActor* ActivateTurret(int Index);
 
 	UFUNCTION(BlueprintCallable)
 	void TriggerAction(bool bIsPressed);

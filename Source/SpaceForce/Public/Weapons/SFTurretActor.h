@@ -9,6 +9,7 @@
 class USFTurretComponent;
 class USkeletalMeshComponent;
 class ASFProjectile;
+class ASFAimVisualization;
 class USoundBase;
 
 UCLASS()
@@ -25,12 +26,20 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 	USoundBase* FireSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+	TSubclassOf<ASFAimVisualization> AimVisualizationTemplate;
 	
-protected:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USFTurretComponent* TurretComponent;
 
+public:
+	UPROPERTY(BlueprintReadonly, EditDefaultsOnly, Category = "Initialization")
+	ASFAimVisualization* AimVisualization;
+
 	virtual void PostInitializeComponents() override;
+
+	//virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
 
 public:	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -40,7 +49,7 @@ public:
 	void AimAt(FVector Target);
 
 	UFUNCTION(BlueprintCallable)
-	void AimAtActor(AActor* TargetActor);
+	void AimAtComponent(USceneComponent* SceneComponent);
 
 	UFUNCTION(BlueprintNativeEvent)
 	void TriggerAction(bool bIsPressed);
@@ -50,6 +59,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	ASFProjectile* SpawnProjectile(const FTransform& Transform);
+
+	UFUNCTION(BlueprintCallable)
+	void SetActivated(bool bValue);
 
 	// UI
 public:

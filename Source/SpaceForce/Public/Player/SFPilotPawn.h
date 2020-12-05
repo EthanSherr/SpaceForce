@@ -77,6 +77,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void StartPilotingShip(USFHandController* Hand, ASFShipPawn* NewShip);
 
+	UFUNCTION(BlueprintCallable)
+	void ActivateTurret(int Index);
+
 public:
 	virtual void BeginPlay() override;
 

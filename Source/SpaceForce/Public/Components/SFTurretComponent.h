@@ -51,8 +51,9 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
-
 	// grabs sockets from skeletalmesh
+
+public:
 	UFUNCTION(BlueprintCallable)
 	void Initialize();
 
@@ -72,7 +73,7 @@ public: // turret interface
 	void AimAt(FVector target);
 
 	UFUNCTION(BlueprintCallable)
-	void AimAtActor(AActor* actor);
+	void AimAtComponent(USceneComponent* Component);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAimingAtTarget(float tolerance = 1);
@@ -114,11 +115,13 @@ private:
 	//AimAt variables
 	bool bWasTargetSet;
 
-	AActor* TrackedActor;
-
 	bool UpdateTargetFromTrackedActor();
 
 public:
 	UPROPERTY(BlueprintReadonly)
 	FVector Target;
+
+	UPROPERTY(BlueprintReadonly)
+	USceneComponent* TrackedComponent;
 };
+

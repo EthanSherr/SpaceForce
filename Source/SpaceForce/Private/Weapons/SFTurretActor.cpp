@@ -4,6 +4,8 @@
 #include "Components/AudioComponent.h"
 #include "../Weapons/SFProjectile.h"
 #include "Kismet/GameplayStatics.h"
+#include "SFAimVisualization.h"
+#include "Helpers/LoggingHelper.h"
 
 ASFTurretActor::ASFTurretActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -24,25 +26,52 @@ void ASFTurretActor::PostInitializeComponents()
 	{
 		TurretComponent->ProjectileSpeed = ProjectileSpeedOverride;
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("PostInitializeComonents %s AimVisTemp: %s"), *GetName(), *ULoggingHelper::GetNameOrNull(AimVisualizationTemplate))
+
+	if (AimVisualizationTemplate)
+	{
+		//TODO load muzzle transform lazily, instead of initialization step.
+		TurretComponent->Initialize();
+		FTransform Transform = TurretComponent->GetMuzzleTransform();
+		AimVisualization = GetWorld()->SpawnActorDeferred<ASFAimVisualization>(AimVisualizationTemplate, Transform);
+		AimVisualization->Turret = this;
+		AimVisualization->FinishSpawning(Transform);
+		FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules::SnapToTargetNotIncludingScale;
+		AimVisualization->AttachToComponent(TurretComponent->SkeletalMesh, AttachmentRules, TurretComponent->MuzzleName);
+	}
 }
+
+//void ASFTurretActor::PostEditChangeProperty(struct FPropertyChangedEvent& e)
+//{
+//	FName PropertyName = (e.Property != NULL) ? e.Property->GetFName() : NAME_None;
+//	if (PropertyName == GET_MEMBER_NAME_CHECKED(ASFTurretActor, AimVisualizationTemplate))
+//	{
+//		UE_LOG(LogTemp, Warning, TEXT("AimVisualizationTemplate changed"))
+//		FTransform Transform;
+//		AimVisualization = GetWorld()->SpawnActorDeferred<ASFAimVisualization>(AimVisualizationTemplate, Transform);
+//		AimVisualization->FinishSpawning(Transform);
+//	}
+//	Super::PostEditChangeProperty(e);
+//}
 
 void ASFTurretActor::AimAt(FVector Target)
 {
 	TurretComponent->AimAt(Target);
+	if (AimVisualization) AimVisualization->SetTargetLocation(Target);
 }
 
-void ASFTurretActor::AimAtActor(AActor* Actor)
+void ASFTurretActor::AimAtComponent(USceneComponent* SceneComponent)
 {
-	TurretComponent->AimAtActor(Actor);
+	TurretComponent->AimAtComponent(SceneComponent);
+	if (AimVisualization) AimVisualization->SetTargetComponent(SceneComponent);
 }
 
 void ASFTurretActor::TriggerAction_Implementation(bool bIsPressed)
 {
 	if (bIsPressed)
 	{
-		FTransform MuzzleTransform = TurretComponent->GetMuzzleTransform();
-		MuzzleTransform.RemoveScaling();
-		SpawnProjectile(MuzzleTransform);
+		SpawnProjectile(TurretComponent->GetMuzzleTransform());
 	}
 }
 
@@ -81,4 +110,17 @@ ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 	UGameplayStatics::FinishSpawningActor(Projectile, Transform);
 
 	return Projectile;
+}
+
+void ASFTurretActor::SetActivated(bool bValue)
+{
+	if (AimVisualization)
+	{
+		AimVisualization->SetActivated(bValue);
+	}
+
+	if (!bValue) 
+	{
+		AimAtComponent(NULL);
+	}
 }

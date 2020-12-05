@@ -8,6 +8,7 @@
 #include "SFTurretDelegate.h"
 #include "MyBlueprintFunctionLibrary.h"
 #include "GameFramework/MovementComponent.h"
+#include "Helpers/LoggingHelper.h"
 
 // Sets default values for this component's properties
 USFTurretComponent::USFTurretComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -45,7 +46,7 @@ void USFTurretComponent::Initialize()
 		return;
 	}
 	InitialBarrelTransformCS = BarrelSocket->GetSocketTransform(SkeletalMesh) * SkeletalMesh->GetComponentTransform().Inverse();
-	UE_LOG(LogTemp, Warning, TEXT("%s InitialBarrelTransform %s"), *GetOwner()->GetName(), *InitialBarrelTransformCS.ToString())
+	//UE_LOG(LogTemp, Warning, TEXT("%s InitialBarrelTransform %s"), *GetOwner()->GetName(), *InitialBarrelTransformCS.ToString())
 	BarrelLength = FVector::Distance(BarrelSocket->GetSocketLocation(SkeletalMesh), MuzzleSocket->GetSocketLocation(SkeletalMesh));
 }
 
@@ -57,12 +58,12 @@ void USFTurretComponent::AimAt(FVector target) {
 	Target = target;
 }
 
-void USFTurretComponent::AimAtActor(AActor* actor) {
+void USFTurretComponent::AimAtComponent(USceneComponent* Component) {
 	if (!WasInitialized(true)) {
 		return;
 	}
-	bWasTargetSet = actor != NULL;
-	TrackedActor = actor;
+	bWasTargetSet = Component != NULL;
+	TrackedComponent = Component;
 }
 
 void USFTurretComponent::Debug()
@@ -144,16 +145,18 @@ FAimCallibration USFTurretComponent::GetAimCallibrationOld() {
 
 bool USFTurretComponent::UpdateTargetFromTrackedActor()
 {
-	if (TrackedActor == NULL) {
+	if (TrackedComponent == NULL) {
 		return false;
 	}
 	if (!bLeadTarget) {
-		Target = TrackedActor->GetActorLocation();
+		Target = TrackedComponent->GetComponentLocation();
 		return true;
 	}
+	//TrackedComponent->GetVelocity()// TODO?
+	FVector Velocity;
 	FProjectilePredictionResult result = UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(
-		TrackedActor->GetActorLocation(),
-		TrackedActor->GetVelocity(),
+		TrackedComponent->GetComponentLocation(),
+		Velocity,
 		GetBarrelTransform().GetLocation(),
 		ProjectileSpeed,
 		BarrelLength);
@@ -178,7 +181,14 @@ bool USFTurretComponent::IsAimingAtTarget(float tolerance) {
 }
 
 FTransform USFTurretComponent::GetMuzzleTransform() {
-	return MuzzleSocket->GetSocketTransform(SkeletalMesh);
+	if (!MuzzleSocket)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("%s muzzle socket is null"), *GetName())
+		return FTransform::Identity;
+	}
+	FTransform Transform = MuzzleSocket->GetSocketTransform(SkeletalMesh);
+	Transform.RemoveScaling();
+	return Transform;
 }
 
 FTransform USFTurretComponent::GetBarrelTransform() {
