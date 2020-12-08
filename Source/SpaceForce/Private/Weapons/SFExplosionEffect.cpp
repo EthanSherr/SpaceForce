@@ -12,6 +12,7 @@ ASFExplosionEffect::ASFExplosionEffect(const FObjectInitializer& ObjectInitializ
 	PrimaryActorTick.bCanEverTick = false;
 	NiagaraComponent = ObjectInitializer.CreateDefaultSubobject<UNiagaraComponent>(this, FName("NiagaraComponent"));
 	NiagaraComponent->bAutoActivate = true;
+	RootComponent = NiagaraComponent;
 }
 
 void ASFExplosionEffect::PreInitializeComponents()

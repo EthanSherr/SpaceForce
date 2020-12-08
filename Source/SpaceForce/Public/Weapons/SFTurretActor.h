@@ -28,6 +28,9 @@ public:
 	USoundBase* FireSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+	USoundBase* ActivationSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 	TSubclassOf<ASFAimVisualization> AimVisualizationTemplate;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
@@ -60,8 +63,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	ASFProjectile* SpawnProjectile(const FTransform& Transform);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION()
 	void SetActivated(bool bValue);
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveActivated(bool bValue);
 
 	// UI
 public:

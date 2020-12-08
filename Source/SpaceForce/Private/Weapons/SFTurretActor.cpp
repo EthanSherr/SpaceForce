@@ -114,6 +114,7 @@ ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 
 void ASFTurretActor::SetActivated(bool bValue)
 {
+	ReceiveActivated(bValue);
 	if (AimVisualization)
 	{
 		AimVisualization->SetActivated(bValue);
@@ -122,5 +123,10 @@ void ASFTurretActor::SetActivated(bool bValue)
 	if (!bValue) 
 	{
 		AimAtComponent(NULL);
+	}
+
+	if (ActivationSound && bValue)
+	{
+		UGameplayStatics::SpawnSoundAttached(ActivationSound, TurretComponent);
 	}
 }

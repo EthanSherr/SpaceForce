@@ -96,7 +96,7 @@ void ASFProjectile::DisableAndDestroy() {
 void ASFProjectile::Explode(const FHitResult& Impact) {
 	ReceiveOnExplode(Impact);
 	ProjectileEffect->SetVariableBool(FName("Exploded"), true);
-	UE_LOG(LogTemp, Warning, TEXT("SFProjectile exploded %s on %s"), *GetName(), *ULoggingHelper::GetNameOrNull(Impact.GetActor()))
+	//UE_LOG(LogTemp, Warning, TEXT("SFProjectile exploded %s on %s"), *GetName(), *ULoggingHelper::GetNameOrNull(Impact.GetActor()))
 
 	const FVector BumpedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * ExplosionBump;
 	
@@ -139,8 +139,9 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 
 		if (bDebugExplosion)
 		{
-			DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionInnerRadius, 8, FColor::Red, false, 6.0f, 1, 2.0f);
-			DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionOuterRadius, 8, FColor::Green, false, 6.0f, 1, 2.0f);
+			//DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionInnerRadius, 8, FColor::Yellow, false, 20.0f, 4, 2.0f);
+			DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionInnerRadius, 8, FColor::Red, false, 3.0f, 3, 2.0f);
+			DrawDebugSphere(GetWorld(), BumpedImpactLocation, ExplosionOuterRadius, 8, FColor::Green, false, 3.0f, 3, 2.0f);
 		}
 	}
 
