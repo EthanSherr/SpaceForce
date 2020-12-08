@@ -337,7 +337,7 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 	FBT_FlyToCustomTarget_Metadata* Meta = &MyMemory->Metadata;
 
 	TArray<FVector>* PathSolution = &MyMemory->QueryResults.PathSolutionOptimized;
-	DrawDebugPoint(GetWorld(), (*PathSolution)[PathSolution->Num() - 1], 5, FColor::Blue, false, 0, 5);
+	//DrawDebugPoint(GetWorld(), (*PathSolution)[PathSolution->Num() - 1], 5, FColor::Blue, false, 0, 5);
 
 	//FVector flightDirection = queryResults.PathSolutionOptimized[MyMemory->solutionTraversalIndex] - pawn->GetActorLocation();
 	auto* BTPawn = Cast<ASFBehaviorTreePawn>(pawn);
