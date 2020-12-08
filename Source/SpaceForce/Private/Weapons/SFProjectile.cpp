@@ -13,6 +13,7 @@
 #include "SFExplosionEffect.h"
 #include "../Helpers/LoggingHelper.h"
 #include "DrawDebugHelpers.h"
+#include "Weapons/SFDeflectable.h"
 
 ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -78,7 +79,25 @@ void ASFProjectile::TriggerExplosion()
 	OnImpact(HitResult);
 }
 
-void ASFProjectile::OnImpact(const FHitResult& HitResult) {
+void ASFProjectile::OnImpact(const FHitResult& HitResult) 
+{
+	AActor* HitActor = HitResult.GetActor();
+	if (HitActor && HitActor->GetClass()->ImplementsInterface(USFDeflectable::StaticClass()))
+	{
+		bool bShouldDeflect = ISFDeflectable::Execute_ShouldDeflectProjectile(HitActor, HitResult);
+		if (bShouldDeflect)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Deflection!"))
+			FRotator DeflectedRotation = FRotationMatrix::MakeFromX(HitResult.ImpactNormal).Rotator();
+			CollisionComp->SetWorldRotation(DeflectedRotation, false);
+			CollisionComp->SetWorldLocation(HitResult.ImpactPoint + HitResult.ImpactNormal * 100);
+
+			MovementComp->SetUpdatedComponent(CollisionComp);
+			MovementComp->Velocity = Speed * HitResult.ImpactNormal;
+			MovementComp->UpdateComponentVelocity();
+			return;
+		}
+	}
 	DisableAndDestroy();
 	Explode(HitResult);
 }

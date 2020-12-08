@@ -16,6 +16,10 @@ USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObject
 	AngularDampingPrimary = 7.0f;
 	AngularDampingSecondary = 7.0f;
 	bMaintainMaxSpeed = false;
+
+	SpinThreshold = 400.0f;
+	bDetectSpin = false;
+	bDebugSpin = false;
 }
 
 bool USFSpringFlightMovementComponent::IsValid(bool logError) {
@@ -56,7 +60,7 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 		return;
 	}
 
-	auto Prim = GetUpdatedPrimitiveComp();
+	UPrimitiveComponent* Prim = GetUpdatedPrimitiveComp();
 	UpdateTarget(DeltaTime);
 
 	FVector ShipForward = Prim->GetForwardVector();
@@ -102,6 +106,29 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 	Prim->AddForce(Force);
 	Prim->AddTorqueInRadians(PrimaryTorque + SecondaryTorque, FName(), true);
 	LastTargetPosition = Target;
+
+
+	if (bDetectSpin)
+	{
+		TrackAngularX(Prim->GetPhysicsAngularVelocity());
+	}
+}
+
+void USFSpringFlightMovementComponent::TrackAngularX(const FVector& AngularVelocity)
+{
+	float AngularX = FMath::Abs(AngularVelocity.X);
+	AverageAngularX = (AverageAngularX + AngularX) * 0.5f;
+	bool bIsSpinningNew = AverageAngularX > SpinThreshold;
+	if (bIsSpinning != bIsSpinningNew)
+	{
+		bIsSpinning = bIsSpinningNew;
+		ReceiveIsSpinning(bIsSpinning);
+	}
+	if (bDebugSpin)
+	{
+		FString Message = FString::Printf(TEXT("AngularVelocity %s"), *AngularVelocity.ToString());
+		GEngine->AddOnScreenDebugMessage(1, 0.0f, bIsSpinningNew ? FColor::Red : FColor::Green, Message);
+	}
 }
 
 void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
