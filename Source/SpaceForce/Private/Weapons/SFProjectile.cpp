@@ -87,14 +87,20 @@ void ASFProjectile::OnImpact(const FHitResult& HitResult)
 		bool bShouldDeflect = ISFDeflectable::Execute_ShouldDeflectProjectile(HitActor, HitResult);
 		if (bShouldDeflect)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Deflection!"))
 			FRotator DeflectedRotation = FRotationMatrix::MakeFromX(HitResult.ImpactNormal).Rotator();
 			CollisionComp->SetWorldRotation(DeflectedRotation, false);
-			CollisionComp->SetWorldLocation(HitResult.ImpactPoint + HitResult.ImpactNormal * 100);
+			CollisionComp->SetWorldLocation(HitResult.ImpactPoint + HitResult.ImpactNormal * 10.0f);
 
 			MovementComp->SetUpdatedComponent(CollisionComp);
 			MovementComp->Velocity = Speed * HitResult.ImpactNormal;
 			MovementComp->UpdateComponentVelocity();
+
+			if (DeflectionExplosionTemplate)
+			{
+				FTransform SpawnTransform(HitResult.ImpactNormal.Rotation(), HitResult.ImpactPoint + HitResult.ImpactNormal * 10.0f);
+				ASFExplosionEffect* const DeflectionEffect = GetWorld()->SpawnActorDeferred<ASFExplosionEffect>(ExplosionTemplate, SpawnTransform);
+				UGameplayStatics::FinishSpawningActor(DeflectionEffect, SpawnTransform);
+			}
 			return;
 		}
 	}

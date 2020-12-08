@@ -24,6 +24,9 @@ public:
 	TSubclassOf<ASFExplosionEffect> ExplosionTemplate;
 
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
+	TSubclassOf<ASFExplosionEffect> DeflectionExplosionTemplate;
+
+	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	TSubclassOf<class AActor> DecalTemplate;
 
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
