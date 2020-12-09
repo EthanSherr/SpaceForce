@@ -51,7 +51,7 @@ void USFTurretComponent::Initialize()
 }
 
 void USFTurretComponent::AimAt(FVector target) {
-	if (!WasInitialized(true)) {
+	if (!WasInitialized(false)) {
 		return;
 	}
 	bWasTargetSet = true;
@@ -59,7 +59,7 @@ void USFTurretComponent::AimAt(FVector target) {
 }
 
 void USFTurretComponent::AimAtComponent(USceneComponent* Component) {
-	if (!WasInitialized(true)) {
+	if (!WasInitialized(false)) {
 		return;
 	}
 	bWasTargetSet = Component != NULL;
