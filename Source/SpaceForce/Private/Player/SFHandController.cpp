@@ -11,6 +11,7 @@
 #include "SpaceForce.h"
 #include "DrawDebugHelpers.h"
 #include "../UI/SFRadialMenuComponent.h"
+#include "DrawDebugHelpers.h"
 
 USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	this->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -25,6 +26,9 @@ USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer
 	ShipScanner->SetCollisionResponseToAllChannels(ECR_Ignore);
 	ShipScanner->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	ShipScanner->SetCollisionObjectType(ECC_Pawn);
+
+	ShipTargetComponent = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, TEXT("ShipTargetComponent"));
+	ShipTargetComponent->SetupAttachment(this);
 
 	PathScanner = ObjectInitializer.CreateDefaultSubobject<USphereComponent>(this, TEXT("PathScanner"));
 	PathScanner->SetSphereRadius(1000.0f);
@@ -55,6 +59,13 @@ void USFHandController::TickComponent(float DeltaTime, enum ELevelTick TickType,
 	{
 		FocusInteractables();
 	}
+
+	//DrawDebugLine(
+	//	GetWorld(),
+	//	ShipTargetComponent->GetComponentLocation(),
+	//	ShipTargetComponent->GetComponentLocation() + ShipTargetComponent->GetUpVector() * 100,
+	//	FColor::Blue, false, 0, 6, 2.0f);
+
 }
 
 void USFHandController::FocusInteractables()

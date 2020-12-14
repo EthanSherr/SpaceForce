@@ -30,6 +30,12 @@ public:
 	UPROPERTY(EditInstanceOnly, Category = "Debug")
 	bool bSpectateDebug;
 
+	UPROPERTY(Category = "Barrel Role", EditAnywhere)
+	float BarrelRoleThreshold;
+
+	UPROPERTY(Category = "Barrel Role", EditAnywhere)
+	float BarrelRoleTimeThreshold;
+
 	UPROPERTY(BlueprintReadOnly)
 	USceneComponent* HandsRoot;
 
@@ -95,6 +101,7 @@ protected:
 	void UpdateNextFlightPath();
 	void UpdateHandsRoot();
 	void UpdateThumbpadAxis();
+	void DetectHandRole(float DeltaTime);
 //update end
 
 //inputs begin
@@ -134,4 +141,28 @@ protected:
 
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "StartedPilotingShip"))
 	void ReceiveStartPilotingShip();
+
+// barrel role detection
+private:
+	UPROPERTY(Transient)
+	FQuat LastDrivingHandRotation;
+
+protected:
+	UFUNCTION()
+	void RegisterBarrelRole(float Direction);
+
+	UPROPERTY(Transient, BlueprintReadWrite)
+	bool bIsDoingBarrelRole;
+
+	UPROPERTY(Transient, BlueprintReadOnly)
+	float BarrelRoleInput;
+
+	UPROPERTY(Transient)
+	FTimerHandle RoleThresholdTimer;
+
+	UFUNCTION()
+	void DoBarrelRoleTimerHandler();
+
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceiveDoABarrelRole(float Direction);
 };

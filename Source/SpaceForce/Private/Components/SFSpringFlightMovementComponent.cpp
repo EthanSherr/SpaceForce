@@ -16,10 +16,6 @@ USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObject
 	AngularDampingPrimary = 7.0f;
 	AngularDampingSecondary = 7.0f;
 	bMaintainMaxSpeed = false;
-
-	SpinThreshold = 400.0f;
-	bDetectSpin = false;
-	bDebugSpin = false;
 }
 
 bool USFSpringFlightMovementComponent::IsValid(bool logError) {
@@ -76,20 +72,16 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 		TargetUp = ShipUp * FVector::DotProduct(ShipUp, targetUp) + ShipRight * FVector::DotProduct(ShipRight, targetUp);
 	}
 
-	//FString Message = FString::Printf(TEXT("TargetVelocity %s"), *TargetVelocity.ToString());
-	//GEngine->AddOnScreenDebugMessage(1, 0.0f, FColor::Yellow, Message);
-
 	FVector Force = CalculateSpringDampingForces(Prim->GetComponentLocation(), Target, ShipVelocity, TargetVelocity, SpringConfig.Stiffness, SpringConfig.Damping, SpringConfig.MaxExtension);
 	FVector PrimaryTorque = CalculateSpringDampingTorque(ShipForward, TargetForward, ShipAngularVelocity, AngularStiffnessPrimary, AngularDampingPrimary);
 	FVector SecondaryTorque = CalculateSpringDampingTorque(ShipUp, TargetUp, ShipAngularVelocity, AngularStiffnessSecondary, AngularDampingSecondary);
-
 
 	FVector Start = Prim->GetComponentLocation();
 
 	if (bDebugRotation)
 	{
-		DrawDebugLine(GetWorld(), Start, Start + TargetUp * 100, FColor::Green, false, 0, 5, 4.0f);
-		DrawDebugLine(GetWorld(), Start, Start + ShipUp * 50, FColor::Yellow, false, 0, 7, 4.0f);
+		DrawDebugLine(GetWorld(), Start, Start + TargetUp * 100, FColor::Green, false, 0, 5, 2.0f);
+		DrawDebugLine(GetWorld(), Start, Start + ShipUp * 50, FColor::Yellow, false, 0, 7, 2.0f);
 	}
 
 	if (bDebugTorque)
@@ -106,30 +98,8 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 	Prim->AddForce(Force);
 	Prim->AddTorqueInRadians(PrimaryTorque + SecondaryTorque, FName(), true);
 	LastTargetPosition = Target;
-
-
-	if (bDetectSpin)
-	{
-		TrackAngularX(Prim->GetPhysicsAngularVelocity());
-	}
 }
 
-void USFSpringFlightMovementComponent::TrackAngularX(const FVector& AngularVelocity)
-{
-	float AngularX = FMath::Abs(AngularVelocity.X);
-	AverageAngularX = (AverageAngularX + AngularX) * 0.5f;
-	bool bIsSpinningNew = AverageAngularX > SpinThreshold;
-	if (bIsSpinning != bIsSpinningNew)
-	{
-		bIsSpinning = bIsSpinningNew;
-		ReceiveIsSpinning(bIsSpinning);
-	}
-	if (bDebugSpin)
-	{
-		FString Message = FString::Printf(TEXT("AngularVelocity %s"), *AngularVelocity.ToString());
-		GEngine->AddOnScreenDebugMessage(1, 0.0f, bIsSpinningNew ? FColor::Red : FColor::Green, Message);
-	}
-}
 
 void USFSpringFlightMovementComponent::UpdateTarget(float DeltaTime)
 {

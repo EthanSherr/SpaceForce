@@ -50,12 +50,6 @@ public:
 		return LinearMaxSpeed;
 	}
 
-	UPROPERTY(EditAnywhere, Category = "Spin")
-	bool bDetectSpin;
-
-	UPROPERTY(EditAnywhere, Category = "Spin")
-	float SpinThreshold;
-
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float LinearStiffness;
 
@@ -71,7 +65,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float AngularDampingPrimary;
 
-	UPROPERTY(EditAnywhere, Category = "Movement")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Movement")
 	float AngularStiffnessSecondary;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
@@ -88,10 +82,6 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Debug")
 	bool bDebugTarget;
-
-	// spin debug
-	UPROPERTY(EditAnywhere, Category = "Debug")
-	bool bDebugSpin;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
 	bool bDebugRotation;
@@ -176,10 +166,4 @@ private:
 	FVector TargetVelocity = FVector::ZeroVector;
 
 	FVector LastTargetPosition;
-
-	UPROPERTY(Transient)
-	float AverageAngularX;
-
-	UFUNCTION()
-	void TrackAngularX(const FVector& AngularVelocity);
 };

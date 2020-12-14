@@ -98,7 +98,7 @@ void ASFProjectile::OnImpact(const FHitResult& HitResult)
 			if (DeflectionExplosionTemplate)
 			{
 				FTransform SpawnTransform(HitResult.ImpactNormal.Rotation(), HitResult.ImpactPoint + HitResult.ImpactNormal * 10.0f);
-				ASFExplosionEffect* const DeflectionEffect = GetWorld()->SpawnActorDeferred<ASFExplosionEffect>(ExplosionTemplate, SpawnTransform);
+				ASFExplosionEffect* const DeflectionEffect = GetWorld()->SpawnActorDeferred<ASFExplosionEffect>(DeflectionExplosionTemplate, SpawnTransform);
 				UGameplayStatics::FinishSpawningActor(DeflectionEffect, SpawnTransform);
 			}
 			return;

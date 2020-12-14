@@ -48,6 +48,9 @@ ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(
 
 	HandExtension = 75.0f;
 	VRChaperone = ObjectInitializer.CreateDefaultSubobject<USteamVRChaperoneComponent>(this, FName("VRChaperone"));
+
+	BarrelRoleThreshold = 600.0f;
+	BarrelRoleTimeThreshold = 0.2f;
 }
 
 void ASFPilotPawn::PostInitializeComponents() 
@@ -114,10 +117,54 @@ void ASFPilotPawn::Tick(float DeltaTime)
 	UpdateNextFlightPath();
 	UpdateHandsRoot();
 	UpdateThumbpadAxis();
-	//if (Ship && Ship->GetActiveTurret())
-	//{
-	//	Ship->GetActiveTurret()->AimAt(GetHandInState(EHandState::Aiming)->GetComponentLocation());
-	//}
+	DetectHandRole(DeltaTime);
+}
+
+void ASFPilotPawn::DetectHandRole(float DeltaTime)
+{
+	//Detect barrel role gesture
+	USFHandController* DrivingHand = GetHandInState(EHandState::Driving);
+	if (DrivingHand)
+	{
+		FQuat CurrentQuat = DrivingHand->GetComponentQuat();
+		FQuat DeltaQ = LastDrivingHandRotation.Inverse() * CurrentQuat;
+		FVector Axis;
+		float Angle;
+		DeltaQ.ToAxisAndAngle(Axis, Angle);
+		Angle = FMath::RadiansToDegrees(Angle);
+		FVector AngularVelocity = CurrentQuat.RotateVector((Axis * Angle) / DeltaTime);
+
+		//FQuat CurrentQuat = DrivingHand->GetComponentRotation().Quaternion();
+		//FQuat QuatDiff = CurrentQuat * LastDrivingHandRotation.Inverse();
+		//FVector AngularSpeed = QuatDiff.Euler() * 180.0f/PI;
+		UE_LOG(LogTemp, Warning, TEXT("AngularVelocity.X %f"), AngularVelocity.X)
+
+		float Direction = FMath::Abs(AngularVelocity.X) > BarrelRoleThreshold ? FMath::Sign(AngularVelocity.X) : 0.0f;
+		RegisterBarrelRole(Direction);
+		LastDrivingHandRotation = CurrentQuat;	
+	}
+}
+
+void ASFPilotPawn::RegisterBarrelRole(float Direction)
+{
+	if (Direction != BarrelRoleInput)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(RoleThresholdTimer);
+
+		BarrelRoleInput = Direction;
+		UE_LOG(LogTemp, Warning, TEXT("Role RESET %f"), Direction)
+		if (BarrelRoleInput != 0.0f)
+		{
+			GetWorld()->GetTimerManager().SetTimer(RoleThresholdTimer, this, &ASFPilotPawn::DoBarrelRoleTimerHandler, BarrelRoleTimeThreshold, false);
+		}
+	}
+}
+
+void ASFPilotPawn::DoBarrelRoleTimerHandler()
+{
+	ReceiveDoABarrelRole(BarrelRoleInput);
+	BarrelRoleInput = 0.0f;
+	UE_LOG(LogTemp, Warning, TEXT("Role SUCCESS"))
 }
 
 void ASFPilotPawn::UpdateNextFlightPath()
@@ -131,10 +178,11 @@ void ASFPilotPawn::UpdateNextFlightPath()
 void ASFPilotPawn::UpdateHandsRoot()
 {
 	auto FlightPath = SplineMovement->GetFlightPath();
-	if (!FlightPath) 
-		return;
-	const FVector Tangent = FlightPath->Spline->GetDirectionAtDistanceAlongSpline(SplineMovement->GetDistance(), ESplineCoordinateSpace::World);
-	HandsRoot->SetRelativeLocation(HandExtension * Tangent);
+	if (FlightPath)
+	{
+		const FVector Tangent = FlightPath->Spline->GetDirectionAtDistanceAlongSpline(SplineMovement->GetDistance(), ESplineCoordinateSpace::World);
+		HandsRoot->SetRelativeLocation(HandExtension * Tangent);
+	}
 }
 
 void ASFPilotPawn::UpdateThumbpadAxis()
@@ -271,7 +319,8 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	NewDrivingHand->SetHandState(EHandState::Driving);
 	NewDrivingHand->RadialMenuComponent->SetData(DefensiveMenuOptions);
 	NewDrivingHand->RadialMenuComponent->SetSelectedIndex(0);
-	NewShip->FlightMovement->SetTargetComponent(NewDrivingHand);
+	NewShip->FlightMovement->SetTargetComponent(NewDrivingHand->ShipTargetComponent);
+	LastDrivingHandRotation = NewDrivingHand->ShipTargetComponent->GetComponentQuat();
 
 	auto NewAimingHand = GetOtherHand(NewDrivingHand);
 	NewAimingHand->SetHandState(EHandState::Aiming);
@@ -279,6 +328,7 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipP
 	NewShip->SetOwner(this);
 	NewShip->AimTargetComponent = NewAimingHand;
 	Ship = NewShip;
+
 	ReceiveStartPilotingShip();
 	NewShip->OnPossessed();
 

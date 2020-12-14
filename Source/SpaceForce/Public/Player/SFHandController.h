@@ -25,8 +25,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
 	USphereComponent* ShipScanner;
 
-	UPROPERTY(EditAnywhere)
+	UPROPERTY(EditDefaultsOnly)
 	USphereComponent* PathScanner;
+
+	UPROPERTY(BlueprintReadonly, EditDefaultsOnly)
+	USceneComponent* ShipTargetComponent;
 
 	UPROPERTY(EditAnywhere, Category = "Interaction")
 	bool bScanForInteractables;
