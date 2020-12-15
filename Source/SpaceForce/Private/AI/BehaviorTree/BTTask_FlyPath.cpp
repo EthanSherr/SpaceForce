@@ -1,7 +1,7 @@
 #include "AI/BehaviorTree/BTTask_FlyPath.h"
 #include "../SFAIController.h"
-#include "../SFBehaviorTreePawn.h"
 #include "../SFPathParams.h"
+#include "AI/SFBehaviorTreeStatesComponent.h"
 #include "DrawDebugHelpers.h"
 
 UBTTask_FlyPath::UBTTask_FlyPath(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -51,10 +51,10 @@ EBTNodeResult::Type UBTTask_FlyPath::ExecuteTask(UBehaviorTreeComponent& OwnerCo
 
 void UBTTask_FlyPath::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, float DeltaSeconds)
 {
-	ASFBehaviorTreePawn* Pawn = Cast<ASFBehaviorTreePawn>(OwnerComp.GetAIOwner()->GetPawn());
+	APawn* Pawn = OwnerComp.GetAIOwner()->GetPawn();
 	FBT_FlyPath* FlyPath = (FBT_FlyPath*)NodeMemory;
 
-	float NextLength = FlyPath->Length + DeltaSeconds * Pawn->GetSpeed();
+	float NextLength = FlyPath->Length + DeltaSeconds * ISFAIInterface::Execute_GetSpeed(Pawn);
 	bool bDidIndexChange = false;
 	while (NextLength >= FlyPath->MaxLength)
 	{
@@ -85,11 +85,13 @@ void UBTTask_FlyPath::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMem
 // custom functions
 USFPathParams* UBTTask_FlyPath::GetPathParams(UBehaviorTreeComponent& OwnerComp)
 {
-	ASFBehaviorTreePawn* BTPawn = Cast<ASFBehaviorTreePawn>(OwnerComp.GetAIOwner()->GetPawn());
-	if (BTPawn)
+	APawn* Pawn = OwnerComp.GetAIOwner()->GetPawn();
+	if (Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass()))
 	{
+		USFBehaviorTreeStatesComponent* BTSComp = ISFAIInterface::Execute_GetBehaviorTreeStatesComp(Pawn);
+		
 		FSFBehaviorTreeState BTState;
-		if (BTPawn->CurrentBehaviorState(BTState))
+		if (BTSComp->CurrentBehaviorState(BTState))
 		{
 			USFPathParams* PathParams = BTState.PathParams;
 			if (PathParams && PathParams->TargetsPoints.Num() > 0)

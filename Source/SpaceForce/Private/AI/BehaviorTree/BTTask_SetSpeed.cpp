@@ -3,9 +3,9 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "../SFAIController.h"
 #include "../SFSpeedParams.h"
-#include "../SFBehaviorTreePawn.h"
 #include "../../Player/SFShipPawn.h"
 #include "../../Components/SFSplineMovementComponent.h"
+#include "AI/SFBehaviorTreeStatesComponent.h"
 
 UBTTask_SetSpeed::UBTTask_SetSpeed(const FObjectInitializer& ObjectInitializer)
 {
@@ -51,15 +51,15 @@ EBTNodeResult::Type UBTTask_SetSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerC
 	UBlackboardComponent* Blackboard = OwnerComp.GetBlackboardComponent();
 	if (Controller)
 	{
-		ASFBehaviorTreePawn* BTPawn = Cast<ASFBehaviorTreePawn>(Controller->GetPawn());
-		if (BTPawn)
+		APawn* Pawn = Controller->GetPawn();
+		if (Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass()))
 		{
-			FSFBehaviorTreeState StateParams;
-			BTPawn->CurrentBehaviorState(StateParams);
-			if (StateParams.SpeedParams)
+			USFBehaviorTreeStatesComponent* BTStates = ISFAIInterface::Execute_GetBehaviorTreeStatesComp(Pawn);
+			USFSpeedParams* SpeedParams = BTStates->GetSpeedParams();
+			if (SpeedParams)
 			{
-				float Speed = StateParams.SpeedParams->MaxSpeed;
-				if (StateParams.SpeedParams->bSpeedRelativeToEnemy) {
+				float Speed = SpeedParams->MaxSpeed;
+				if (SpeedParams->bSpeedRelativeToEnemy) {
 					AActor* Enemy = Cast<AActor>(Blackboard->GetValueAsObject(EnemyKey.SelectedKeyName));
 					ASFShipPawn* ShipPawn = Cast<ASFShipPawn>(Enemy);
 					if (ShipPawn) 
@@ -72,7 +72,7 @@ EBTNodeResult::Type UBTTask_SetSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerC
 					}
 				}
 
-				BTPawn->SetSpeed(Speed);
+				ISFAIInterface::Execute_SetSpeed(Pawn, Speed);
 
 				return EBTNodeResult::Succeeded;
 			}
@@ -89,13 +89,5 @@ void UBTTask_SetSpeed::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMe
 
 void UBTTask_SetSpeed::OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult)
 {
-	//FBT_FlyToTarget* myMemory = (FBT_FlyToTarget*)NodeMemory;
-
-	//UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
-	//if (ensure(BlackboardComp) && myMemory->BBObserverDelegateHandle.IsValid())
-	//	BlackboardComp->UnregisterObserver(FlightLocationKey.GetSelectedKeyID(), myMemory->BBObserverDelegateHandle);
-
-	//myMemory->BBObserverDelegateHandle.Reset();
-
 	Super::OnTaskFinished(OwnerComp, NodeMemory, TaskResult);
 }

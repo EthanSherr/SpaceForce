@@ -1,8 +1,8 @@
 #include "BTTask_FollowFlightPath.h"
 #include "../SFAIController.h"
-#include "../SFBehaviorTreePawn.h"
 #include "../SFPathParams.h"
 #include "../../Environment/SFFlightPath.h"
+#include "AI/SFBehaviorTreeStatesComponent.h"
 #include "DrawDebugHelpers.h"
 
 UBTTask_FollowFlightPath::UBTTask_FollowFlightPath(const FObjectInitializer& ObjectInitializer)
@@ -47,25 +47,24 @@ void UBTTask_FollowFlightPath::InitializeFromAsset(UBehaviorTree& Asset)
 
 EBTNodeResult::Type UBTTask_FollowFlightPath::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	AAIController* Controller = OwnerComp.GetAIOwner();
-	if (Controller)
-	{
-		ASFBehaviorTreePawn* BTPawn = Cast<ASFBehaviorTreePawn>(Controller->GetPawn());
-		if (BTPawn)
-		{
-			FSFBehaviorTreeState StateParams;
-			if (BTPawn->CurrentBehaviorState(StateParams) && StateParams.PathParams->FlightPath)
-			{
-				FBT_FollowFlightPath* Memory = (FBT_FollowFlightPath*)NodeMemory;
-				ASFFlightPath* FlightPath = StateParams.PathParams->FlightPath;
-				
-				Memory->PathOffset = 0.f;
-				Memory->Offset = BTPawn->GetActorLocation() - FlightPath->GetLocationAtDistance(0);
+	APawn* Pawn = OwnerComp.GetAIOwner()->GetPawn();
 
-				return EBTNodeResult::InProgress;
-			}
+	if (Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass()))
+	{
+		FSFBehaviorTreeState StateParams;
+		USFBehaviorTreeStatesComponent* BTSComp = ISFAIInterface::Execute_GetBehaviorTreeStatesComp(Pawn);
+		if (BTSComp->CurrentBehaviorState(StateParams) && StateParams.PathParams->FlightPath)
+		{
+			FBT_FollowFlightPath* Memory = (FBT_FollowFlightPath*)NodeMemory;
+			ASFFlightPath* FlightPath = StateParams.PathParams->FlightPath;
+				
+			Memory->PathOffset = 0.f;
+			Memory->Offset = Pawn->GetActorLocation() - FlightPath->GetLocationAtDistance(0);
+
+			return EBTNodeResult::InProgress;
 		}
 	}
+	
 	return EBTNodeResult::Failed;
 }
 
@@ -74,19 +73,21 @@ void UBTTask_FollowFlightPath::TickTask(UBehaviorTreeComponent& OwnerComp, uint8
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 	FBT_FollowFlightPath* Memory = (FBT_FollowFlightPath*)NodeMemory;
-	ASFBehaviorTreePawn* Pawn = Cast<ASFBehaviorTreePawn>(OwnerComp.GetAIOwner()->GetPawn());
+	APawn* Pawn = OwnerComp.GetAIOwner()->GetPawn();
 
 	FSFBehaviorTreeState StateParams;
-	Pawn->CurrentBehaviorState(StateParams);
+
+	USFBehaviorTreeStatesComponent* BTSComp = ISFAIInterface::Execute_GetBehaviorTreeStatesComp(Pawn);
+	BTSComp->CurrentBehaviorState(StateParams);
 	ASFFlightPath* FlightPath = StateParams.PathParams->FlightPath;
 
-	if (!Pawn || !FlightPath)
+	if (!FlightPath)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Failed);
 		return;
 	}
 
-	Memory->PathOffset += Pawn->GetSpeed() * DeltaSeconds;
+	Memory->PathOffset += ISFAIInterface::Execute_GetSpeed(Pawn) * DeltaSeconds;
 
 	if (FlightPath->OffsetExceedsLength(Memory->PathOffset))
 	{

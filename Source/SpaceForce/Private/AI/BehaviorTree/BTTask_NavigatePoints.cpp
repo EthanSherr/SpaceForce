@@ -2,6 +2,7 @@
 #include "../SFAIController.h"
 #include "../SFBehaviorTreePawn.h"
 #include "../SFPathParams.h"
+#include "AI/SFBehaviorTreeStatesComponent.h"
 
 UBTTask_NavigatePoints::UBTTask_NavigatePoints(const FObjectInitializer& ObjectInitializer)
 {
@@ -82,11 +83,12 @@ void UBTTask_NavigatePoints::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* 
 
 USFPathParams* UBTTask_NavigatePoints::GetPathParams(UBehaviorTreeComponent& OwnerComp)
 {
-	ASFBehaviorTreePawn* BTPawn = Cast<ASFBehaviorTreePawn>(OwnerComp.GetAIOwner()->GetPawn());
-	if (BTPawn)
+	APawn* Pawn = OwnerComp.GetAIOwner()->GetPawn();
+	if (Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass()))
 	{
 		FSFBehaviorTreeState BTState;
-		if (BTPawn->CurrentBehaviorState(BTState))
+		USFBehaviorTreeStatesComponent* BTSComp = ISFAIInterface::Execute_GetBehaviorTreeStatesComp(Pawn);
+		if (BTSComp->CurrentBehaviorState(BTState))
 		{
 			USFPathParams* PathParams = BTState.PathParams;
 			if (PathParams && PathParams->TargetsPoints.Num() > 0)

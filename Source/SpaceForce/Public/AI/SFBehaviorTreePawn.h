@@ -21,8 +21,8 @@ public:
 
 public:	
 
-	UPROPERTY(EditAnywhere, Category = "Behaviors")
-	TMap<FString, FSFBehaviorTreeState> BehaviorMap; //M
+	//UPROPERTY(EditAnywhere, Category = "Behaviors")
+	//TMap<FString, FSFBehaviorTreeState> BehaviorMap; //M
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CurrentBehaviorState(FSFBehaviorTreeState& State);
@@ -30,8 +30,8 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
 	void ChangeBehavior(FString NextBehavior);
 
-	UPROPERTY(EditAnywhere)
-	bool DebugDisabled; //M
+	//UPROPERTY(EditAnywhere)
+	//bool DebugDisabled; //M
 
 	//OLD
 
@@ -40,12 +40,6 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement")
 	void MoveTo(FVector location);
-
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
-	void SetSpeed(float Speed);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "Movement", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
-	float GetSpeed();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class ASFAIController* GetSFAIController() const;
@@ -60,6 +54,17 @@ public:
 
 	//AI Interface
 	virtual USFBehaviorTreeStatesComponent* GetBehaviorTreeStatesComp_Implementation() override;
+
+	/*
+		UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
+		void SetSpeed(float Speed);
+
+		UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "Movement", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
+		float GetSpeed();
+	*/
+	void SetSpeed_Implementation(float Speed) override;
+
+	float GetSpeed_Implementation() override;
 
 private:
 	UPROPERTY()

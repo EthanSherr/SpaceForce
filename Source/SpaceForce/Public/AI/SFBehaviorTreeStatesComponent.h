@@ -45,11 +45,11 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
 	void Disable();
 
-	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
-	//float GetSpeed();
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
+	float GetSpeed();
 
-	//UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
-	//void SetSpeed(float Speed);
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
+	void SetSpeed(float Speed);
 };
 
 
@@ -59,13 +59,16 @@ class SPACEFORCE_API USFBehaviorTreeStatesComponent : public UActorComponent
 	GENERATED_BODY()
 
 public:		
-	UPROPERTY(EditAnywhere, Category = "Behaviors")
+	UPROPERTY(EditAnywhere, Category = "Settings")
 	bool DebugDisabled;
 
-	UPROPERTY(EditAnywhere, Category = "Behaviors")
+	UPROPERTY(EditAnywhere, Category = "Settings")
 	FString InitialBehavior;
 
-	UPROPERTY(EditAnywhere, Category = "Behaviors")
+	UPROPERTY(EditAnywhere, Category = "Settings")
+	USFSpeedParams* DefaultSpeedParams;
+
+	UPROPERTY(EditAnywhere, Category = "Settings")
 	TMap<FString, FSFBehaviorTreeState> BehaviorMap;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)

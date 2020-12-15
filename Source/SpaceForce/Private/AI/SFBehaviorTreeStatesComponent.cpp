@@ -29,6 +29,9 @@ void USFBehaviorTreeStatesComponent::BeginPlay()
 
 bool USFBehaviorTreeStatesComponent::CurrentBehaviorState(FSFBehaviorTreeState& State)
 {
+	//Populate Defaults
+	State.SpeedParams = DefaultSpeedParams;
+
 	if (!BehaviorMap.Contains(Behavior))
 	{
 		return false;
@@ -42,19 +45,19 @@ void USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior)
 	APawn* Pawn = Cast<APawn>(GetOwner());
 	if (!Pawn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("BeahviorTreeStateCompnent Owner must be a Pawn, Owner: %s"), *GetOwner()->GetName())
+		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: BehaviorTreeStateCompnent Owner must be a Pawn"), *GetOwner()->GetName())
 		return;
 	}
 	if (DebugDisabled)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("DebugDisabled true %s"), *Pawn->GetName())
+		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: ChangeBehavior failed DebugDisabled true"), *Pawn->GetName())
 		return;
 	}
 
 	ASFAIController* SFController = Pawn->GetController<ASFAIController>();
 	if (!SFController)
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s: ChangeBehavior(%s) failed: No SFAIController owner."), *GetName(), *NextBehavior)
+		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: No SFAIController owner."), *GetOwner()->GetName(), *NextBehavior)
 		return;
 	}
 
@@ -70,7 +73,7 @@ void USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior)
 
 	if (!BehaviorMap.Contains(NextBehavior))
 	{
-		UE_LOG(LogTemp, Error, TEXT("%s: ChangeBehavior(%s) failed: Unknown behavior."), *GetName(), *NextBehavior)
+		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: Unknown behavior."), *GetOwner()->GetName(), *NextBehavior)
 		return;
 	}
 	Behavior = NextBehavior;
@@ -82,9 +85,6 @@ void USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior)
 USFSpeedParams* USFBehaviorTreeStatesComponent::GetSpeedParams()
 {
 	FSFBehaviorTreeState CurrentState;
-	if (!CurrentBehaviorState(CurrentState) || !CurrentState.SpeedParams)
-	{
-		return DefaultSpeedParams;
-	}
+	CurrentBehaviorState(CurrentState);
 	return CurrentState.SpeedParams;
 }

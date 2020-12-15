@@ -25,7 +25,7 @@
 #include "Runtime/AIModule/Classes/AIController.h"
 #include "VisualLogger/VisualLogger.h"
 #include "DrawDebugHelpers.h"
-#include "../SFBehaviorTreePawn.h"
+#include "AI/SFBehaviorTreeStatesComponent.h"
 
 UBTTask_FlyToCustom::UBTTask_FlyToCustom(const FObjectInitializer& ObjectInitializer) 
 	: Super(ObjectInitializer)
@@ -340,13 +340,12 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 	//DrawDebugPoint(GetWorld(), (*PathSolution)[PathSolution->Num() - 1], 5, FColor::Blue, false, 0, 5);
 
 	//FVector flightDirection = queryResults.PathSolutionOptimized[MyMemory->solutionTraversalIndex] - pawn->GetActorLocation();
-	auto* BTPawn = Cast<ASFBehaviorTreePawn>(pawn);
-	if (!BTPawn)
+	if (!pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass()))
 	{
-		UE_LOG(LogTemp, Error, TEXT("FlyToCustom needs a BehaviorTreePawn in order to get speed, panw = %s"), *pawn->GetName())
+		UE_LOG(LogTemp, Error, TEXT("FlyToCustom needs a AIInterface pawn in order to get speed, pawn name = %s"), *pawn->GetName())
 		return;
 	}
-	float Speed = BTPawn->GetSpeed();
+	float Speed = ISFAIInterface::Execute_GetSpeed(pawn);
 	float NextLength = Meta->Length + DeltaSeconds * Speed;
 	while (NextLength >= Meta->MaxLength)
 	{

@@ -137,7 +137,7 @@ void ASFPilotPawn::DetectHandRole(float DeltaTime)
 		//FQuat CurrentQuat = DrivingHand->GetComponentRotation().Quaternion();
 		//FQuat QuatDiff = CurrentQuat * LastDrivingHandRotation.Inverse();
 		//FVector AngularSpeed = QuatDiff.Euler() * 180.0f/PI;
-		UE_LOG(LogTemp, Warning, TEXT("AngularVelocity.X %f"), AngularVelocity.X)
+		//UE_LOG(LogTemp, Warning, TEXT("AngularVelocity.X %f"), AngularVelocity.X)
 
 		float Direction = FMath::Abs(AngularVelocity.X) > BarrelRoleThreshold ? FMath::Sign(AngularVelocity.X) : 0.0f;
 		RegisterBarrelRole(Direction);

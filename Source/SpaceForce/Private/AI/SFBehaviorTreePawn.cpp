@@ -21,13 +21,13 @@ void ASFBehaviorTreePawn::PostLoad()
 {
 	Super::PostLoad();
 #if WITH_EDITORONLY_DATA
-	if (BehaviorMap.Num() && !BehaviorStates->BehaviorMap.Num())
-	{
-		for (auto KeyValue : BehaviorMap)
-		{
-			BehaviorStates->BehaviorMap.Add(KeyValue);
-		}
-	}
+	//if (BehaviorMap.Num() && !BehaviorStates->BehaviorMap.Num())
+	//{
+	//	for (auto KeyValue : BehaviorMap)
+	//	{
+	//		BehaviorStates->BehaviorMap.Add(KeyValue);
+	//	}
+	//}
 #endif
 }
 
@@ -41,51 +41,27 @@ void ASFBehaviorTreePawn::AddMovementInput(FVector WorldDirection, float ScaleVa
 
 void ASFBehaviorTreePawn::ChangeBehavior(FString NextBehavior)
 {
-	if (DebugDisabled) return;
-	ASFAIController* SFController = GetController<ASFAIController>();
-	if (!SFController)
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s: ChangeBehavior(%s) failed: No SFAIController owner."), *GetName(), *NextBehavior)
-		return;
-	}
-
-	if (NextBehavior == FString("_Terminate")) 
-	{
-		SFController->UnPossess();
-		ReceiveDisable();
-		return;
-	}
-
-	if (!BehaviorMap.Contains(NextBehavior))
-	{
-		UE_LOG(LogTemp, Error, TEXT("%s: ChangeBehavior(%s) failed: Unknown behavior."), *GetName(), *NextBehavior)
-		return;
-	}
-	Behavior = NextBehavior;
-	FSFBehaviorTreeState BehaviorState = BehaviorMap[NextBehavior];
-
-	SFController->StartBehaviorTree(BehaviorState.BehaviorTree);
-	//SFController->SetFlightPathInBlackboard(BehaviorState.FlightPath);
-	//set some parameters?
-}
-
-float ASFBehaviorTreePawn::GetSpeed_Implementation()
-{
-	UE_LOG(LogTemp, Warning, TEXT("Base GetSpeed is being called."))
-	return 0.0f;
+	BehaviorStates->ChangeBehavior(NextBehavior);
 }
 
 bool ASFBehaviorTreePawn::CurrentBehaviorState(FSFBehaviorTreeState& State)
 {
-	if (!BehaviorMap.Contains(Behavior))
-	{
-		return false;
-	}
-	State = BehaviorMap[Behavior];
-	return true;
+	return BehaviorStates->CurrentBehaviorState(State);
 }
 
+// SFAIInterface
 USFBehaviorTreeStatesComponent* ASFBehaviorTreePawn::GetBehaviorTreeStatesComp_Implementation()
 {
 	return BehaviorStates;
+}
+
+void ASFBehaviorTreePawn::SetSpeed_Implementation(float Speed)
+{
+	UE_LOG(LogTemp, Error, TEXT("SetSpeed base does nothing"))
+}
+
+float ASFBehaviorTreePawn::GetSpeed_Implementation()
+{
+	UE_LOG(LogTemp, Error, TEXT("GetSpeed base does nothing"))
+	return 0;
 }
