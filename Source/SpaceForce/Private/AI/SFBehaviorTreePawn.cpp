@@ -9,10 +9,26 @@
 
 ASFBehaviorTreePawn::ASFBehaviorTreePawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = false;
+
+	BehaviorStates = ObjectInitializer.CreateDefaultSubobject<USFBehaviorTreeStatesComponent>(this, TEXT("BehaviorStates"));
 }
 
 void ASFBehaviorTreePawn::BeginPlay() {
 	Super::BeginPlay();
+}
+
+void ASFBehaviorTreePawn::PostLoad()
+{
+	Super::PostLoad();
+#if WITH_EDITORONLY_DATA
+	if (BehaviorMap.Num() && !BehaviorStates->BehaviorMap.Num())
+	{
+		for (auto KeyValue : BehaviorMap)
+		{
+			BehaviorStates->BehaviorMap.Add(KeyValue);
+		}
+	}
+#endif
 }
 
 ASFAIController* ASFBehaviorTreePawn::GetSFAIController() const {
@@ -69,8 +85,7 @@ bool ASFBehaviorTreePawn::CurrentBehaviorState(FSFBehaviorTreeState& State)
 	return true;
 }
 
-//bool ASFBehaviorTreePawn::GetTargetVelocity(AActor* TargetActor, FVector& Velocity) const
-//{
-//	FVector Velocity = TargetActor->GetVelocity()
-//	if (Velocity == )
-//}
+USFBehaviorTreeStatesComponent* ASFBehaviorTreePawn::GetBehaviorTreeStatesComp_Implementation()
+{
+	return BehaviorStates;
+}

@@ -2,35 +2,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "./SFBehaviorTreeStatesComponent.h"
 #include "SFBehaviorTreePawn.generated.h"
 
-class UBehaviorTree;
 class ASFFlightPath;
 class UFloatCurve;
 
-class USFSpeedParams;
-class USFPathParams;
-
-USTRUCT(BlueprintType)
-struct FSFBehaviorTreeState
-{
-	GENERATED_USTRUCT_BODY()
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors")
-	FString NextBehavior = FString("_Terminate");
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors")
-	UBehaviorTree* BehaviorTree;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Pathing")
-	USFSpeedParams* SpeedParams;
-
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Pathing")
-	USFPathParams* PathParams;
-};
-
 UCLASS()
-class SPACEFORCE_API ASFBehaviorTreePawn : public APawn
+class SPACEFORCE_API ASFBehaviorTreePawn : public APawn, public ISFAIInterface
 {
 	GENERATED_UCLASS_BODY()
 
@@ -43,16 +22,18 @@ public:
 public:	
 
 	UPROPERTY(EditAnywhere, Category = "Behaviors")
-	TMap<FString, FSFBehaviorTreeState> BehaviorMap;
+	TMap<FString, FSFBehaviorTreeState> BehaviorMap; //M
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CurrentBehaviorState(FSFBehaviorTreeState& State);
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
 	void ChangeBehavior(FString NextBehavior);
 
 	UPROPERTY(EditAnywhere)
-	bool DebugDisabled;
+	bool DebugDisabled; //M
+
+	//OLD
 
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent)
 	void AttackActor(AActor* actor);
@@ -60,19 +41,25 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement")
 	void MoveTo(FVector location);
 
-	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement")
+	UFUNCTION(BlueprintCallable, BlueprintImplementableEvent, Category = "Movement", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
 	void SetSpeed(float Speed);
 
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "Movement")
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, BlueprintPure, Category = "Movement", meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
 	float GetSpeed();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	class ASFAIController* GetSFAIController() const;
 
-	UFUNCTION(BlueprintImplementableEvent)
+	UFUNCTION(BlueprintImplementableEvent, meta = (DeprecatedFunction, DeprecationMessage = "Function has been deprecated, Please use the new function"))
 	void ReceiveDisable();
-	//UFUNCTION(BlueprintCallable, BlueprintPure)
-	//bool GetTargetVelocity(AActor* TargetActor, FVector& Velocity) const;
+
+	UPROPERTY(EditAnywhere)
+	USFBehaviorTreeStatesComponent* BehaviorStates;
+
+	virtual void PostLoad() override;
+
+	//AI Interface
+	virtual USFBehaviorTreeStatesComponent* GetBehaviorTreeStatesComp_Implementation() override;
 
 private:
 	UPROPERTY()
