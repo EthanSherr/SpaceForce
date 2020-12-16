@@ -1,6 +1,5 @@
 #include "BTTask_NavigatePoints.h"
 #include "../SFAIController.h"
-#include "../SFBehaviorTreePawn.h"
 #include "../SFPathParams.h"
 #include "AI/SFBehaviorTreeStatesComponent.h"
 

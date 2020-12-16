@@ -57,11 +57,16 @@ USFBehaviorTreeStatesComponent* ASFBehaviorTreePawn::GetBehaviorTreeStatesComp_I
 
 void ASFBehaviorTreePawn::SetSpeed_Implementation(float Speed)
 {
-	UE_LOG(LogTemp, Error, TEXT("SetSpeed base does nothing"))
+	UE_LOG(LogTemp, Error, TEXT("SetSpeed base does nothing, override SetSpeed_Implementation"))
 }
 
 float ASFBehaviorTreePawn::GetSpeed_Implementation()
 {
-	UE_LOG(LogTemp, Error, TEXT("GetSpeed base does nothing"))
+	UE_LOG(LogTemp, Error, TEXT("GetSpeed base does nothing, override GetSpeed_Implementation"))
 	return 0;
+}
+
+void ASFBehaviorTreePawn::AttackActor_Implementation(AActor* Actor)
+{
+	UE_LOG(LogTemp, Warning, TEXT("AttackActor base does nothing, override AttackActor_Implementatino"))
 }

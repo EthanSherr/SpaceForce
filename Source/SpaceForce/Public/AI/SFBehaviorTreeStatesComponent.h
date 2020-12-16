@@ -50,6 +50,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
 	void SetSpeed(float Speed);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
+	void AttackActor(class AActor* Enemy);
 };
 
 

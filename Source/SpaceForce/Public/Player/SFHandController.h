@@ -9,7 +9,7 @@
 
 class ASFFlightPath;
 class ASFPilotPawn;
-class ASFShipPawn;
+class ASFPlayerShip;
 class USphereComponent;
 class USFRadialMenuComponent;
 
@@ -47,13 +47,13 @@ public:
 	ASFFlightPath* GetNearestFlightPath(ASFFlightPath* PathToIgnore);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ASFShipPawn* GetOverlappingShip();
+	ASFPlayerShip* GetOverlappingShip();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASFPilotPawn* GetPilot();
 	
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ASFShipPawn* GetShip();
+	ASFPlayerShip* GetShip();
 
 	UFUNCTION()
 	bool RecievesInput();

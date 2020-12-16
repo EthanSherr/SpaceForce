@@ -9,7 +9,7 @@
 class USFHealthComponent;
 class USFSplineMovementComponent;
 class USFSpringFlightMovementComponent;
-class USFBoosterManagerComponent;
+//class USFBoosterManagerComponent;
 class ASFPilotPawn;
 class ASFTurretActor;
 
@@ -43,14 +43,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFHealthComponent* HealthComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	USFBoosterManagerComponent* BoosterManagerComponent;
+	//UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	//USFBoosterManagerComponent* BoosterManagerComponent;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive();
 
-	UFUNCTION(BlueprintCallable)
-	void TrySetIsBoosting(bool bNewIsBoosting);
+	//UFUNCTION(BlueprintCallable)
+	//void TrySetIsBoosting(bool bNewIsBoosting);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnPossessed();

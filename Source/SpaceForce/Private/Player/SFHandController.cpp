@@ -7,7 +7,7 @@
 #include "../Environment/SFFlightPath.h"
 #include "../UI/SFLevelDiorama.h"
 #include "SFPilotPawn.h"
-#include "SFShipPawn.h"
+#include "SFPlayerShip.h"
 #include "SpaceForce.h"
 #include "DrawDebugHelpers.h"
 #include "../UI/SFRadialMenuComponent.h"
@@ -132,18 +132,18 @@ ASFPilotPawn* USFHandController::GetPilot() {
 	return Cast<ASFPilotPawn>(GetOwner());
 }
 
-ASFShipPawn* USFHandController::GetShip() {
+ASFPlayerShip* USFHandController::GetShip() {
 	auto Pilot = GetPilot();
 	if (!Pilot) {
 		return NULL;
 	}
-	return Cast<ASFShipPawn>(Pilot->Ship);
+	return Cast<ASFPlayerShip>(Pilot->Ship);
 }
 
-ASFShipPawn* USFHandController::GetOverlappingShip() {
+ASFPlayerShip* USFHandController::GetOverlappingShip() {
 	TArray<AActor*> Overlapping;
-	ShipScanner->GetOverlappingActors(Overlapping, ASFShipPawn::StaticClass());
-	return Overlapping.Num() > 0 ? Cast<ASFShipPawn>(Overlapping[0]) : NULL;
+	ShipScanner->GetOverlappingActors(Overlapping, ASFPlayerShip::StaticClass());
+	return Overlapping.Num() > 0 ? Cast<ASFPlayerShip>(Overlapping[0]) : NULL;
 }
 
 TEnumAsByte<EHandState> USFHandController::GetHandState() {

@@ -14,7 +14,7 @@ class USFHandController;
 class UCameraComponent;
 class USFSplineMovementComponent;
 class USteamVRChaperoneComponent;
-class ASFShipPawn;
+class ASFPlayerShip;
 class UInputComponent;
 class UTimelineComponent;
 class UCurveFloat;
@@ -55,7 +55,7 @@ public:
 	USteamVRChaperoneComponent* VRChaperone;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Init")
-	ASFShipPawn* InitializeWithShip;
+	ASFPlayerShip* InitializeWithShip;
 
 	UPROPERTY(EditAnywhere, Category = "Init", BlueprintReadWrite)
 	TArray<FSFRadialMenuOption> OffensiveMenuOptions;
@@ -66,7 +66,7 @@ public:
 
 	// Gets set once ship is being piloted, one hand is now driving.
 	UPROPERTY(BlueprintReadOnly)
-	ASFShipPawn* Ship;
+	ASFPlayerShip* Ship;
 public:
 	UFUNCTION(BlueprintPure, BlueprintCallable)
 	USFHandController* GetHandInState(TEnumAsByte<EHandState> HandState);
@@ -81,7 +81,7 @@ public:
 	void OnTrigger(USFHandController* Hand, bool bIsPressed);
 
 	UFUNCTION(BlueprintCallable)
-	void StartPilotingShip(USFHandController* Hand, ASFShipPawn* NewShip);
+	void StartPilotingShip(USFHandController* Hand, ASFPlayerShip* NewShip);
 
 	UFUNCTION(BlueprintCallable)
 	void ActivateTurret(int Index);

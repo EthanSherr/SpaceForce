@@ -28,7 +28,7 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	FlightMovement->AngularStiffnessPrimary = 115.0f;
 	FlightMovement->AngularStiffnessSecondary = 275.0f;
 
-	BoosterManagerComponent = ObjectInitializer.CreateDefaultSubobject<USFBoosterManagerComponent>(this, FName("BoosterManagerComponent"));
+	//BoosterManagerComponent = ObjectInitializer.CreateDefaultSubobject<USFBoosterManagerComponent>(this, FName("BoosterManagerComponent"));
 
 	HealthComponent = ObjectInitializer.CreateDefaultSubobject<USFHealthComponent>(this, FName("HealthComponent"));
 	HealthComponent->Health = 100.0f;
@@ -95,10 +95,10 @@ USFSplineMovementComponent* ASFShipPawn::GetAssociatedSplineMovementComponent() 
 	return AssociatedSplineMovementComponent;
 }
 
-void ASFShipPawn::TrySetIsBoosting(bool bNewIsBoosting)
-{
-	BoosterManagerComponent->TrySetIsBoosting(bNewIsBoosting);
-}
+//void ASFShipPawn::TrySetIsBoosting(bool bNewIsBoosting)
+//{
+//	BoosterManagerComponent->TrySetIsBoosting(bNewIsBoosting);
+//}
 
 // inventory setup
 void ASFShipPawn::SpawnInventory()

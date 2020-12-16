@@ -33,20 +33,14 @@ public:
     UFUNCTION()
     virtual void BeginPlay() override;
 
-    UFUNCTION(BlueprintCallable)
-    void AttackActor(AActor* actor);
-
-    UFUNCTION(BlueprintCallable)
-    void MoveToVector(FVector vector);
-
     UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
     void SetEnemyInBlackboard(AActor* Enemy);
 
     UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
     void SetCanAttackInBlackboard(bool InValue);
 
-    UFUNCTION(BlueprintPUre, Category = "AI Helper")
-    void IsValidLocation(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug = false);
+    UFUNCTION(BlueprintPure, Category = "AI Helper")
+    void IsValidLocation_OLD(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug = false);
 
     UFUNCTION(BlueprintCallable, Category = "AI Helper")
     void StartBehaviorTree(UBehaviorTree* BehaviorTree);

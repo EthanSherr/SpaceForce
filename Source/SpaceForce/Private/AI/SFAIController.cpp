@@ -48,21 +48,7 @@ void ASFAIController::SetEnemyInBlackboard(AActor* Enemy) {
 	}
 }
 
-void ASFAIController::AttackActor(AActor* target) {
-	ASFBehaviorTreePawn* Bot = Cast<ASFBehaviorTreePawn>(GetPawn());
-	if (Bot) {
-		Bot->AttackActor(target);
-	}
-}
-
-void ASFAIController::MoveToVector(FVector vector) {
-	ASFBehaviorTreePawn* Bot = Cast<ASFBehaviorTreePawn>(GetPawn());
-	if (Bot) {
-		Bot->MoveTo(vector);
-	}
-}
-
-void ASFAIController::IsValidLocation(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug)
+void ASFAIController::IsValidLocation_OLD(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug)
 {
 	bIsValid = true;
 	TArray<FHitResult> OutHits;

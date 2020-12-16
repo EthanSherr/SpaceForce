@@ -12,7 +12,7 @@
 #include "Camera/CameraComponent.h"
 #include "SFHandController.h"
 #include "SpaceForce.h"
-#include "SFShipPawn.h"
+#include "SFPlayerShip.h"
 #include "SteamVRChaperoneComponent.h"
 #include "DrawDebugHelpers.h"
 #include "../UI/SFRadialMenuComponent.h"
@@ -87,7 +87,7 @@ void ASFPilotPawn::PostEditChangeProperty(FPropertyChangedEvent& PropertyChanged
 			GetWorld()->SweepMultiByChannel(OutHits, GetActorLocation(), GetActorLocation(), FQuat::Identity, ECC_WorldStatic, MyColShape);
 			for (FHitResult Hit : OutHits)
 			{
-				if (ASFShipPawn* HitShip = Cast<ASFShipPawn>(Hit.GetActor()))
+				if (ASFPlayerShip* HitShip = Cast<ASFPlayerShip>(Hit.GetActor()))
 				{
 					InitializeWithShip = HitShip;
 					break;
@@ -312,7 +312,7 @@ void ASFPilotPawn::SetSpeed(float Speed) {
 	SplineMovement->Speed = Speed;
 }
 
-void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFShipPawn* NewShip) {
+void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFPlayerShip* NewShip) {
 	if (!NewShip) 
 		return;
 	

@@ -29,14 +29,18 @@ void USFBehaviorTreeStatesComponent::BeginPlay()
 
 bool USFBehaviorTreeStatesComponent::CurrentBehaviorState(FSFBehaviorTreeState& State)
 {
-	//Populate Defaults
-	State.SpeedParams = DefaultSpeedParams;
-
 	if (!BehaviorMap.Contains(Behavior))
 	{
 		return false;
 	}
 	State = BehaviorMap[Behavior];
+
+	//Populate Defaults
+	if (!State.SpeedParams)
+	{
+		State.SpeedParams = DefaultSpeedParams;
+	}
+
 	return true;
 }
 
