@@ -9,9 +9,9 @@
 class USFHealthComponent;
 class USFSplineMovementComponent;
 class USFSpringFlightMovementComponent;
-//class USFBoosterManagerComponent;
-class ASFPilotPawn;
 class ASFTurretActor;
+class UDestructibleMesh;
+class USFDestructibleComponent;
 
 UCLASS()
 class SPACEFORCE_API ASFShipPawn : public APawn
@@ -25,17 +25,14 @@ public:
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	TArray<ASFTurretActor*> Turrets;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ShipStaticMesh;
+
+	UPROPERTY(Transient, EditAnywhere, BlueprintReadWrite, Category = "Effects")
+	UDestructibleMesh* DestructibleFacade;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFSpringFlightMovementComponent* FlightMovement;
-
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	ASFPilotPawn* GetOwnerPilot();
-	
-	UFUNCTION(BlueprintCallable, BlueprintPure)
-	USFSplineMovementComponent* GetAssociatedSplineMovementComponent();
 
 	UPROPERTY(BlueprintReadWrite)
 	USceneComponent* AimTargetComponent;
@@ -43,19 +40,18 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFHealthComponent* HealthComponent;
 
-	//UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	//USFBoosterManagerComponent* BoosterManagerComponent;
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool IsAlive();
-
-	//UFUNCTION(BlueprintCallable)
-	//void TrySetIsBoosting(bool bNewIsBoosting);
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void OnPossessed();
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	UPrimitiveComponent* GetRootPrimitive() const;
+
 protected:
+	virtual void BeginPlay() override;
+
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
@@ -63,18 +59,23 @@ protected:
 
 	virtual void PostInitializeComponents() override;
 
+// SFHealthComponent delegate methods
 	UFUNCTION()
-	virtual void OnDeath(float Health, float MaxHealth);
+	virtual void OnDeath(USFHealthComponent* HealthComp, float Damage);
 
-private:
-	UPROPERTY()
-	USFSplineMovementComponent* AssociatedSplineMovementComponent;
+	//Deals damage to DestructibleComponent using DamageEvent's USFDamageType's DestructibleDamage
+	//UFUNCTION()
+	//virtual void TakeDestructibleDamage(struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
 
 
 // inventory setup
 private:
 	void SpawnInventory();
 	void AddTurret(ASFTurretActor* Turret);
+
+	// Created after ship dies
+	UPROPERTY(Transient)
+	USFDestructibleComponent* DestructibleComp;
 
 protected:
 	UPROPERTY(BlueprintGetter = GetActiveTurret)

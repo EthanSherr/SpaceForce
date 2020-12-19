@@ -24,25 +24,34 @@ void USFHealthComponent::InitializeComponent()
 
 float USFHealthComponent::Damage(float DamageAmount)
 {
-	return ChangeHealth(-DamageAmount);
+	return ChangeHealth(-DamageAmount, FDamageEvent(), NULL, NULL);
 }
 
-float USFHealthComponent::ChangeHealth(float DeltaHealth)
+float USFHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
+	return ChangeHealth(-Damage, DamageEvent, EventInstigator, DamageCauser);
+}
+
+float USFHealthComponent::ChangeHealth(float DeltaHealth, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	LastEventInstigator = EventInstigator;
+	LastDamageCauser = DamageCauser;
+
 	float UpdatedHealth = Health + DeltaHealth;
 	Health = UpdatedHealth;
+
 	if (OnHealthChanged.IsBound())
 	{
-		OnHealthChanged.Broadcast(Health, MaxHealth);
+		OnHealthChanged.Broadcast(this, DeltaHealth);
 	}
 	if (!DeadBroadcasted && IsDead() && OnDeath.IsBound())
 	{
-		OnDeath.Broadcast(Health, MaxHealth);
+		OnDeath.Broadcast(this, DeltaHealth);
 		DeadBroadcasted = true;
 	}
 	if (!MegaDeadBroadcasted && IsMegaDead() && OnMegaDeath.IsBound())
 	{
-		OnMegaDeath.Broadcast(Health, MaxHealth);
+		OnMegaDeath.Broadcast(this, DeltaHealth);
 		MegaDeadBroadcasted = true;
 	}
 

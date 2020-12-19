@@ -1,6 +1,6 @@
 #include "SFBoosterManagerComponent.h"
 #include "Components/TimelineComponent.h"
-#include "../Player/SFShipPawn.h"
+#include "../Player/SFPlayerShip.h"
 #include "../Player/SFPilotPawn.h"
 #include "../Components/SFSplineMovementComponent.h"
 #include "../Components/SFSpringFlightMovementComponent.h"
@@ -101,7 +101,7 @@ void USFBoosterManagerComponent::TrySetIsBoosting(bool bNewIsBoosting)
 
 void USFBoosterManagerComponent::SetSpeedBoostDelta(float NewBoostSpeed)
 {
-	auto Ship = Cast<ASFShipPawn>(GetOwner());
+	auto Ship = Cast<ASFPlayerShip>(GetOwner());
 	if (!Ship || !Ship->GetOwnerPilot())
 		return;
 
@@ -112,7 +112,7 @@ void USFBoosterManagerComponent::SetSpeedBoostDelta(float NewBoostSpeed)
 
 void USFBoosterManagerComponent::SetLinearStiffnessBoostDelta(float NewBoostHandling)
 {
-	auto Ship = Cast<ASFShipPawn>(GetOwner());
+	auto Ship = Cast<ASFPlayerShip>(GetOwner());
 	if (!Ship)
 		return;
 

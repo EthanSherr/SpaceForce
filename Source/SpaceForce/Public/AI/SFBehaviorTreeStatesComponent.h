@@ -9,6 +9,7 @@
 class UBehaviorTree;
 class USFSpeedParams;
 class USFPathParams;
+class ASFAIController;
 
 USTRUCT(BlueprintType)
 struct FSFBehaviorTreeState
@@ -21,10 +22,10 @@ struct FSFBehaviorTreeState
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors")
 	UBehaviorTree* BehaviorTree;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Pathing")
+	UPROPERTY(Instanced, BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Pathing")
 	USFSpeedParams* SpeedParams;
 
-	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Pathing")
+	UPROPERTY(Instanced, BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Pathing")
 	USFPathParams* PathParams;
 };
 
@@ -68,7 +69,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	FString InitialBehavior;
 
-	UPROPERTY(EditAnywhere, Category = "Settings")
+	UPROPERTY(Instanced, EditAnywhere, Category = "Settings")
 	USFSpeedParams* DefaultSpeedParams;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
@@ -79,6 +80,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeBehavior(FString NextBehavior);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	ASFAIController* GetSFAIController() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	USFSpeedParams* GetSpeedParams();

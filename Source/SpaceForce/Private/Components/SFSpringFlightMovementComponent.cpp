@@ -34,7 +34,8 @@ void USFSpringFlightMovementComponent::AddInputVector(FVector WorldVector, bool 
 	//DrawDebugLine(GetWorld(), GetUpdatedPrimitiveComp()->GetComponentLocation(), Target, FColor::Yellow, false, 0.f, 10, 0.5f);
 	//DrawDebugPoint(GetWorld(), Target, 5.0f, FColor::Yellow, false, 0.f, 10);
 	SetTarget(MoveTarget);
-	//Super::AddInputVector(WorldVector, bForce);
+	Super::AddInputVector(WorldVector, bForce);
+	ConsumeInputVector();
 	//PendingInputVector grows until cleared with ConsumeInputVector().
 }
 

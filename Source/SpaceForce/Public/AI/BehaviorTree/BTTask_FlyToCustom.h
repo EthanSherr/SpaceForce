@@ -134,6 +134,12 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Custom")
 	bool bEnableCustom;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "Custom")
+	bool bMaintainLastInputVectorLength;
+
+	UPROPERTY(EditAnywhere, Category = "Custom")
+	bool bDebugCustomPath;
+
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category = "DoN Navigation")
 	FDoNNavigationQueryParams QueryParams;
 
@@ -172,6 +178,10 @@ protected:
 	void TickPathNavigation(UBehaviorTreeComponent& OwnerComp, FBT_FlyToCustomTarget* MyMemory, float DeltaSeconds);
 	//custom
 	void TickPathNavigationCustom(UBehaviorTreeComponent& OwnerComp, FBT_FlyToCustomTarget* MyMemory, float DeltaSeconds);
+	//custom
+	bool FixTravelPointOffset(APawn* Pawn, FBT_FlyToCustomTarget* Meta);
+
+	void DebugPath(TArray<FVector>* Path, int32 Index);
 
 	virtual void OnTaskFinished(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory, EBTNodeResult::Type TaskResult) override;
 

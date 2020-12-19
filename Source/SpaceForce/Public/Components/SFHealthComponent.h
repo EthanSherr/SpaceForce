@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "SFHealthComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthEventDelegate, float, NewHealth, float, MaxHealth);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FHealthEventDelegate, class USFHealthComponent*, HealthComponent, float, Damage);
 
 UCLASS(ClassGroup = "Custom", meta = (BlueprintSpawnableComponent))
 class SPACEFORCE_API USFHealthComponent : public UActorComponent
@@ -14,12 +14,19 @@ class SPACEFORCE_API USFHealthComponent : public UActorComponent
 	GENERATED_UCLASS_BODY()
 
 public:	
+	UPROPERTY(BlueprintReadonly)
+	class AController* LastEventInstigator;
+	UPROPERTY(BlueprintReadonly)
+	class AActor* LastDamageCauser;
 
 	UFUNCTION(BlueprintCallable)
 	float Damage(float DamageAmount);
 
 	UFUNCTION(BlueprintCallable)
-	float ChangeHealth(float DeltaHealth);
+	float ChangeHealth(float DeltaHealth, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
+
+	UFUNCTION(BlueprintCallable)
+	float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
 
 	UFUNCTION(BlueprintPure, BlueprintCallable)
 	bool IsMegaDead();

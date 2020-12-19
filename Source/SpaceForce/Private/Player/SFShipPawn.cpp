@@ -3,23 +3,30 @@
 
 #include "SFShipPawn.h"
 #include "Components/StaticMeshComponent.h"
-#include "../Components/SFBoosterManagerComponent.h"
-#include "../Components/SFSpringFlightMovementComponent.h"
-#include "../Components/SFSplineMovementComponent.h"
-#include "../Components/SFHealthComponent.h"
-#include "../Environment/SFFlightPath.h"
-#include "SFPilotPawn.h"
+#include "Components/SFBoosterManagerComponent.h"
+#include "Components/SFSpringFlightMovementComponent.h"
+#include "Components/SFSplineMovementComponent.h"
+#include "Components/SFHealthComponent.h"
+#include "Components/SFDestructibleComponent.h"
+#include "Environment/SFFlightPath.h"
 #include "SpaceForce.h"
-#include "../Weapons/SFTurretActor.h"
+#include "Weapons/SFTurretActor.h"
+#include "DestructibleComponent.h"
+#include "DrawDebugHelpers.h"
+#include "Helpers/LoggingHelper.h"
+#include "Weapons/SFDamageType.h"
 
 ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
+	// how to replace root https://answers.unrealengine.com/questions/538332/replace-root-component-on-an-inherited-class.html
 	ShipStaticMesh = ObjectInitializer.CreateDefaultSubobject<UStaticMeshComponent>(this, FName("ShipStaticMesh"));
 	ShipStaticMesh->SetSimulatePhysics(true);
 	ShipStaticMesh->SetCollisionProfileName(COLLISION_PROFILE_PAWN);
 	ShipStaticMesh->OnComponentHit.AddDynamic(this, &ASFShipPawn::OnCollision);
 	ShipStaticMesh->SetNotifyRigidBodyCollision(true);
+	ShipStaticMesh->SetEnableGravity(false);
+	ShipStaticMesh->bApplyImpulseOnDamage = false;
 
 	RootComponent = ShipStaticMesh;
 
@@ -28,10 +35,13 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	FlightMovement->AngularStiffnessPrimary = 115.0f;
 	FlightMovement->AngularStiffnessSecondary = 275.0f;
 
-	//BoosterManagerComponent = ObjectInitializer.CreateDefaultSubobject<USFBoosterManagerComponent>(this, FName("BoosterManagerComponent"));
-
 	HealthComponent = ObjectInitializer.CreateDefaultSubobject<USFHealthComponent>(this, FName("HealthComponent"));
 	HealthComponent->Health = 100.0f;
+}
+
+void ASFShipPawn::BeginPlay()
+{
+	Super::BeginPlay();
 }
 
 void ASFShipPawn::PostInitializeComponents()
@@ -41,10 +51,48 @@ void ASFShipPawn::PostInitializeComponents()
 	SpawnInventory();
 }
 
+float ASFShipPawn::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	Damage = -HealthComponent->ChangeHealth(-Damage, DamageEvent, EventInstigator, DamageCauser);
+	if (HealthComponent->IsDead() && DestructibleFacade)
+	{
+		DestructibleComp = NewObject<USFDestructibleComponent>(this, USFDestructibleComponent::StaticClass(), TEXT("DestructibleFacade"));
+		DestructibleComp->RegisterComponent();
+		DestructibleComp->SetDestructibleMesh(DestructibleFacade);
+		DestructibleComp->SetWorldTransform(ShipStaticMesh->GetComponentTransform());
+		DestructibleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		DestructibleComp->SetNotifyRigidBodyCollision(true);
+		DestructibleComp->SetSimulatePhysics(true);
+		DestructibleComp->SetEnableGravity(true);
+		DestructibleComp->SetCollisionProfileName(COLLISION_PROFILE_PAWN);
+
+		DestructibleComp->SetPhysicsLinearVelocity(ShipStaticMesh->GetPhysicsLinearVelocity());
+		DestructibleComp->SetPhysicsAngularVelocity(ShipStaticMesh->GetPhysicsAngularVelocity());
+
+		DestructibleComp->OnComponentHit.AddDynamic(this, &ASFShipPawn::OnCollision);
+
+		DestructibleFacade = NULL;
+
+		ShipStaticMesh->SetVisibility(false, true);
+		ShipStaticMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		SetRootComponent(DestructibleComp);
+	}
+
+	if (DestructibleComp)
+	{
+		//override by damage event
+		DestructibleComp->ReceiveComponentDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+	}
+	return Damage;
+}
+
 void ASFShipPawn::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
 	FString Name = OtherActor ? OtherActor->GetName() : FString("NULL");
-	if (OtherActor && !OtherActor->IsRootComponentMovable())
+	if (HitComponent == DestructibleComp)
+	{
+		DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 4, FColor::Red, true, 10, 3);
+	} else if (OtherActor && !OtherActor->IsRootComponentMovable())
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Ship %s hit %s"), *GetName(), *Name)
 		float PointDamage = 100.0f;
@@ -54,52 +102,31 @@ void ASFShipPawn::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherAc
 	}
 }
 
-
-void ASFShipPawn::OnDeath(float Health, float MaxHealth) {
+void ASFShipPawn::OnDeath(USFHealthComponent* HealthComp, float Damage) 
+{
 	FlightMovement->ClearTarget();
+}
+
+//void ASFShipPawn::TakeDestructibleDamage(struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+//{
+//	if (!DestructibleComp)
+//	{
+//		UE_LOG(LogTemp, Error, TEXT("%s ReceiveDestructibleDamage called but !DestructibleComp"), *GetName())
+//		return;
+//	}
+//	USFDamageType const* const DamageTypeCDO = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<USFDamageType>() : GetDefault<USFDamageType>();
+//	DestructibleComp->ReceiveComponentDamage(DamageTypeCDO->DestructibleDamage, DamageEvent, EventInstigator, DamageCauser);
+//}
+
+UPrimitiveComponent* ASFShipPawn::GetRootPrimitive() const
+{
+	return Cast<UPrimitiveComponent>(GetRootComponent());
 }
 
 bool ASFShipPawn::IsAlive()
 {
 	return HealthComponent->IsAlive();
 }
-
-ASFPilotPawn* ASFShipPawn::GetOwnerPilot() {
-	return Cast<ASFPilotPawn>(GetOwner());
-}
-
-float ASFShipPawn::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
-{
-	HealthComponent->ChangeHealth(-Damage);
-	return Damage;
-}
-
-USFSplineMovementComponent* ASFShipPawn::GetAssociatedSplineMovementComponent() {
-	if (AssociatedSplineMovementComponent) {
-		return AssociatedSplineMovementComponent;
-	}
-	auto Pilot = GetOwnerPilot();
-	if (Pilot) {
-		AssociatedSplineMovementComponent = Pilot->SplineMovement;
-		return AssociatedSplineMovementComponent;
-	}
-	auto TargetComponent = FlightMovement->TargetComponent;
-	if (TargetComponent) {
-		auto TargetOwner = TargetComponent->GetOwner();
-		AssociatedSplineMovementComponent = Cast<USFSplineMovementComponent>(TargetOwner->GetComponentByClass(USFSplineMovementComponent::StaticClass()));
-		if (AssociatedSplineMovementComponent) {
-			return AssociatedSplineMovementComponent;
-		}
-	}
-	AssociatedSplineMovementComponent = Cast<USFSplineMovementComponent>(GetComponentByClass(USFSplineMovementComponent::StaticClass()));
-	return AssociatedSplineMovementComponent;
-}
-
-//void ASFShipPawn::TrySetIsBoosting(bool bNewIsBoosting)
-//{
-//	BoosterManagerComponent->TrySetIsBoosting(bNewIsBoosting);
-//}
-
 // inventory setup
 void ASFShipPawn::SpawnInventory()
 {

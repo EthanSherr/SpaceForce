@@ -3,7 +3,7 @@
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
 #include "../SFAIController.h"
 #include "../SFSpeedParams.h"
-#include "../../Player/SFShipPawn.h"
+#include "Player/SFPlayerShip.h"
 #include "../../Components/SFSplineMovementComponent.h"
 #include "AI/SFBehaviorTreeStatesComponent.h"
 
@@ -61,7 +61,7 @@ EBTNodeResult::Type UBTTask_SetSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerC
 				float Speed = SpeedParams->MaxSpeed;
 				if (SpeedParams->bSpeedRelativeToEnemy) {
 					AActor* Enemy = Cast<AActor>(Blackboard->GetValueAsObject(EnemyKey.SelectedKeyName));
-					ASFShipPawn* ShipPawn = Cast<ASFShipPawn>(Enemy);
+					ASFPlayerShip* ShipPawn = Cast<ASFPlayerShip>(Enemy);
 					if (ShipPawn) 
 					{
 						USFSplineMovementComponent* SplineMovement = ShipPawn->GetAssociatedSplineMovementComponent();

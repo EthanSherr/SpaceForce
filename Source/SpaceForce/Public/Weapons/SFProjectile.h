@@ -19,7 +19,6 @@ class SPACEFORCE_API ASFProjectile : public AActor
 	GENERATED_UCLASS_BODY()
 public:
 
-
 	UPROPERTY(EditDefaultsOnly, Category = Effects)
 	TSubclassOf<ASFExplosionEffect> ExplosionTemplate;
 
@@ -95,6 +94,13 @@ protected:
 
 	UPROPERTY(Transient)
 	bool bExploded;
+
+	//deferred impulse, sometimes the actor hit is not yet simulating
+	FVector DeferredImpulse;
+	FVector DeferredImpulseLocation;
+	UPrimitiveComponent* HitPrimitive;
+	UFUNCTION()
+	void ApplyDeferredImpulse();
 
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "Projectile", Meta = (ExposeOnSpawn = true))

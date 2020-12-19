@@ -13,5 +13,8 @@ UCLASS()
 class SPACEFORCE_API USFDamageType : public UDamageType
 {
 	GENERATED_BODY()
-	
+public:
+    UPROPERTY(EditDefaultsOnly, Category = "Destruction")
+    float DestructibleDamage = 1.0f;
+
 };

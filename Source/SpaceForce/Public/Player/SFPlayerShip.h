@@ -6,7 +6,9 @@
 #include "Player/SFShipPawn.h"
 #include "SFPlayerShip.generated.h"
 
+class USFSplineMovementComponent;
 class USFBoosterManagerComponent;
+class ASFPilotPawn;
 
 UCLASS()
 class SPACEFORCE_API ASFPlayerShip : public ASFShipPawn
@@ -23,4 +25,10 @@ public:
 
     UFUNCTION(BlueprintCallable)
     void TrySetIsBoosting(bool bNewIsBoosting);
+
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    ASFPilotPawn* GetOwnerPilot() const;
+    
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    USFSplineMovementComponent* GetAssociatedSplineMovementComponent();
 };

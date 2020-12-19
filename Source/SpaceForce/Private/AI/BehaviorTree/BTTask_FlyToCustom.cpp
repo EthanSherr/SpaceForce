@@ -35,6 +35,7 @@ UBTTask_FlyToCustom::UBTTask_FlyToCustom(const FObjectInitializer& ObjectInitial
 	NodeName = "Fly To Custom";
 	bNotifyTick = true;
 	bEnableCustom = true;
+	bMaintainLastInputVectorLength = true;
 	
 	FlightLocationKey.AddVectorFilter(this,		    GET_MEMBER_NAME_CHECKED(UBTTask_FlyToCustom, FlightLocationKey));
 	FlightResultKey.AddBoolFilter(this,				GET_MEMBER_NAME_CHECKED(UBTTask_FlyToCustom, FlightResultKey));
@@ -230,18 +231,94 @@ void UBTTask_FlyToCustom::Pathfinding_OnFinish(const FDoNNavigationQueryData& Da
 	{
 		APawn* Pawn = ownerComp->GetAIOwner()->GetPawn();
 
+		if (bMaintainLastInputVectorLength)
+		{
+			FixTravelPointOffset(Pawn, myMemory);
+			return;
+		}
 		FVector Start = Pawn->GetTargetLocation();
 		FVector End = myMemory->QueryResults.PathSolutionOptimized[0];
 		FVector Delta = End - Start;
 		float MaxLength = Delta.Size();
 		Delta = MaxLength == 0.0f ? FVector::ZeroVector : Delta / MaxLength;
 
+		myMemory->Metadata.ActiveInstanceIdx = MaxLength == 0.0f ? 1 : 0;
 		myMemory->Metadata.Start = Start;
 		myMemory->Metadata.Direction = Delta;
 		myMemory->Metadata.MaxLength = MaxLength;
-		myMemory->Metadata.Length = 0.0f;
-		UE_LOG(LogTemp, Warning, TEXT("Start %s, Delta %s, MaxLength %f"), *Start.ToString(), *Delta.ToString(), MaxLength)
+		//Here
+
+		myMemory->Metadata.Length = Pawn->GetLastMovementInputVector().Size();
+		
+		//UE_LOG(LogTemp, Warning, TEXT("%s Metadata.Length = %f"), *Pawn->GetLastMovementInputVector().ToString(), myMemory->Metadata.Length)
+		//myMemory->Metadata.Length = 0.0f;
+		//UE_LOG(LogTemp, Warning, TEXT("Start %s, Delta %s, MaxLength %f"), *Start.ToString(), *Delta.ToString(), MaxLength)
 	}
+}
+
+void UBTTask_FlyToCustom::DebugPath(TArray<FVector>* Path, int32 Index)
+{
+	for (int i = 0; i < Path->Num() - 1; i++)
+	{
+		FColor Color = Index == i ? FColor::Green : FColor::White;
+		DrawDebugLine(GetWorld(), (*Path)[i], (*Path)[i + 1], Color, false, 0.0f, 2, 3.0f);
+	}
+}
+
+bool UBTTask_FlyToCustom::FixTravelPointOffset(APawn* Pawn, FBT_FlyToCustomTarget* Memory)
+{
+
+	//swap first path location w/ actual location, it should be close enough
+	TArray<FVector>* Path = &Memory->QueryResults.PathSolutionOptimized;
+	UE_LOG(LogTemp, Warning, TEXT("Before %d"), Memory->QueryResults.PathSolutionOptimized.Num())
+	Path->Insert(Pawn->GetActorLocation(), 0);
+	UE_LOG(LogTemp, Warning, TEXT("Aft %u"), Memory->QueryResults.PathSolutionOptimized.Num())
+
+	float Offset = Pawn->GetLastMovementInputVector().Size();
+
+	FString Message = FString::Printf(TEXT("PendingOffset %f, LastOffset %f"), Pawn->GetPendingMovementInputVector().Size(), Pawn->GetLastMovementInputVector().Size());
+	GEngine->AddOnScreenDebugMessage(5, 0.5f, FColor::White, Message);
+	
+	uint16 Index = 0;
+	float MaxLength = 0.0f;
+	float Length = 0.0f;
+	FVector Start;
+	//stretch the length of the last movement input vector size over the new upcoming path,
+	do
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Push start index %u"), Index)
+		if (Index + 1 >= Path->Num()) {
+			UE_LOG(LogTemp, Error, TEXT("Index + 1 exceeds Path->Num"))
+			return false;
+		}
+		Start = (*Path)[Index];
+		FVector End = (*Path)[Index + 1];
+		MaxLength = (End - Start).Size();
+		if (MaxLength <= Offset)
+		{
+			Offset -= MaxLength;
+			Index++;
+		}
+		else
+		{
+			Length = Offset;
+			Offset = 0.0f;
+		}
+
+	} while (Offset > 0.0f);
+
+	Memory->solutionTraversalIndex = Index;
+	Memory->Metadata.Length = Length;
+	Memory->Metadata.MaxLength = MaxLength;
+	Memory->Metadata.Start = (*Path)[Index];
+	Memory->Metadata.Direction = ((*Path)[Index + 1] - (*Path)[Index]) / MaxLength;
+
+	DrawDebugPoint(GetWorld(), Memory->Metadata.Start + Memory->Metadata.Direction * Memory->Metadata.Length, 5, FColor::Green, false, 5.0f, 5);
+
+	DrawDebugLine(GetWorld(), Pawn->GetActorLocation(), Pawn->GetActorLocation() + Pawn->GetLastMovementInputVector(), FColor::Green, false, 2, 5, 1.0f);
+	DrawDebugLine(GetWorld(), Memory->Metadata.Start, Memory->Metadata.Start + Memory->Metadata.Length * Memory->Metadata.Direction, FColor::Red, false, 2, 5, 1.0f);
+
+	return true;
 }
 
 void UBTTask_FlyToCustom::Pathfinding_OnDynamicCollisionAlert(const FDonNavigationDynamicCollisionPayload& Data)
@@ -352,7 +429,7 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 		NextLength -= Meta->MaxLength;
 		MyMemory->solutionTraversalIndex++;
 
-		if (MyMemory->solutionTraversalIndex > queryResults.PathSolutionOptimized.Num() - 1)
+		if (MyMemory->solutionTraversalIndex >= queryResults.PathSolutionOptimized.Num() - 1)
 		{
 			auto controller = pawn->GetController();
 			auto blackboard = controller ? controller->FindComponentByClass<UBlackboardComponent>() : NULL;
@@ -370,7 +447,7 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 				IDonNavigator::Execute_OnLocomotionEnd(pawn, true /*success*/);
 
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-
+			UE_LOG(LogTemp, Warning, TEXT("Finished!"))
 			return;
 		} 
 		else 
@@ -405,6 +482,12 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 		Meta->Direction /= Meta->MaxLength;
 	}
 	Meta->Length = NextLength;
+	if (bDebugCustomPath)
+	{
+		FString Message = FString::Printf(TEXT("Segment %d, Offset %f, Total Pts: %d"), MyMemory->solutionTraversalIndex, (100 * MyMemory->Metadata.Length / MyMemory->Metadata.MaxLength), MyMemory->QueryResults.PathSolutionOptimized.Num());
+		GEngine->AddOnScreenDebugMessage(10, 0, FColor::White, Message);
+		DebugPath(&MyMemory->QueryResults.PathSolutionOptimized, MyMemory->solutionTraversalIndex);
+	}
 	FVector flightDirection = Meta->Start + Meta->Direction * Meta->Length - pawn->GetActorLocation();
 
 	//auto navigator = Cast<IDonNavigator>(pawn);

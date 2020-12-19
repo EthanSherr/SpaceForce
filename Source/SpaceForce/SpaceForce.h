@@ -12,6 +12,7 @@
 #define COLLISION_PROFILE_BLOCK_ALL_DYNAMIC FName("BlockAllDynamic")
 #define COLLISION_PROFILE_TRIGGER			FName("Trigger")
 #define COLLISION_PROFILE_PAWN				FName("Pawn")
+#define COLLISION_PROFILE_DESTRUCTIBLE		FName("Destructible")
 #define COLLISION_PROFILE_GENERATOR			FName("Generator")
 #define COLLISION_PROFILE_LANDSCAPE			FName("Landscape")
 #define COLLISION_PROFILE_UI				FName("UI")

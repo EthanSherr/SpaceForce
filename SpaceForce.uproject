@@ -14,7 +14,8 @@
 				"AIModule",
 				"HeadMountedDisplay",
 				"UMG",
-				"DonAINavigation"
+				"DonAINavigation",
+				"ApexDestruction"
 			]
 		}
 	],

@@ -92,3 +92,10 @@ USFSpeedParams* USFBehaviorTreeStatesComponent::GetSpeedParams()
 	CurrentBehaviorState(CurrentState);
 	return CurrentState.SpeedParams;
 }
+
+ASFAIController* USFBehaviorTreeStatesComponent::GetSFAIController() const
+{
+	APawn* Pawn = Cast<APawn>(GetOwner());
+	if (!Pawn) return NULL;
+	return Cast<ASFAIController>(Pawn->GetController());
+}

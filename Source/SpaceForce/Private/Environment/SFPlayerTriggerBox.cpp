@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "SFPlayerTriggerBox.h"
-#include "../Player/SFShipPawn.h"
+#include "Player/SFPlayerShip.h"
 #include "DrawDebugHelpers.h"
 #include "SpaceForce.h"
 
@@ -31,8 +31,7 @@ void ASFPlayerTriggerBox::BeginPlay()
 
 void ASFPlayerTriggerBox::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	auto* ShipPawn = Cast<ASFShipPawn>(OtherActor);
-	if (!ShipPawn || !ShipPawn->GetOwnerPilot()) {
+	if (!Cast<ASFPlayerShip>(OtherActor)) {
 		return;
 	}
 
