@@ -80,9 +80,15 @@ void USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior)
 		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: Unknown behavior."), *GetOwner()->GetName(), *NextBehavior)
 		return;
 	}
-	Behavior = NextBehavior;
-	FSFBehaviorTreeState BehaviorState = BehaviorMap[NextBehavior];
 
+	FSFBehaviorTreeState BehaviorState = BehaviorMap[NextBehavior];
+	if (!BehaviorState.BehaviorTree)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: No BehaviorTree provided"), *GetOwner()->GetName(), *NextBehavior)
+		return;
+	}
+
+	Behavior = NextBehavior;
 	SFController->StartBehaviorTree(BehaviorState.BehaviorTree);
 }
 

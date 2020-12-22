@@ -14,6 +14,7 @@
 #include "../Helpers/LoggingHelper.h"
 #include "DrawDebugHelpers.h"
 #include "Weapons/SFDeflectable.h"
+#include "Weapons/SFDamageType.h"
 
 ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -48,6 +49,9 @@ ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Supe
 	InitialLifeSpan = 7.0f;
 
 	ExplosionBump = 10.0f;
+	
+	static ConstructorHelpers::FClassFinder<USFDamageType> DamageObj(TEXT("/Game/Blueprints/Weapons/BP_ImpactDamage"));
+	DamageType = DamageObj.Class ? DamageObj.Class : USFDamageType::StaticClass();
 }
 
 void ASFProjectile::PreInitializeComponents() 
@@ -64,12 +68,6 @@ void ASFProjectile::PostInitializeComponents()
 	CollisionComp->MoveIgnoreActors = IgnoreActors;
 	CollisionComp->MoveIgnoreActors.Add(GetInstigator());
 	ProjectileEffect->SetAsset(ProjectileTemplate);
-	DamageType = DamageType ? DamageType : TSubclassOf<UDamageType>(UDamageType::StaticClass());
-}
-
-void ASFProjectile::BeginPlay() 
-{
-	Super::BeginPlay();
 }
 
 void ASFProjectile::TriggerExplosion()
@@ -142,7 +140,7 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 		}
 		if (Impulse > 0) {
 			HitPrimitive = Cast<UPrimitiveComponent>(Impact.GetActor()->GetRootComponent());
-			UE_LOG(LogTemp, Warning, TEXT("%s apply impulse to %s is Sim %d amt %s"), *GetName(), *ULoggingHelper::GetNameOrNull(HitPrimitive), HitPrimitive->IsSimulatingPhysics(), *(-Impact.ImpactNormal * Impulse).ToString())
+			//UE_LOG(LogTemp, Warning, TEXT("%s apply impulse to %s is Sim %d amt %s"), *GetName(), *ULoggingHelper::GetNameOrNull(HitPrimitive), HitPrimitive->IsSimulatingPhysics(), *(-Impact.ImpactNormal * Impulse).ToString())
 			DeferredImpulse = -Impact.ImpactNormal * Impulse;
 			DeferredImpulseLocation = Impact.ImpactPoint;
 

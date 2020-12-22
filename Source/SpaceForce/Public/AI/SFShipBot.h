@@ -19,6 +19,8 @@ class SPACEFORCE_API ASFShipBot : public ASFShipPawn, public ISFAIInterface, pub
 public:
 	ASFShipBot(const FObjectInitializer& ObjectInitializer);
 
+	virtual void PostInitializeComponents();
+
 	UPROPERTY(EditAnywhere)
 	USFBehaviorTreeStatesComponent* BehaviorStates;
 
@@ -36,4 +38,6 @@ public:
 	virtual float GetSpeed_Implementation() override;
 
 	virtual void AttackActor_Implementation(class AActor* Actor) override;
+
+	virtual void ReceiveDeath_Implementation(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 };

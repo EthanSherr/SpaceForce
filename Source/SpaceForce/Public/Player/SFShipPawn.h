@@ -12,6 +12,9 @@ class USFSpringFlightMovementComponent;
 class ASFTurretActor;
 class UDestructibleMesh;
 class USFDestructibleComponent;
+class USFDamageType;
+class ASFExplosionEffect;
+class UNiagaraSystem;
 
 UCLASS()
 class SPACEFORCE_API ASFShipPawn : public APawn
@@ -31,6 +34,15 @@ public:
 	UPROPERTY(Transient, EditAnywhere, BlueprintReadWrite, Category = "Effects")
 	UDestructibleMesh* DestructibleFacade;
 
+	UPROPERTY(Transient, EditDefaultsOnly, BlueprintReadonly, Category = "Effects")
+	TSubclassOf<ASFExplosionEffect> ExplosionEffect;
+
+	UPROPERTY(Transient, EditDefaultsOnly, BlueprintReadonly, Category = "Effects")
+	UNiagaraSystem* FractureSystem;
+
+	UPROPERTY(Transient, EditDefaultsOnly, BlueprintReadonly, Category = "Effects")
+	TSubclassOf<ASFExplosionEffect> ImpactEffect;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFSpringFlightMovementComponent* FlightMovement;
 
@@ -49,33 +61,31 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	UPrimitiveComponent* GetRootPrimitive() const;
 
-protected:
-	virtual void BeginPlay() override;
+	UPROPERTY(EditInstanceOnly)
+	bool bDebugCollision;
 
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<USFDamageType> ImpactDamageType;
+
+protected:
 	UFUNCTION()
 	void OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
 
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
+	UFUNCTION(BlueprintNativeEvent, Category = "Death")
+	void ReceiveDeath(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
+
+	UPROPERTY(BlueprintReadonly, Category = "Death")
+	bool bDeathReceived;
+
 	virtual void PostInitializeComponents() override;
-
-// SFHealthComponent delegate methods
-	UFUNCTION()
-	virtual void OnDeath(USFHealthComponent* HealthComp, float Damage);
-
-	//Deals damage to DestructibleComponent using DamageEvent's USFDamageType's DestructibleDamage
-	//UFUNCTION()
-	//virtual void TakeDestructibleDamage(struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser);
 
 
 // inventory setup
 private:
 	void SpawnInventory();
 	void AddTurret(ASFTurretActor* Turret);
-
-	// Created after ship dies
-	UPROPERTY(Transient)
-	USFDestructibleComponent* DestructibleComp;
 
 protected:
 	UPROPERTY(BlueprintGetter = GetActiveTurret)

@@ -2,7 +2,6 @@
 
 
 #include "SFAIController.h"
-#include "SFBehaviorTreePawn.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"

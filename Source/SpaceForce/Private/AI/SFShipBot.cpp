@@ -5,19 +5,30 @@
 #include "AI/SFAIController.h"
 #include "Components/SFSpringFlightMovementComponent.h"
 #include "Environment/SFPlayerTriggerBox.h"
+#include "Components/SFHealthComponent.h"
 
 ASFShipBot::ASFShipBot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
-	UE_LOG(LogTemp, Warning, TEXT("SFShipBot constructor %s"), *GetName())
-	if (BehaviorStates)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("BehaviorStates is actually not null"))
-	}
 	BehaviorStates = ObjectInitializer.CreateDefaultSubobject<USFBehaviorTreeStatesComponent>(this, TEXT("BehaviorStates"));
 	AIControllerClass = ASFAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
+
+void ASFShipBot::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+}
+
+void ASFShipBot::ReceiveDeath_Implementation(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
+{
+	Super::ReceiveDeath_Implementation(Damage, DamageEvent, EventInstigator, DamageCauser);
+	auto* AIController = GetSFAIController();
+	if (!AIController)
+		return;
+	AIController->UnPossess();
+}
+
 
 ASFAIController* ASFShipBot::GetSFAIController() const
 {

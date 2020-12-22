@@ -5,6 +5,8 @@
 #include "Components/PrimitiveComponent.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
+#include "Helpers/LoggingHelper.h"
+
 USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.TickGroup = ETickingGroup::TG_PrePhysics;
@@ -30,6 +32,11 @@ bool USFSpringFlightMovementComponent::IsValid(bool logError) {
 }
 
 void USFSpringFlightMovementComponent::AddInputVector(FVector WorldVector, bool bForce) {
+	if (!GetUpdatedPrimitiveComp())
+	{
+		UE_LOG(LogTemp, Error, TEXT("SpringFlightMovement failed for %s, rootComp is %s"), *GetOwner()->GetName(), *ULoggingHelper::GetNameOrNull(GetOwner()->GetRootComponent()))
+		return;
+	}
 	const FVector MoveTarget = WorldVector + GetUpdatedPrimitiveComp()->GetComponentLocation();
 	//DrawDebugLine(GetWorld(), GetUpdatedPrimitiveComp()->GetComponentLocation(), Target, FColor::Yellow, false, 0.f, 10, 0.5f);
 	//DrawDebugPoint(GetWorld(), Target, 5.0f, FColor::Yellow, false, 0.f, 10);

@@ -15,6 +15,8 @@
 #include "DrawDebugHelpers.h"
 #include "Helpers/LoggingHelper.h"
 #include "Weapons/SFDamageType.h"
+#include "Player/SFShipDestructible.h"
+#include "Weapons/SFExplosionEffect.h"
 
 ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -37,86 +39,78 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 
 	HealthComponent = ObjectInitializer.CreateDefaultSubobject<USFHealthComponent>(this, FName("HealthComponent"));
 	HealthComponent->Health = 100.0f;
-}
 
-void ASFShipPawn::BeginPlay()
-{
-	Super::BeginPlay();
+	static ConstructorHelpers::FClassFinder<USFDamageType> ImpactDamageOb(TEXT("/Game/Blueprints/Weapons/BP_ImpactDamage"));
+	ImpactDamageType = ImpactDamageOb.Class;
+
+	bDebugCollision = false;
 }
 
 void ASFShipPawn::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	HealthComponent->OnDeath.AddDynamic(this, &ASFShipPawn::OnDeath);
 	SpawnInventory();
 }
 
 float ASFShipPawn::TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
-	Damage = -HealthComponent->ChangeHealth(-Damage, DamageEvent, EventInstigator, DamageCauser);
-	if (HealthComponent->IsDead() && DestructibleFacade)
+	HealthComponent->ChangeHealth(-Damage, DamageEvent, EventInstigator, DamageCauser);
+	UE_LOG(LogTemp, Warning, TEXT("%s Health is %f"), *GetName(), HealthComponent->Health)
+
+	if (HealthComponent->IsDead() && !bDeathReceived)
 	{
-		DestructibleComp = NewObject<USFDestructibleComponent>(this, USFDestructibleComponent::StaticClass(), TEXT("DestructibleFacade"));
-		DestructibleComp->RegisterComponent();
-		DestructibleComp->SetDestructibleMesh(DestructibleFacade);
-		DestructibleComp->SetWorldTransform(ShipStaticMesh->GetComponentTransform());
-		DestructibleComp->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		DestructibleComp->SetNotifyRigidBodyCollision(true);
-		DestructibleComp->SetSimulatePhysics(true);
-		DestructibleComp->SetEnableGravity(true);
-		DestructibleComp->SetCollisionProfileName(COLLISION_PROFILE_PAWN);
-
-		DestructibleComp->SetPhysicsLinearVelocity(ShipStaticMesh->GetPhysicsLinearVelocity());
-		DestructibleComp->SetPhysicsAngularVelocity(ShipStaticMesh->GetPhysicsAngularVelocity());
-
-		DestructibleComp->OnComponentHit.AddDynamic(this, &ASFShipPawn::OnCollision);
-
-		DestructibleFacade = NULL;
-
-		ShipStaticMesh->SetVisibility(false, true);
-		ShipStaticMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		SetRootComponent(DestructibleComp);
-	}
-
-	if (DestructibleComp)
-	{
-		//override by damage event
-		DestructibleComp->ReceiveComponentDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+		ReceiveDeath_Implementation(Damage, DamageEvent, EventInstigator, DamageCauser);
 	}
 	return Damage;
 }
 
-void ASFShipPawn::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void ASFShipPawn::ReceiveDeath_Implementation(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
-	FString Name = OtherActor ? OtherActor->GetName() : FString("NULL");
-	if (HitComponent == DestructibleComp)
+	if (ExplosionEffect)
 	{
-		DrawDebugPoint(GetWorld(), Hit.ImpactPoint, 4, FColor::Red, true, 10, 3);
-	} else if (OtherActor && !OtherActor->IsRootComponentMovable())
+		FHitResult OutHit;
+		FVector OutImpulse;
+		DamageEvent.GetBestHitInfo(this, DamageCauser, OutHit, OutImpulse);
+		FTransform Transform = FTransform(OutHit.ImpactPoint);
+		ASFExplosionEffect* Effect = GetWorld()->SpawnActor<ASFExplosionEffect>(ExplosionEffect, Transform);
+	}
+	if (DestructibleFacade)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Ship %s hit %s"), *GetName(), *Name)
-		float PointDamage = 100.0f;
-		TSubclassOf<UDamageType> DamageType = UDamageType::StaticClass();
-		FPointDamageEvent PointDmg(PointDamage, Hit, Hit.ImpactNormal, DamageType);
-		this->TakeDamage(PointDamage, PointDmg, Controller, this);
+		FlightMovement->ClearTarget();
+		ShipStaticMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
+		ShipStaticMesh->SetSimulatePhysics(false);
+		ShipStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ShipStaticMesh->SetVisibility(false, true);
+		FTransform SpawnTransform = ShipStaticMesh->GetComponentTransform();
+		ASFShipDestructible* Destructible = GetWorld()->SpawnActorDeferred<ASFShipDestructible>(ASFShipDestructible::StaticClass(), SpawnTransform, this->GetOwner(), this, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+		Destructible->Initialize(ShipStaticMesh, DestructibleFacade);
+		Destructible->FractureSystem = FractureSystem;
+		Destructible->FinishSpawning(SpawnTransform);
+		Destructible->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+		DestructibleFacade = NULL;
 	}
 }
 
-void ASFShipPawn::OnDeath(USFHealthComponent* HealthComp, float Damage) 
+void ASFShipPawn::OnCollision(UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	FlightMovement->ClearTarget();
-}
+	float ImpulseSize = NormalImpulse.Size();
 
-//void ASFShipPawn::TakeDestructibleDamage(struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
-//{
-//	if (!DestructibleComp)
-//	{
-//		UE_LOG(LogTemp, Error, TEXT("%s ReceiveDestructibleDamage called but !DestructibleComp"), *GetName())
-//		return;
-//	}
-//	USFDamageType const* const DamageTypeCDO = DamageEvent.DamageTypeClass ? DamageEvent.DamageTypeClass->GetDefaultObject<USFDamageType>() : GetDefault<USFDamageType>();
-//	DestructibleComp->ReceiveComponentDamage(DamageTypeCDO->DestructibleDamage, DamageEvent, EventInstigator, DamageCauser);
-//}
+	float ImpactDamage = ImpulseSize / 50.0f;
+	if (ImpactDamage > 25.0f && ImpactDamageType)
+	{
+		if (ImpactEffect)
+		{
+			GetWorld()->SpawnActor<ASFExplosionEffect>(ImpactEffect, FTransform(Hit.ImpactPoint));
+		}
+
+		FPointDamageEvent PointDmg(ImpactDamage, Hit, NormalImpulse.GetSafeNormal(), ImpactDamageType);
+		if (bDebugCollision)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s ImpactDamage %f"), *GetName(), ImpactDamage)
+		}
+		this->TakeDamage(ImpactDamage, PointDmg, Controller, OtherActor);
+	}
+}
 
 UPrimitiveComponent* ASFShipPawn::GetRootPrimitive() const
 {

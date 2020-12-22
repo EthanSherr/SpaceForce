@@ -84,8 +84,6 @@ protected:
 	UFUNCTION()
 	void OnImpact(const FHitResult& HitResult);
 
-	virtual void BeginPlay() override;
-
 	virtual void PreInitializeComponents() override;
 	virtual void PostInitializeComponents() override;
 	void Explode(const FHitResult& HitResult);
