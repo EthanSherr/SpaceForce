@@ -5,7 +5,6 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
-#include "SFTurretDelegate.h"
 #include "MyBlueprintFunctionLibrary.h"
 #include "GameFramework/MovementComponent.h"
 #include "Helpers/LoggingHelper.h"

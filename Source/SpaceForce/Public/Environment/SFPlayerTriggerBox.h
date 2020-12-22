@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
 #include "SFTriggerableActor.h"
-#include "SFTriggerData.h"
 #include "Engine/TriggerBox.h"
 #include "SFPlayerTriggerBox.generated.h"
 

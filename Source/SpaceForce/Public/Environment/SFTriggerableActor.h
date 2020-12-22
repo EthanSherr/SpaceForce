@@ -2,7 +2,6 @@
 
 #pragma once
 
-#include "SFTriggerData.h"
 #include "SFTriggerableActor.generated.h"
 
 UINTERFACE(BlueprintType)
