@@ -43,6 +43,6 @@ public:
     void IsValidLocation_OLD(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug = false);
 
     UFUNCTION(BlueprintCallable, Category = "AI Helper")
-    void StartBehaviorTree(UBehaviorTree* BehaviorTree);
+    bool StartBehaviorTree(UBehaviorTree* BehaviorTree);
 
 };

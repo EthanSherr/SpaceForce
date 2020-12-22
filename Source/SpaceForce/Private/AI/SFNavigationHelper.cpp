@@ -3,13 +3,24 @@
 
 #include "SFNavigationHelper.h"
 #include "SFNavigationManager.h" 
+#include "Helpers/LoggingHelper.h"
 
 ASFNavigationManager* USFNavigationHelper::SFNavigationManager(UObject* WorldContextObject)
 {
-	return Cast<ASFNavigationManager>(UDonNavigationHelper::DonNavigationManager(WorldContextObject));
+	auto* NavMan = Cast<ASFNavigationManager>(UDonNavigationHelper::DonNavigationManager(WorldContextObject));
+	if (!NavMan)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Called static SFNavigationManager but none exist in level."))
+	}
+	return NavMan;
 }
 
 ASFNavigationManager* USFNavigationHelper::SFNavigationManagerForActor(const AActor* Actor)
 {
-	return Cast<ASFNavigationManager>(UDonNavigationHelper::DonNavigationManagerForActor(Actor));
+	auto* NavMan = Cast<ASFNavigationManager>(UDonNavigationHelper::DonNavigationManagerForActor(Actor));
+	if (!NavMan)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Called static SFNavigationManagerForActor(%s) but none exist in level."), *ULoggingHelper::GetNameOrNull(Actor))
+	}
+	return NavMan;
 }

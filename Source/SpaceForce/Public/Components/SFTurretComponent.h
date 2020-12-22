@@ -82,7 +82,7 @@ public: // turret interface
 	FAimCallibration GetAimCallibration();
 
 	UFUNCTION(BlueprintCallable)
-		FAimCallibration GetAimCallibrationOld();
+	FAimCallibration GetAimCallibrationOld();
 
 public: // getters
 	//Gives you the desired pitch/yaw for the barrel in component space (used by anim bp)

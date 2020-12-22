@@ -4,6 +4,7 @@
 #include "AI/SFBehaviorTreeStatesComponent.h"
 #include "AI/SFAIController.h"
 #include "AI/SFSpeedParams.h"
+#include "AI/SFAttackParams.h"
 
 // AIInterface
 USFAIInterface::USFAIInterface(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -23,7 +24,8 @@ void USFBehaviorTreeStatesComponent::BeginPlay()
 
 	if (!InitialBehavior.IsEmpty())
 	{
-		ChangeBehavior(InitialBehavior);
+		FSFBehaviorTreeState State;
+		ChangeBehavior(InitialBehavior, State, NULL);
 	}
 }
 
@@ -40,29 +42,33 @@ bool USFBehaviorTreeStatesComponent::CurrentBehaviorState(FSFBehaviorTreeState& 
 	{
 		State.SpeedParams = DefaultSpeedParams;
 	}
+	if (!State.AttackParams)
+	{
+		State.AttackParams = DefaultAttackParams;
+	}
 
 	return true;
 }
 
-void USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior)
+bool USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior, FSFBehaviorTreeState& OutState, AActor* EventInstigator)
 {
 	APawn* Pawn = Cast<APawn>(GetOwner());
 	if (!Pawn)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: BehaviorTreeStateCompnent Owner must be a Pawn"), *GetOwner()->GetName())
-		return;
+		return false;
 	}
 	if (DebugDisabled)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: ChangeBehavior failed DebugDisabled true"), *Pawn->GetName())
-		return;
+		return false;
 	}
 
 	ASFAIController* SFController = Pawn->GetController<ASFAIController>();
 	if (!SFController)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: No SFAIController owner."), *GetOwner()->GetName(), *NextBehavior)
-		return;
+		return false;
 	}
 
 	if (NextBehavior == FString("_Terminate"))
@@ -72,24 +78,36 @@ void USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior)
 		{
 			ISFAIInterface::Execute_Disable(Pawn);
 		}
-		return;
+		return false;
 	}
 
 	if (!BehaviorMap.Contains(NextBehavior))
 	{
 		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: Unknown behavior."), *GetOwner()->GetName(), *NextBehavior)
-		return;
+		return false;
 	}
 
-	FSFBehaviorTreeState BehaviorState = BehaviorMap[NextBehavior];
-	if (!BehaviorState.BehaviorTree)
+	OutState = BehaviorMap[NextBehavior];
+	if (!OutState.BehaviorTree)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: No BehaviorTree provided"), *GetOwner()->GetName(), *NextBehavior)
-		return;
+		return false;
 	}
 
+	if (!SFController->StartBehaviorTree(OutState.BehaviorTree))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: AIController failed to StartBehaviorTree"), *GetOwner()->GetName(), *NextBehavior)
+		return false;
+	}
+	
 	Behavior = NextBehavior;
-	SFController->StartBehaviorTree(BehaviorState.BehaviorTree);
+
+	USFAttackParams* AttackParams = GetAttackParams();
+	TWeakObjectPtr<AActor> Enemy = (!AttackParams || AttackParams->bInferEnemy) ? EventInstigator : AttackParams->Enemy;
+	
+	SFController->SetEnemyInBlackboard(Enemy.Get());
+
+	return true;
 }
 
 USFSpeedParams* USFBehaviorTreeStatesComponent::GetSpeedParams()
@@ -97,6 +115,13 @@ USFSpeedParams* USFBehaviorTreeStatesComponent::GetSpeedParams()
 	FSFBehaviorTreeState CurrentState;
 	CurrentBehaviorState(CurrentState);
 	return CurrentState.SpeedParams;
+}
+
+USFAttackParams* USFBehaviorTreeStatesComponent::GetAttackParams()
+{
+	FSFBehaviorTreeState CurrentState;
+	CurrentBehaviorState(CurrentState);
+	return CurrentState.AttackParams;
 }
 
 ASFAIController* USFBehaviorTreeStatesComponent::GetSFAIController() const

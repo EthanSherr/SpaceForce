@@ -78,7 +78,7 @@ void ASFAIController::IsValidLocation_OLD(const FVector& Vector, bool& bIsValid,
 	}
 }
 
-void ASFAIController::StartBehaviorTree(UBehaviorTree* BehaviorTree)
+bool ASFAIController::StartBehaviorTree(UBehaviorTree* BehaviorTree)
 {
 	if (BehaviorTree->BlackboardAsset) {
 		BlackboardComp->InitializeBlackboard(*BehaviorTree->BlackboardAsset);
@@ -89,4 +89,5 @@ void ASFAIController::StartBehaviorTree(UBehaviorTree* BehaviorTree)
 
 	BehaviorComp->PrimaryComponentTick.SetTickFunctionEnable(true);
 	BehaviorComp->StartTree(*BehaviorTree);
+	return true;
 }

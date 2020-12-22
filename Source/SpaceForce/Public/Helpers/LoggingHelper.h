@@ -16,6 +16,6 @@ class SPACEFORCE_API ULoggingHelper : public UBlueprintFunctionLibrary
 
 public:
     UFUNCTION(BlueprintCallable, BlueprintPure, Category = "MyCategory")
-    static FString GetNameOrNull(UObject* Object);
+    static FString GetNameOrNull(const UObject* Object);
 
 };

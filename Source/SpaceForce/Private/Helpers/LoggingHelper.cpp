@@ -3,7 +3,7 @@
 
 #include "Helpers/LoggingHelper.h"
 
-FString ULoggingHelper::GetNameOrNull(UObject* Object)
+FString ULoggingHelper::GetNameOrNull(const UObject* Object)
 {
 	return Object ? Object->GetName() : FString("NULL");
 }
