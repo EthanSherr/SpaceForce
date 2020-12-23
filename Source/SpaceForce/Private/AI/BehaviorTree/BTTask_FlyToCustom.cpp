@@ -261,7 +261,7 @@ void UBTTask_FlyToCustom::DebugPath(TArray<FVector>* Path, int32 Index)
 	for (int i = 0; i < Path->Num() - 1; i++)
 	{
 		FColor Color = Index == i ? FColor::Green : FColor::White;
-		DrawDebugLine(GetWorld(), (*Path)[i], (*Path)[i + 1], Color, false, 0.0f, 2, 3.0f);
+		DrawDebugLine(GetWorld(), (*Path)[i], (*Path)[i + 1], Color, false, 0.0f, 0, 3.0f);
 	}
 }
 
@@ -270,14 +270,12 @@ bool UBTTask_FlyToCustom::FixTravelPointOffset(APawn* Pawn, FBT_FlyToCustomTarge
 
 	//swap first path location w/ actual location, it should be close enough
 	TArray<FVector>* Path = &Memory->QueryResults.PathSolutionOptimized;
-	UE_LOG(LogTemp, Warning, TEXT("Before %d"), Memory->QueryResults.PathSolutionOptimized.Num())
 	Path->Insert(Pawn->GetActorLocation(), 0);
-	UE_LOG(LogTemp, Warning, TEXT("Aft %u"), Memory->QueryResults.PathSolutionOptimized.Num())
 
 	float Offset = Pawn->GetLastMovementInputVector().Size();
 
-	FString Message = FString::Printf(TEXT("PendingOffset %f, LastOffset %f"), Pawn->GetPendingMovementInputVector().Size(), Pawn->GetLastMovementInputVector().Size());
-	GEngine->AddOnScreenDebugMessage(5, 0.5f, FColor::White, Message);
+	//FString Message = FString::Printf(TEXT("PendingOffset %f, LastOffset %f"), Pawn->GetPendingMovementInputVector().Size(), Pawn->GetLastMovementInputVector().Size());
+	//GEngine->AddOnScreenDebugMessage(5, 0.5f, FColor::White, Message);
 	
 	uint16 Index = 0;
 	float MaxLength = 0.0f;
@@ -286,9 +284,7 @@ bool UBTTask_FlyToCustom::FixTravelPointOffset(APawn* Pawn, FBT_FlyToCustomTarge
 	//stretch the length of the last movement input vector size over the new upcoming path,
 	do
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Push start index %u"), Index)
 		if (Index + 1 >= Path->Num()) {
-			UE_LOG(LogTemp, Error, TEXT("Index + 1 exceeds Path->Num"))
 			return false;
 		}
 		Start = (*Path)[Index];
@@ -447,7 +443,6 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 				IDonNavigator::Execute_OnLocomotionEnd(pawn, true /*success*/);
 
 			FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
-			UE_LOG(LogTemp, Warning, TEXT("Finished!"))
 			return;
 		} 
 		else 

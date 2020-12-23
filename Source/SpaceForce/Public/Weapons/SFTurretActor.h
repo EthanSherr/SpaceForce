@@ -36,9 +36,11 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	USFTurretComponent* TurretComponent;
 
-public:
-	UPROPERTY(BlueprintReadonly, EditDefaultsOnly, Category = "Initialization")
+protected:
+	UPROPERTY(Transient, BlueprintReadonly)
 	ASFAimVisualization* AimVisualization;
+
+public:
 
 	virtual void PostInitializeComponents() override;
 

@@ -19,7 +19,7 @@ class SPACEFORCE_API ASFShipBot : public ASFShipPawn, public ISFAIInterface, pub
 public:
 	ASFShipBot(const FObjectInitializer& ObjectInitializer);
 
-	virtual void PostInitializeComponents();
+	virtual void PostInitializeComponents() override;
 
 	UPROPERTY(EditAnywhere)
 	USFBehaviorTreeStatesComponent* BehaviorStates;

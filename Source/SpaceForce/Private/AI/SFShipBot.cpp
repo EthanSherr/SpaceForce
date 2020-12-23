@@ -23,10 +23,8 @@ void ASFShipBot::PostInitializeComponents()
 void ASFShipBot::ReceiveDeath_Implementation(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
 	Super::ReceiveDeath_Implementation(Damage, DamageEvent, EventInstigator, DamageCauser);
-	auto* AIController = GetSFAIController();
-	if (!AIController)
-		return;
-	AIController->UnPossess();
+	DetachFromControllerPendingDestroy();
+	Destroy();
 }
 
 

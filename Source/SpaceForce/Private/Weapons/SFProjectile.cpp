@@ -126,20 +126,21 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 	const FTransform SpawnTransform(Impact.ImpactNormal.Rotation(), BumpedImpactLocation);
 	AController* const Controller = Cast<AController>(GetOwner());
 
-	if (Impact.GetActor()) {
+	AActor* HitActor = Impact.Actor.Get();
+	if (HitActor) {
 		if (PointDamage > 0) {
 			FPointDamageEvent PointDmg(PointDamage, Impact, Impact.ImpactNormal, DamageType);
-			Impact.GetActor()->TakeDamage(PointDamage, PointDmg, Controller, this);
+			HitActor->TakeDamage(PointDamage, PointDmg, Controller, this);
 		}
 		if (DecalTemplate) {
 			AActor* const DecalActor = GetWorld()->SpawnActorDeferred<AActor>(DecalTemplate, SpawnTransform);
 			if (DecalActor) {
 				UGameplayStatics::FinishSpawningActor(DecalActor, SpawnTransform);
-				DecalActor->AttachToActor(Impact.GetActor(), FAttachmentTransformRules::KeepWorldTransform, FName());
+				DecalActor->AttachToActor(HitActor, FAttachmentTransformRules::KeepWorldTransform, FName());
 			}
 		}
 		if (Impulse > 0) {
-			HitPrimitive = Cast<UPrimitiveComponent>(Impact.GetActor()->GetRootComponent());
+			HitPrimitive = Cast<UPrimitiveComponent>(HitActor->GetRootComponent());
 			//UE_LOG(LogTemp, Warning, TEXT("%s apply impulse to %s is Sim %d amt %s"), *GetName(), *ULoggingHelper::GetNameOrNull(HitPrimitive), HitPrimitive->IsSimulatingPhysics(), *(-Impact.ImpactNormal * Impulse).ToString())
 			DeferredImpulse = -Impact.ImpactNormal * Impulse;
 			DeferredImpulseLocation = Impact.ImpactPoint;

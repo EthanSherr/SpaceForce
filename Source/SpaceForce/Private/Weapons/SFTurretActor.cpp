@@ -27,8 +27,6 @@ void ASFTurretActor::PostInitializeComponents()
 		TurretComponent->ProjectileSpeed = ProjectileSpeedOverride;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("PostInitializeComonents %s AimVisTemp: %s"), *GetName(), *ULoggingHelper::GetNameOrNull(AimVisualizationTemplate))
-
 	if (AimVisualizationTemplate)
 	{
 		//TODO load muzzle transform lazily, instead of initialization step.

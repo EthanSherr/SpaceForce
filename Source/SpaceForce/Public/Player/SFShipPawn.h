@@ -15,6 +15,7 @@ class USFDestructibleComponent;
 class USFDamageType;
 class ASFExplosionEffect;
 class UNiagaraSystem;
+class UAudioComponent;
 
 UCLASS()
 class SPACEFORCE_API ASFShipPawn : public APawn
@@ -31,7 +32,10 @@ public:
 	UPROPERTY(EditAnywhere)
 	UStaticMeshComponent* ShipStaticMesh;
 
-	UPROPERTY(Transient, EditAnywhere, BlueprintReadWrite, Category = "Effects")
+	UPROPERTY(Transient, EditDefaultsOnly, BlueprintReadonly, Category = "Effects")
+	UAudioComponent* EngineAudio;
+
+	UPROPERTY(Transient, EditDefaultsOnly, Category = "Effects")
 	UDestructibleMesh* DestructibleFacade;
 
 	UPROPERTY(Transient, EditDefaultsOnly, BlueprintReadonly, Category = "Effects")

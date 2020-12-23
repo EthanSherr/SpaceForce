@@ -1,7 +1,5 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "SFShipPawn.h"
+#include "Components/AudioComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/SFBoosterManagerComponent.h"
 #include "Components/SFSpringFlightMovementComponent.h"
@@ -29,8 +27,10 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 	ShipStaticMesh->SetNotifyRigidBodyCollision(true);
 	ShipStaticMesh->SetEnableGravity(false);
 	ShipStaticMesh->bApplyImpulseOnDamage = false;
-
 	RootComponent = ShipStaticMesh;
+
+	EngineAudio = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("EngineAudio"));
+	EngineAudio->SetupAttachment(RootComponent);
 
 	FlightMovement = ObjectInitializer.CreateDefaultSubobject<USFSpringFlightMovementComponent>(this, FName("FlightMovement"));
 	FlightMovement->LinearMaxSpeed = 0.0f;
@@ -78,16 +78,22 @@ void ASFShipPawn::ReceiveDeath_Implementation(float Damage, struct FDamageEvent 
 	{
 		FlightMovement->ClearTarget();
 		ShipStaticMesh->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Ignore);
-		ShipStaticMesh->SetSimulatePhysics(false);
-		ShipStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		ShipStaticMesh->SetVisibility(false, true);
 		FTransform SpawnTransform = ShipStaticMesh->GetComponentTransform();
 		ASFShipDestructible* Destructible = GetWorld()->SpawnActorDeferred<ASFShipDestructible>(ASFShipDestructible::StaticClass(), SpawnTransform, this->GetOwner(), this, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
 		Destructible->Initialize(ShipStaticMesh, DestructibleFacade);
 		Destructible->FractureSystem = FractureSystem;
 		Destructible->FinishSpawning(SpawnTransform);
 		Destructible->TakeDamage(Damage, DamageEvent, EventInstigator, DamageCauser);
+
+		ShipStaticMesh->SetSimulatePhysics(false);
+		ShipStaticMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		ShipStaticMesh->SetVisibility(false, true);
 		DestructibleFacade = NULL;
+	}
+
+	for (ASFTurretActor* Turret : Turrets)
+	{
+		Turret->Destroy();
 	}
 }
 
