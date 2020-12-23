@@ -309,10 +309,10 @@ bool UBTTask_FlyToCustom::FixTravelPointOffset(APawn* Pawn, FBT_FlyToCustomTarge
 	Memory->Metadata.Start = (*Path)[Index];
 	Memory->Metadata.Direction = ((*Path)[Index + 1] - (*Path)[Index]) / MaxLength;
 
-	DrawDebugPoint(GetWorld(), Memory->Metadata.Start + Memory->Metadata.Direction * Memory->Metadata.Length, 5, FColor::Green, false, 5.0f, 5);
+	//DrawDebugPoint(GetWorld(), Memory->Metadata.Start + Memory->Metadata.Direction * Memory->Metadata.Length, 5, FColor::Green, false, 5.0f, 5);
 
-	DrawDebugLine(GetWorld(), Pawn->GetActorLocation(), Pawn->GetActorLocation() + Pawn->GetLastMovementInputVector(), FColor::Green, false, 2, 5, 1.0f);
-	DrawDebugLine(GetWorld(), Memory->Metadata.Start, Memory->Metadata.Start + Memory->Metadata.Length * Memory->Metadata.Direction, FColor::Red, false, 2, 5, 1.0f);
+	//DrawDebugLine(GetWorld(), Pawn->GetActorLocation(), Pawn->GetActorLocation() + Pawn->GetLastMovementInputVector(), FColor::Green, false, 2, 5, 1.0f);
+	//DrawDebugLine(GetWorld(), Memory->Metadata.Start, Memory->Metadata.Start + Memory->Metadata.Length * Memory->Metadata.Direction, FColor::Red, false, 2, 5, 1.0f);
 
 	return true;
 }

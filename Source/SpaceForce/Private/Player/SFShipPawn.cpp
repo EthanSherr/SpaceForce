@@ -152,6 +152,10 @@ void ASFShipPawn::AddTurret(ASFTurretActor* Turret)
 ASFTurretActor* ASFShipPawn::ActivateTurret(int Index)
 {
 	ActiveTurret = Turrets[Index];
+	if (ActiveTurret)
+	{
+		ActiveTurret->SetActivated(true);
+	}
 	return ActiveTurret;
 }
 

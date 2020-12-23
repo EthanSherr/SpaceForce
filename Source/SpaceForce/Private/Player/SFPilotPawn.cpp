@@ -369,5 +369,4 @@ void ASFPilotPawn::ActivateTurret(int Index)
 		return;
 	}
 	Turret->AimAtComponent(Hand);
-	Turret->SetActivated(true);
 }

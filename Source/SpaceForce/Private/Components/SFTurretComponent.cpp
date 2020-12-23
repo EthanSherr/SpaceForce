@@ -152,7 +152,7 @@ bool USFTurretComponent::UpdateTargetFromTrackedActor()
 		return true;
 	}
 	//TrackedComponent->GetVelocity()// TODO?
-	FVector Velocity;
+	FVector Velocity = TrackedComponent->GetComponentVelocity();
 	FProjectilePredictionResult result = UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(
 		TrackedComponent->GetComponentLocation(),
 		Velocity,
