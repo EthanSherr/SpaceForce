@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Weapons/SFTurretDelegate.h"
+#include "Weapons/SFAttachment.h"
 #include "SFShipPawn.generated.h"
 
 class USFHealthComponent;
@@ -24,7 +25,7 @@ class SPACEFORCE_API ASFShipPawn : public APawn, public ISFTurretDelegate
 
 public:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TArray<TSubclassOf<class ASFTurretActor>> TurretClasses;
+	TArray<FSFAttachment> TurretClasses;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Inventory")
 	TArray<ASFTurretActor*> Turrets;
@@ -89,7 +90,7 @@ protected:
 // inventory setup
 private:
 	void SpawnInventory();
-	void AddTurret(ASFTurretActor* Turret);
+	void AddTurret(ASFTurretActor* Turret, FName SocketName);
 
 protected:
 	UPROPERTY(BlueprintGetter = GetActiveTurret)

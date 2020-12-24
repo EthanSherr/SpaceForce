@@ -133,22 +133,21 @@ bool ASFShipPawn::IsAlive()
 // inventory setup
 void ASFShipPawn::SpawnInventory()
 {
-	for (int32 i = 0; i < TurretClasses.Num(); i++)
+	for (const FSFAttachment Attachment : TurretClasses)
 	{
 		FActorSpawnParameters SpawnInfo;
 		SpawnInfo.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-		ASFTurretActor* NewTurret = GetWorld()->SpawnActor<ASFTurretActor>(TurretClasses[i], SpawnInfo);
-		AddTurret(NewTurret);
+		ASFTurretActor* NewTurret = GetWorld()->SpawnActor<ASFTurretActor>(Attachment.ActorClass, SpawnInfo);
+		AddTurret(NewTurret, Attachment.SocketName);
 	}
 }
 
-void ASFShipPawn::AddTurret(ASFTurretActor* Turret)
+void ASFShipPawn::AddTurret(ASFTurretActor* Turret, FName SocketName)
 {
-	if (!Turret)
-		return;
+	if (!Turret) return;
 	Turrets.Add(Turret);
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
-	Turret->AttachToActor(this, AttachmentRules, Turret->SocketName);
+	Turret->AttachToActor(this, AttachmentRules, SocketName);
 	Turret->SetOwner(this);
 }
 

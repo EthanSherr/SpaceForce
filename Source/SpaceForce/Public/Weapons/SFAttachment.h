@@ -4,16 +4,16 @@
 
 class AActor;
 
-USTRUCT(Blueprintable)
+USTRUCT(BlueprintType)
 struct SPACEFORCE_API FSFAttachment
 {
 	GENERATED_USTRUCT_BODY()
 
 public:
 
-	UPROPERTY(BlueprintReadWrite)
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FName SocketName;
 
-	UPROPERTY(BlueprintReadWrite)
-	TSubclassOf<AActor> Actor;
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AActor> ActorClass;
 };
