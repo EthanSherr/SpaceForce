@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Player/SFShipPawn.h"
+#include "Weapons/SFTurretDelegate.h"
 #include "SFPlayerShip.generated.h"
 
 class USFSplineMovementComponent;
@@ -31,4 +32,5 @@ public:
     
     UFUNCTION(BlueprintCallable, BlueprintPure)
     USFSplineMovementComponent* GetAssociatedSplineMovementComponent();
+
 };

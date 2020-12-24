@@ -1,84 +1,102 @@
 #include "SFTurretActor.h"
-#include "../Components/SFTurretComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Components/AudioComponent.h"
-#include "../Weapons/SFProjectile.h"
 #include "Kismet/GameplayStatics.h"
 #include "SFAimVisualization.h"
-#include "Helpers/LoggingHelper.h"
+#include "SFProjectile.h"
+#include "SFSimpleTurretAnimInstance.h"
 
 ASFTurretActor::ASFTurretActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = false;
 	RootComponent = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, "Root");
 
-	TurretComponent = ObjectInitializer.CreateDefaultSubobject<USFTurretComponent>(this, "Turret");
-	TurretComponent->SetupAttachment(RootComponent);
+	TurretComp = ObjectInitializer.CreateDefaultSubobject<USkeletalMeshComponent>(this, "TurretComp");
+	TurretComp->SetupAttachment(RootComponent);
+
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstOb(TEXT("/Game/Assets/skm/Ship_Turret_Base/ABP_Ship_Turret_Base1"));
+	TurretComp->AnimClass = AnimInstOb.Class;
+
+	MuzzleName = FName("Muzzle");
+	BarrelName = FName("Barrel");
 
 	ProjectileSpeedOverride = 0.0f;
+}
+
+void ASFTurretActor::PreInitializeComponents()
+{
+	Super::PreInitializeComponents();
 }
 
 void ASFTurretActor::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	
-	if (ProjectileSpeedOverride)
+
+	ProjectileSpeed = ProjectileSpeedOverride;
+	if (ProjectileSpeed <= 0 && ProjectileClass)
 	{
-		TurretComponent->ProjectileSpeed = ProjectileSpeedOverride;
+		ProjectileSpeed = ProjectileClass.GetDefaultObject()->Speed;
 	}
 
+	auto* SimpleAnimInst = Cast<USFSimpleTurretAnimInstance>(TurretComp->AnimScriptInstance);
+	if (SimpleAnimInst)
+	{
+		SimpleAnimInst->Initialize(MuzzleName, BarrelName);
+	}
 	if (AimVisualizationTemplate)
 	{
-		//TODO load muzzle transform lazily, instead of initialization step.
-		TurretComponent->Initialize();
-		FTransform Transform = TurretComponent->GetMuzzleTransform();
+		FTransform Transform = GetMuzzleTransform();
 		AimVisualization = GetWorld()->SpawnActorDeferred<ASFAimVisualization>(AimVisualizationTemplate, Transform);
 		AimVisualization->Turret = this;
 		AimVisualization->FinishSpawning(Transform);
 		FAttachmentTransformRules AttachmentRules = FAttachmentTransformRules::SnapToTargetNotIncludingScale;
-		AimVisualization->AttachToComponent(TurretComponent->SkeletalMesh, AttachmentRules, TurretComponent->MuzzleName);
+		AimVisualization->AttachToComponent(TurretComp, AttachmentRules, MuzzleName);
 	}
 }
 
-//void ASFTurretActor::PostEditChangeProperty(struct FPropertyChangedEvent& e)
-//{
-//	FName PropertyName = (e.Property != NULL) ? e.Property->GetFName() : NAME_None;
-//	if (PropertyName == GET_MEMBER_NAME_CHECKED(ASFTurretActor, AimVisualizationTemplate))
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("AimVisualizationTemplate changed"))
-//		FTransform Transform;
-//		AimVisualization = GetWorld()->SpawnActorDeferred<ASFAimVisualization>(AimVisualizationTemplate, Transform);
-//		AimVisualization->FinishSpawning(Transform);
-//	}
-//	Super::PostEditChangeProperty(e);
-//}
-
-void ASFTurretActor::AimAt(FVector Target)
+FTransform ASFTurretActor::GetBarrelTransform() const
 {
-	TurretComponent->AimAt(Target);
-	if (AimVisualization) AimVisualization->SetTargetLocation(Target);
+	FTransform Transform = TurretComp->GetSocketTransform(BarrelName, ERelativeTransformSpace::RTS_World);
+	Transform.RemoveScaling();
+	return Transform;
 }
 
-void ASFTurretActor::AimAtComponent(USceneComponent* SceneComponent)
+FTransform ASFTurretActor::GetMuzzleTransform() const
 {
-	TurretComponent->AimAtComponent(SceneComponent);
-	if (AimVisualization) AimVisualization->SetTargetComponent(SceneComponent);
+	FTransform Transform = TurretComp->GetSocketTransform(MuzzleName, ERelativeTransformSpace::RTS_World);
+	Transform.RemoveScaling();
+	return Transform;
+}
+
+bool ASFTurretActor::GetTarget_Implementation(FVector& OutTarget)
+{
+	AActor* Own = GetOwner();
+	if (!bActivated ||
+		!Own ||
+		!Own->IsValidLowLevel() ||
+		!Own->GetClass()->ImplementsInterface(USFTurretDelegate::StaticClass()))
+	{
+		return false;
+	}
+	return ISFTurretDelegate::Execute_GetTarget(Own, OutTarget);
 }
 
 void ASFTurretActor::TriggerAction_Implementation(bool bIsPressed)
 {
 	if (bIsPressed)
 	{
-		SpawnProjectile(TurretComponent->GetMuzzleTransform());
+		SpawnProjectile(TurretComp->GetSocketTransform(MuzzleName, ERelativeTransformSpace::RTS_World));
 	}
 }
 
+//REMOVE?
 float ASFTurretActor::GetTriggetAxis()
 {
-	APlayerController* PC = Cast<APlayerController>(GetOwner());
-	if (!PC)
-		return 0.0f;
-	return PC->GetInputAxisKeyValue("TriggerAxis");
+	if (APlayerController* PC = Cast<APlayerController>(GetOwner()))
+	{
+		return PC->GetInputAxisKeyValue("TriggerAxis");
+	}
+	return 0.0f;
 }
 
 ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
@@ -94,15 +112,15 @@ ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 		IgnoreActors.Add(GetOwner());
 	}
 	Projectile->IgnoreActors = IgnoreActors;
-	if (ProjectileSpeedOverride)
+	if (ProjectileSpeed)
 	{
-		Projectile->Speed = ProjectileSpeedOverride;
+		Projectile->Speed = ProjectileSpeed;
 	}
 
 	UAudioComponent* AC = NULL;
 	if (FireSound)
 	{
-		AC = UGameplayStatics::SpawnSoundAttached(FireSound, TurretComponent);
+		AC = UGameplayStatics::SpawnSoundAttached(FireSound, TurretComp);
 	}
 
 	UGameplayStatics::FinishSpawningActor(Projectile, Transform);
@@ -112,19 +130,31 @@ ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 
 void ASFTurretActor::SetActivated(bool bValue)
 {
+	if (bValue == bActivated) return;
 	ReceiveActivated(bValue);
 	if (AimVisualization)
 	{
 		AimVisualization->SetActivated(bValue);
 	}
 
-	if (!bValue) 
-	{
-		AimAtComponent(NULL);
-	}
-
 	if (ActivationSound && bValue)
 	{
-		UGameplayStatics::SpawnSoundAttached(ActivationSound, TurretComponent);
+		UGameplayStatics::SpawnSoundAttached(ActivationSound, TurretComp);
 	}
+
+	bActivated = bValue;
+}
+
+float ASFTurretActor::GetBarrelLength()
+{
+	if (auto* SimpleAnimInst = Cast<USFSimpleTurretAnimInstance>(TurretComp->AnimScriptInstance))
+	{
+		return SimpleAnimInst->GetBarrelLength();
+	}
+	return 0.0f;
+}
+
+float ASFTurretActor::GetProjectileSpeed() const
+{
+	return ProjectileSpeed;
 }

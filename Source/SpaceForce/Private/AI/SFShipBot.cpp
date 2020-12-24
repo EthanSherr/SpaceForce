@@ -1,11 +1,11 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
-
 #include "AI/SFShipBot.h"
 #include "AI/SFAIController.h"
 #include "Components/SFSpringFlightMovementComponent.h"
-#include "Environment/SFPlayerTriggerBox.h"
 #include "Components/SFHealthComponent.h"
+#include "Components/SFTracker.h"
+#include "Environment/SFPlayerTriggerBox.h"
+#include "Weapons/SFTurretActor.h"
+#include "Helpers/SFMath.h"
 
 ASFShipBot::ASFShipBot(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -57,5 +57,30 @@ float ASFShipBot::GetSpeed_Implementation()
 
 void ASFShipBot::AttackActor_Implementation(AActor* Actor)
 {
-	UE_LOG(LogTemp, Warning, TEXT("AttackActor base does nothing, override AttackActor_Implementatino"))
+	EnemyTracker->SetTargetActor(Actor);
+}
+
+// SFTurretDelegate & Aim
+bool ASFShipBot::GetTarget_Implementation(FVector& OutTarget)
+{
+	FVector Position;
+	FVector Velocity;
+	if (!EnemyTracker->GetTarget(Position, Velocity))
+	{
+		return false;
+	}
+
+	ASFTurretActor* Turret = GetActiveTurret();
+
+	FProjectilePredictionResult Result = USFMath::ComputeProjectilePrediction(
+		Position,
+		Velocity,
+		Turret->GetBarrelTransform().GetLocation(),
+		Turret->GetProjectileSpeed(),
+		Turret->GetBarrelLength()
+	);
+
+	OutTarget = Result.predictedImpact;
+
+	return true;
 }

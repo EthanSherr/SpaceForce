@@ -1,9 +1,8 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
 #pragma once
 
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
+#include "Weapons/SFTurretDelegate.h"
 #include "SFShipPawn.generated.h"
 
 class USFHealthComponent;
@@ -16,9 +15,10 @@ class USFDamageType;
 class ASFExplosionEffect;
 class UNiagaraSystem;
 class UAudioComponent;
+class USFTracker;
 
 UCLASS()
-class SPACEFORCE_API ASFShipPawn : public APawn
+class SPACEFORCE_API ASFShipPawn : public APawn, public ISFTurretDelegate
 {
 	GENERATED_UCLASS_BODY()
 
@@ -35,6 +35,9 @@ public:
 	UPROPERTY(Transient, EditDefaultsOnly, BlueprintReadonly, Category = "Effects")
 	UAudioComponent* EngineAudio;
 
+	UPROPERTY(EditAnywhere, BlueprintReadonly)
+	USFTracker* EnemyTracker;
+
 	UPROPERTY(Transient, EditDefaultsOnly, Category = "Effects")
 	UDestructibleMesh* DestructibleFacade;
 
@@ -49,9 +52,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFSpringFlightMovementComponent* FlightMovement;
-
-	UPROPERTY(BlueprintReadWrite)
-	USceneComponent* AimTargetComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	USFHealthComponent* HealthComponent;
@@ -105,4 +105,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void TriggerAction(bool bIsPressed);
 // inventory end
+
+// SFTurretDelegate
+
+	//Default implementation: Returns position of EnemyTracker's target.
+	UFUNCTION(BlueprintCallable)
+	virtual bool GetTarget_Implementation(FVector& OutTarget) override;
 };

@@ -734,7 +734,7 @@ bool UBTTask_FlyToCustom::TeleportAndExit(UBehaviorTreeComponent& OwnerComp, boo
 		bool bLocationValid = !NavigationManager->IsLocationBeneathLandscape(flightDestination);
 		if(bLocationValid)
 		{
-			FVector flightDestination = blackboard->GetValueAsVector(FlightLocationKey.SelectedKeyName);
+			flightDestination = blackboard->GetValueAsVector(FlightLocationKey.SelectedKeyName);
 			pawn->SetActorLocation(flightDestination, false);
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, FString::Printf(TEXT("%s teleported, being unable to find pathfind aerially!"), pawn ? *pawn->GetName() : *FString("")));
 			bTeleportSuccess = true;

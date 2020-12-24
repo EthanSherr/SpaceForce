@@ -34,7 +34,7 @@ ASFProjectile::ASFProjectile(const FObjectInitializer& ObjectInitializer) : Supe
 	MovementComp->bRotationFollowsVelocity = true;
 	MovementComp->ProjectileGravityScale = 0.f;
 
-	Speed = 800.0f;
+	Speed = 812.0f;
 	MovementComp->InitialSpeed = Speed;
 	MovementComp->MaxSpeed = Speed;
 	AudioComp = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("AudioComp"));

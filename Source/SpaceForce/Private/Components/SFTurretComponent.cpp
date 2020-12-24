@@ -5,7 +5,7 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Engine/SkeletalMeshSocket.h"
 #include "DrawDebugHelpers.h"
-#include "MyBlueprintFunctionLibrary.h"
+#include "Helpers/SFMath.h"
 #include "GameFramework/MovementComponent.h"
 #include "Helpers/LoggingHelper.h"
 
@@ -153,7 +153,7 @@ bool USFTurretComponent::UpdateTargetFromTrackedActor()
 	}
 	//TrackedComponent->GetVelocity()// TODO?
 	FVector Velocity = TrackedComponent->GetComponentVelocity();
-	FProjectilePredictionResult result = UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(
+	FProjectilePredictionResult result = USFMath::ComputeProjectilePrediction(
 		TrackedComponent->GetComponentLocation(),
 		Velocity,
 		GetBarrelTransform().GetLocation(),

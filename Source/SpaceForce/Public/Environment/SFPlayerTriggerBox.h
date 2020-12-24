@@ -27,6 +27,8 @@ public:
 	UFUNCTION()
 	virtual void BeginPlay() override;
 
+	virtual void PostLoad() override;
+
 protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

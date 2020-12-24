@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Kismet/BlueprintFunctionLibrary.h"
-#include "MyBlueprintFunctionLibrary.generated.h"
+#include "SFMath.generated.h"
 
 USTRUCT(BlueprintType)
 struct FProjectilePredictionResult
@@ -27,7 +27,7 @@ struct FProjectilePredictionResult
 };
 
 UCLASS()
-class SPACEFORCE_API UMyBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
+class SPACEFORCE_API USFMath : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

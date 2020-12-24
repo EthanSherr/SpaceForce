@@ -20,6 +20,7 @@
 #include "../UI/SFRadialMenuOption.h"
 #include "../UI/SFRadialMenuComponent.h"
 #include "Helpers/LoggingHelper.h"
+#include "Components/SFTracker.h"
 
 ASFPilotPawn::ASFPilotPawn(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryActorTick.bCanEverTick = true;
@@ -326,7 +327,7 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFPlaye
 	NewAimingHand->SetHandState(EHandState::Aiming);
 
 	NewShip->SetOwner(this);
-	NewShip->AimTargetComponent = NewAimingHand;
+	NewShip->EnemyTracker->SetTargetComponent(NewAimingHand);
 	Ship = NewShip;
 
 	ReceiveStartPilotingShip();
@@ -358,7 +359,7 @@ void ASFPilotPawn::ActivateTurret(int Index)
 	if (Turret)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Deactivating previous turret %s"), *Turret->GetName())
-		Turret->AimAtComponent(NULL);
+		//Turret->AimAtComponent(NULL);
 		Turret->SetActivated(false);
 	}
 
@@ -368,5 +369,5 @@ void ASFPilotPawn::ActivateTurret(int Index)
 		UE_LOG(LogTemp, Error, TEXT("ActivateTurret failed, NULL for index %d"), Index)
 		return;
 	}
-	Turret->AimAtComponent(Hand);
+	//Turret->AimAtComponent(Hand);
 }

@@ -21,6 +21,25 @@ ASFPlayerTriggerBox::ASFPlayerTriggerBox(const class FObjectInitializer& ObjectI
 #endif
 }
 
+void ASFPlayerTriggerBox::PostLoad()
+{
+	auto* Self = this;
+	Targets = Targets.FilterByPredicate([=](const AActor* Target) {
+		if (!Target)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s removed NULL reference from Targets"), *Self->GetName())
+			return false;
+		}
+		if (!Target->GetClass()->ImplementsInterface(USFTriggerableActor::StaticClass()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("%s Target %s must implement USFTriggerableActor"), *Self->GetName(), *Target->GetName())
+			return false;
+		}
+		return true;
+	});
+	Super::PostLoad();
+}
+
 void ASFPlayerTriggerBox::BeginPlay()
 {
 	Super::BeginPlay();

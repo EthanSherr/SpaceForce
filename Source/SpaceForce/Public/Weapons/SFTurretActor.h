@@ -4,24 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Weapons/SFTurretDelegate.h"
 #include "SFTurretActor.generated.h"
 
-class USFTurretComponent;
-class USkeletalMeshComponent;
 class ASFProjectile;
 class ASFAimVisualization;
 class USoundBase;
+class USkeletalMeshComponent;
 
 UCLASS()
-class SPACEFORCE_API ASFTurretActor : public AActor
+class SPACEFORCE_API ASFTurretActor : public AActor, public ISFTurretDelegate
 {
 	GENERATED_UCLASS_BODY()
 
 public:
+	UPROPERTY(EditDefaultsOnly)
+	FName SocketName;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 	TSubclassOf<ASFProjectile> ProjectileClass;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Initialization")
 	float ProjectileSpeedOverride;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
@@ -33,8 +36,21 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 	TSubclassOf<ASFAimVisualization> AimVisualizationTemplate;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	USFTurretComponent* TurretComponent;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Initialization")
+	USkeletalMeshComponent* TurretComp;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
+	FName MuzzleName;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
+	FName BarrelName;
+
+// TurretDelegate
+	UFUNCTION(BlueprintCallable)
+	virtual bool GetTarget_Implementation(FVector& OutTarget) override;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetBarrelLength();
 
 protected:
 	UPROPERTY(Transient, BlueprintReadonly)
@@ -42,23 +58,19 @@ protected:
 
 public:
 
+	virtual void PreInitializeComponents() override;
 	virtual void PostInitializeComponents() override;
 
-	//virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FTransform GetBarrelTransform() const;
 
-public:	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
-	FName SocketName;
-
-	UFUNCTION(BlueprintCallable)
-	void AimAt(FVector Target);
-
-	UFUNCTION(BlueprintCallable)
-	void AimAtComponent(USceneComponent* SceneComponent);
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FTransform GetMuzzleTransform() const;
 
 	UFUNCTION(BlueprintNativeEvent)
 	void TriggerAction(bool bIsPressed);
 
+	//REMOVE?
 	UFUNCTION(BlueprintPure)
 	float GetTriggetAxis();
 
@@ -71,6 +83,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent)
 	void ReceiveActivated(bool bValue);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetProjectileSpeed() const;
+
 	// UI
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
@@ -78,4 +93,11 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
 	UMaterialInterface* MaterialIcon;
+
+private:
+	UPROPERTY(Transient)
+	bool bActivated;
+
+	UPROPERTY(Transient)
+	float ProjectileSpeed;
 };

@@ -14,9 +14,7 @@ class SPACEFORCE_API ASFAimVisualization : public AActor
 public:	
 	ASFAimVisualization();
 
-public:	
-	virtual void Tick(float DeltaTime) override;
-	
+public:		
 	UFUNCTION(BlueprintCallable)
 	void SetTargetComponent(USceneComponent* SceneComponent);
 

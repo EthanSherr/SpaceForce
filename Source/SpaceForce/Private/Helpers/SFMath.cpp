@@ -1,9 +1,6 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+#include "SFMath.h"
 
-
-#include "MyBlueprintFunctionLibrary.h"
-
-FProjectilePredictionResult UMyBlueprintFunctionLibrary::ComputeProjectilePrediction(FVector P0, FVector V0, FVector P1, float s1, float m) {
+FProjectilePredictionResult USFMath::ComputeProjectilePrediction(FVector P0, FVector V0, FVector P1, float s1, float m) {
 	FProjectilePredictionResult result;
 	FVector D = P0 - P1;
 	float a = FMath::Square(V0.X) + FMath::Square(V0.Y) + FMath::Square(V0.Z) - FMath::Square(s1);
@@ -31,7 +28,7 @@ FProjectilePredictionResult UMyBlueprintFunctionLibrary::ComputeProjectilePredic
 }
 
 
-float UMyBlueprintFunctionLibrary::MinNonNegative(float a, float b) {
+float USFMath::MinNonNegative(float a, float b) {
 	if (a > 0 && b > 0) {
 		return FMath::Min(a, b);
 	} else if (a > 0) {
@@ -42,6 +39,6 @@ float UMyBlueprintFunctionLibrary::MinNonNegative(float a, float b) {
 	return -1.f;
 }
 
-float UMyBlueprintFunctionLibrary::MinMax(float v, float min, float max) {
+float USFMath::MinMax(float v, float min, float max) {
 	return FMath::Max(FMath::Min(v, max), min);
 }

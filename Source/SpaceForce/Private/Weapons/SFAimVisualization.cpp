@@ -7,11 +7,6 @@ ASFAimVisualization::ASFAimVisualization()
 	PrimaryActorTick.TickGroup = ETickingGroup::TG_EndPhysics;
 }
 
-void ASFAimVisualization::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-}
-
 bool ASFAimVisualization::GetTarget(FVector& OutVector) const
 {
 	if (bTargetLocationSet)

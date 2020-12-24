@@ -33,11 +33,20 @@ public:
 	//AI Interface
 	virtual USFBehaviorTreeStatesComponent* GetBehaviorTreeStatesComp_Implementation() override;
 
+	UFUNCTION(BlueprintCallable)
 	virtual void SetSpeed_Implementation(float Speed) override;
 
+	UFUNCTION(BlueprintCallable)
 	virtual float GetSpeed_Implementation() override;
 
+	UFUNCTION(BlueprintCallable)
 	virtual void AttackActor_Implementation(class AActor* Actor) override;
 
+	UFUNCTION(BlueprintCallable)
 	virtual void ReceiveDeath_Implementation(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
+
+	//SFTurretDelegate
+
+	//Default implementation leads target, uses barrel length & barrel transform
+	virtual bool GetTarget_Implementation(FVector& OutTarget) override;
 };

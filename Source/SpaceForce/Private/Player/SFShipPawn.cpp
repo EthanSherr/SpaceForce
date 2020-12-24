@@ -6,6 +6,7 @@
 #include "Components/SFSplineMovementComponent.h"
 #include "Components/SFHealthComponent.h"
 #include "Components/SFDestructibleComponent.h"
+#include "Components/SFTracker.h"
 #include "Environment/SFFlightPath.h"
 #include "SpaceForce.h"
 #include "Weapons/SFTurretActor.h"
@@ -31,6 +32,8 @@ ASFShipPawn::ASFShipPawn(const FObjectInitializer& ObjectInitializer) : Super(Ob
 
 	EngineAudio = ObjectInitializer.CreateDefaultSubobject<UAudioComponent>(this, FName("EngineAudio"));
 	EngineAudio->SetupAttachment(RootComponent);
+
+	EnemyTracker = ObjectInitializer.CreateDefaultSubobject<USFTracker>(this, FName("EnemyTracker"));
 
 	FlightMovement = ObjectInitializer.CreateDefaultSubobject<USFSpringFlightMovementComponent>(this, FName("FlightMovement"));
 	FlightMovement->LinearMaxSpeed = 0.0f;
@@ -167,3 +170,10 @@ void ASFShipPawn::TriggerAction(bool bIsPressed)
 	ActiveTurret->TriggerAction(bIsPressed);
 }
 // end inventory setup
+
+//SFAITurret delegate
+bool ASFShipPawn::GetTarget_Implementation(FVector& OutTarget)
+{
+	FVector Velocity;
+	return EnemyTracker->GetTarget(OutTarget, Velocity);
+}
