@@ -18,4 +18,7 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TWeakObjectPtr<AActor> Enemy;
+
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	int InitialAttackId;
 };

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Weapons/SFTurretDelegate.h"
+#include "UObject/WeakInterfacePtr.h"
 #include "SFTurretActor.generated.h"
 
 class ASFProjectile;
@@ -45,9 +46,12 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
 	FName BarrelName;
 
+	UPROPERTY(Transient)
+	TWeakObjectPtr<UObject> DelegateRef;
+
 // TurretDelegate
 	UFUNCTION(BlueprintCallable)
-	virtual bool GetTarget_Implementation(FVector& OutTarget) override;
+	virtual bool GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetBarrelLength();
@@ -67,7 +71,7 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FTransform GetMuzzleTransform() const;
 
-	UFUNCTION(BlueprintNativeEvent)
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void TriggerAction(bool bIsPressed);
 
 	//REMOVE?
@@ -86,6 +90,8 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetProjectileSpeed() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HasAimLock(float DeltaDegrees = 0.1f);
 	// UI
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)

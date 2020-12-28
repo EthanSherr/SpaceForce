@@ -68,17 +68,17 @@ FTransform ASFTurretActor::GetMuzzleTransform() const
 	return Transform;
 }
 
-bool ASFTurretActor::GetTarget_Implementation(FVector& OutTarget)
+bool ASFTurretActor::GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget)
 {
-	AActor* Own = GetOwner();
+	UObject* Delegate = DelegateRef.Get();
 	if (!bActivated ||
-		!Own ||
-		!Own->IsValidLowLevel() ||
-		!Own->GetClass()->ImplementsInterface(USFTurretDelegate::StaticClass()))
+		!Delegate ||
+		!Delegate->IsValidLowLevel() ||
+		!Delegate->GetClass()->ImplementsInterface(USFTurretDelegate::StaticClass()))
 	{
 		return false;
 	}
-	return ISFTurretDelegate::Execute_GetTarget(Own, OutTarget);
+	return ISFTurretDelegate::Execute_GetTarget(Delegate, this, OutTarget);
 }
 
 void ASFTurretActor::TriggerAction_Implementation(bool bIsPressed)
@@ -157,4 +157,9 @@ float ASFTurretActor::GetBarrelLength()
 float ASFTurretActor::GetProjectileSpeed() const
 {
 	return ProjectileSpeed;
+}
+
+bool ASFTurretActor::HasAimLock(float DeltaDegrees)
+{
+	return false;
 }

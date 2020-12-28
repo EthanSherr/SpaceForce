@@ -58,6 +58,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
 	void AttackActor(class AActor* Enemy);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
+	void SwitchAttack(int AttackId);
 };
 
 

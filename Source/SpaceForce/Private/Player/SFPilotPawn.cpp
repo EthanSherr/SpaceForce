@@ -327,7 +327,8 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFPlaye
 	NewAimingHand->SetHandState(EHandState::Aiming);
 
 	NewShip->SetOwner(this);
-	NewShip->EnemyTracker->SetTargetComponent(NewAimingHand);
+	bool Changed;
+	NewShip->EnemyTracker->SetTargetComponent(NewAimingHand, Changed);
 	Ship = NewShip;
 
 	ReceiveStartPilotingShip();

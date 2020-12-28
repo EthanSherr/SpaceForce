@@ -111,5 +111,5 @@ public:
 
 	//Default implementation: Returns position of EnemyTracker's target.
 	UFUNCTION(BlueprintCallable)
-	virtual bool GetTarget_Implementation(FVector& OutTarget) override;
+	virtual bool GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget) override;
 };

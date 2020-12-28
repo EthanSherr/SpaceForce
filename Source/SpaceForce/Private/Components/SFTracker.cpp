@@ -12,34 +12,32 @@ void USFTracker::BeginPlay()
 	Super::BeginPlay();
 	if (InitialTrackedActor)
 	{
-		SetTargetActor(InitialTrackedActor);
+		bool OutChanged;
+		SetTargetActor(InitialTrackedActor, OutChanged);
 	}
 }
 
 void USFTracker::SetTargetVector(FVector Vector)
 {
-	ClearTarget();
 	TrackedVector = Vector;
 	TrackerType == ETrackerType::Vector;
 }
 
-void USFTracker::SetTargetComponent(USceneComponent* Component)
+void USFTracker::SetTargetComponent(USceneComponent* Component, bool& OutTargetChanged)
 {
-	ClearTarget();
-	if (Component && Component->IsValidLowLevel())
+	USceneComponent* NewComponent = Component && Component->IsValidLowLevel() ? Component : NULL;
+	OutTargetChanged = TrackedComponent.Get() != NewComponent || ETrackerType::Component != TrackerType;
+	if (OutTargetChanged)
 	{
-		TrackedComponent = Component;
+		TrackedComponent = NewComponent;
 		TrackerType = ETrackerType::Component;
 	}
 }
 
-void USFTracker::SetTargetActor(AActor* Actor)
+void USFTracker::SetTargetActor(AActor* Actor, bool& OutTargetChanged)
 {
-	ClearTarget();
-	if (Actor && Actor->IsValidLowLevel())
-	{
-		SetTargetComponent(Actor->GetRootComponent());
-	}
+	USceneComponent* NewCompnent = Actor && Actor->IsValidLowLevel() ? Actor->GetRootComponent() : NULL;
+	SetTargetComponent(NewCompnent, OutTargetChanged);
 }
 
 bool USFTracker::GetTarget(FVector& OutPosition, FVector& OutVelocity)
@@ -56,6 +54,7 @@ bool USFTracker::GetTarget(FVector& OutPosition, FVector& OutVelocity)
 		if (SceneComp && SceneComp->IsValidLowLevel())
 		{
 			OutPosition = SceneComp->GetComponentLocation();
+			OutVelocity = SceneComp->GetComponentVelocity();
 			bSuccess = true;
 		}
 	}
@@ -66,6 +65,11 @@ bool USFTracker::GetTarget(FVector& OutPosition, FVector& OutVelocity)
 		bSuccess = true;
 	}
 	return bSuccess;
+}
+
+bool USFTracker::HasTarget() const
+{
+	return TrackerType != ETrackerType::None;
 }
 
 void USFTracker::ClearTarget()

@@ -1,5 +1,6 @@
 #include "AI/SFShipBot.h"
 #include "AI/SFAIController.h"
+#include "AI/SFTurretControllerManager.h"
 #include "Components/SFSpringFlightMovementComponent.h"
 #include "Components/SFHealthComponent.h"
 #include "Components/SFTracker.h"
@@ -13,20 +14,24 @@ ASFShipBot::ASFShipBot(const FObjectInitializer& ObjectInitializer) : Super(Obje
 	BehaviorStates = ObjectInitializer.CreateDefaultSubobject<USFBehaviorTreeStatesComponent>(this, TEXT("BehaviorStates"));
 	AIControllerClass = ASFAIController::StaticClass();
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	TurretManager = ObjectInitializer.CreateDefaultSubobject<USFTurretControllerManager>(this, TEXT("TurretManager"));
 }
 
 void ASFShipBot::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+	TurretManager->Initialize(EnemyTracker);
+	ReceivePostInitializeComponents();
 }
 
 void ASFShipBot::ReceiveDeath_Implementation(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
 	Super::ReceiveDeath_Implementation(Damage, DamageEvent, EventInstigator, DamageCauser);
+	//ClearAttackLoop();
 	DetachFromControllerPendingDestroy();
 	Destroy();
 }
-
 
 ASFAIController* ASFShipBot::GetSFAIController() const
 {
@@ -57,30 +62,17 @@ float ASFShipBot::GetSpeed_Implementation()
 
 void ASFShipBot::AttackActor_Implementation(AActor* Actor)
 {
-	EnemyTracker->SetTargetActor(Actor);
+	bool OutChanged;
+	EnemyTracker->SetTargetActor(Actor, OutChanged);
+}
+
+void ASFShipBot::SwitchAttack_Implementation(int AttackId)
+{
+	TurretManager->SwitchController(AttackId);
 }
 
 // SFTurretDelegate & Aim
-bool ASFShipBot::GetTarget_Implementation(FVector& OutTarget)
+bool ASFShipBot::GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget)
 {
-	FVector Position;
-	FVector Velocity;
-	if (!EnemyTracker->GetTarget(Position, Velocity))
-	{
-		return false;
-	}
-
-	ASFTurretActor* Turret = GetActiveTurret();
-
-	FProjectilePredictionResult Result = USFMath::ComputeProjectilePrediction(
-		Position,
-		Velocity,
-		Turret->GetBarrelTransform().GetLocation(),
-		Turret->GetProjectileSpeed(),
-		Turret->GetBarrelLength()
-	);
-
-	OutTarget = Result.predictedImpact;
-
-	return true;
+	return false;
 }

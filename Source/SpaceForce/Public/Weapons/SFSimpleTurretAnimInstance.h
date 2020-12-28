@@ -21,6 +21,8 @@ public:
 public:
 	float GetBarrelLength();
 
+	float GetAimDelta() const;
+
 protected:
 	bool WasInitialized(bool logError = false);
 
@@ -41,4 +43,7 @@ protected:
 
 	UPROPERTY(Transient, BlueprintReadonly, Category = "Animation Output")
 	float Yaw;
+
+	UPROPERTY(Transient, BlueprintReadonly, Category = "Aim Var")
+	float AimDelta;
 };

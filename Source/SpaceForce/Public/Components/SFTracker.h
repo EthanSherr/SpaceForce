@@ -26,16 +26,19 @@ public:
 	void SetTargetVector(FVector Vector);
 
 	UFUNCTION(BlueprintCallable)
-	void SetTargetComponent(USceneComponent* Component);
+	void SetTargetComponent(USceneComponent* Component, bool& OutTargetChanged);
 
 	UFUNCTION(BlueprintCallable)
-	void SetTargetActor(AActor* Actor);
+	void SetTargetActor(AActor* Actor, bool& OutTargetChanged);
 
 	UFUNCTION(BlueprintCallable)
 	void ClearTarget();
 
 	UFUNCTION(BlueprintCallable)
 	bool GetTarget(FVector& OutPosition, FVector& OutVelocity);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HasTarget() const;
 
 public:
 	virtual void BeginPlay() override;

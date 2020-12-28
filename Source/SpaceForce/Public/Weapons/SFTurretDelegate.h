@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "SFTurretDelegate.generated.h"
 
+class ASFTurretActor;
+
 UINTERFACE(BlueprintType)
 class SPACEFORCE_API USFTurretDelegate : public UInterface
 {
@@ -15,5 +17,5 @@ class SPACEFORCE_API ISFTurretDelegate
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Turret Delegate")
-	bool GetTarget(FVector& OutTarget);
+	bool GetTarget(ASFTurretActor* Turret, FVector& OutTarget);
 };

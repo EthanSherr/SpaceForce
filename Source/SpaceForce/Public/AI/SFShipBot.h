@@ -10,6 +10,8 @@
 
 class ASFAIController;
 class ASFPlayerTriggerBox;
+class ASFTurretActor;
+class USFTurretControllerManager;
 
 UCLASS()
 class SPACEFORCE_API ASFShipBot : public ASFShipPawn, public ISFAIInterface, public ISFTriggerableActor
@@ -21,8 +23,17 @@ public:
 
 	virtual void PostInitializeComponents() override;
 
-	UPROPERTY(EditAnywhere)
+protected:
+	UFUNCTION(BlueprintImplementableEvent)
+	void ReceivePostInitializeComponents();
+
+public:
+
+	UPROPERTY(EditAnywhere, Category = "Personality")
 	USFBehaviorTreeStatesComponent* BehaviorStates;
+
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Personality")
+	USFTurretControllerManager* TurretManager;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASFAIController* GetSFAIController() const;
@@ -39,14 +50,19 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual float GetSpeed_Implementation() override;
 
+	// Sets EnemyTracker
 	UFUNCTION(BlueprintCallable)
 	virtual void AttackActor_Implementation(class AActor* Actor) override;
+
+	// Passes attack id to TurretManager
+	UFUNCTION(BlueprintCallable)
+	virtual void SwitchAttack_Implementation(int AttackId) override;
 
 	UFUNCTION(BlueprintCallable)
 	virtual void ReceiveDeath_Implementation(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
-	//SFTurretDelegate
-
-	//Default implementation leads target, uses barrel length & barrel transform
-	virtual bool GetTarget_Implementation(FVector& OutTarget) override;
+// SFTurretDelegate
+	// Bots' turrets have TurretController delegates
+	// swapped in runtime after init TurretManager->RegisterTurret(ControllerId, Turret)
+	virtual bool GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget) override;
 };

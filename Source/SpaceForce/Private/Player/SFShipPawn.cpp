@@ -149,6 +149,7 @@ void ASFShipPawn::AddTurret(ASFTurretActor* Turret, FName SocketName)
 	FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, false);
 	Turret->AttachToActor(this, AttachmentRules, SocketName);
 	Turret->SetOwner(this);
+	Turret->DelegateRef = this; //Bots override this with TurretControllerManager
 }
 
 ASFTurretActor* ASFShipPawn::ActivateTurret(int Index)
@@ -171,7 +172,7 @@ void ASFShipPawn::TriggerAction(bool bIsPressed)
 // end inventory setup
 
 //SFAITurret delegate
-bool ASFShipPawn::GetTarget_Implementation(FVector& OutTarget)
+bool ASFShipPawn::GetTarget_Implementation(ASFTurretActor* Target, FVector& OutTarget)
 {
 	FVector Velocity;
 	return EnemyTracker->GetTarget(OutTarget, Velocity);

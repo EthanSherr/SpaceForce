@@ -107,6 +107,12 @@ bool USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior, FSFBeh
 	
 	SFController->SetEnemyInBlackboard(Enemy.Get());
 
+	if (AttackParams && AttackParams->InitialAttackId >= 0)
+	{
+		ISFAIInterface::Execute_SwitchAttack(Pawn, AttackParams->InitialAttackId);
+		ISFAIInterface::Execute_AttackActor(Pawn, Enemy.Get());
+	}
+
 	return true;
 }
 

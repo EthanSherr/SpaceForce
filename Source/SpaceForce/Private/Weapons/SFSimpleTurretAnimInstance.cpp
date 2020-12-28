@@ -43,7 +43,7 @@ void USFSimpleTurretAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	FVector Target;
 	if (!OwningActor ||
 		!OwningActor->GetClass()->ImplementsInterface(USFTurretDelegate::StaticClass()) ||
-		!ISFTurretDelegate::Execute_GetTarget(OwningActor, Target))
+		!ISFTurretDelegate::Execute_GetTarget(OwningActor, NULL, Target))
 	{
 		Yaw = 0.0f;
 		Pitch = 0.0f;
@@ -63,4 +63,11 @@ void USFSimpleTurretAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
 	Yaw = to.Yaw;
 	Pitch = to.Pitch;
+
+	AimDelta = FMath::Max(to.Yaw - Yaw, to.Pitch - Pitch);
+}
+
+float USFSimpleTurretAnimInstance::GetAimDelta() const
+{
+	return AimDelta;
 }
