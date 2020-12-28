@@ -19,7 +19,7 @@ class SPACEFORCE_API USFTracker : public UActorComponent
 {
 	GENERATED_UCLASS_BODY()
 public:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditAnywhere)
 	AActor* InitialTrackedActor;
 
 	UFUNCTION(BlueprintCallable)
