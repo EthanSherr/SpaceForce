@@ -29,7 +29,7 @@ ASFNavigationManager::ASFNavigationManager(const FObjectInitializer& ObjectIniti
 	GenerateNeighborDirections();
 
 	bEnableGroundScan = true;
-	GroundTraceHeight = 200.0f;
+	GroundTraceHeight = 2000.0f;
 }
 
 void ASFNavigationManager::UpdateVoxelCollision(FDonNavigationVoxel& Volume)

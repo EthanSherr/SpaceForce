@@ -60,7 +60,7 @@ void UBTTask_FlyToCustom::InitializeFromAsset(UBehaviorTree& Asset)
 EBTNodeResult::Type UBTTask_FlyToCustom::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	EBTNodeResult::Type NodeResult = SchedulePathfindingRequest(OwnerComp, NodeMemory);
-
+	UE_LOG(LogTemp, Warning, TEXT("Pathfinding ExecuteTask start %d"), (NodeResult == EBTNodeResult::InProgress))
 	if (bRecalcPathOnDestinationChanged && (NodeResult == EBTNodeResult::InProgress))
 	{
 		UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
@@ -94,8 +94,11 @@ EBTNodeResult::Type UBTTask_FlyToCustom::SchedulePathfindingRequest(UBehaviorTre
 		*/
 	NavigationManager =  UDonNavigationHelper::DonNavigationManagerForActor(pawn);
 	if (NavigationManager->HasTask(pawn) && !QueryParams.bForceRescheduleQuery)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pathfinding ScheduleRequest, Failure, hastask & !force"))
+
 		return EBTNodeResult::Failed; // early exit instead of going through the manager's internal checks and fallback via HandleTaskFailure (which isn't appropriate here)
-	
+	}
 	// Validate internal state:
 	if (!pawn || !myMemory || !blackboard || !NavigationManager)
 	{
@@ -143,6 +146,7 @@ EBTNodeResult::Type UBTTask_FlyToCustom::SchedulePathfindingRequest(UBehaviorTre
 
 void UBTTask_FlyToCustom::AbortPathfindingRequest(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
+	UE_LOG(LogTemp, Warning, TEXT("Pathfinding AbortPathFindingRequest"))
 	APawn* pawn = OwnerComp.GetAIOwner()->GetPawn();
 	FBT_FlyToCustomTarget* myMemory = (FBT_FlyToCustomTarget*)NodeMemory;
 
@@ -188,10 +192,13 @@ FBT_FlyToCustomTarget* UBTTask_FlyToCustom::TaskMemoryFromGenericPayload(void* G
 
 void UBTTask_FlyToCustom::Pathfinding_OnFinish(const FDoNNavigationQueryData& Data)
 {	
+	UE_LOG(LogTemp, Warning, TEXT("Pathfinding Pathfinding_OnFinish"))
 	auto myMemory = TaskMemoryFromGenericPayload(Data.QueryParams.CustomDelegatePayload);
 	if (!myMemory)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pathfinding  1) !myMemory"))
 		return;
-
+	}
 	// Store query results:	
 	myMemory->QueryResults = Data;
 
@@ -209,7 +216,7 @@ void UBTTask_FlyToCustom::Pathfinding_OnFinish(const FDoNNavigationQueryData& Da
 			UE_LOG(LogTemp, Log, TEXT("Found empty pathsolution in Fly To node. Aborting task..."));
 			myMemory->QueryResults.QueryStatus = EDonNavigationQueryStatus::Failure;
 		}
-
+		UE_LOG(LogTemp, Warning, TEXT("Pathfinding  2) !PathSolutionOptimized"))
 		return;
 	}
 
@@ -231,6 +238,10 @@ void UBTTask_FlyToCustom::Pathfinding_OnFinish(const FDoNNavigationQueryData& Da
 	{
 		APawn* Pawn = ownerComp->GetAIOwner()->GetPawn();
 
+		FString Message = FString::Printf(TEXT("Pathing Solution Found"));
+		GEngine->AddOnScreenDebugMessage(123, 2.0f, FColor::Yellow, Message);
+		UE_LOG(LogTemp, Warning, TEXT("Pathfinding 3) %s"), *Message)
+
 		if (bMaintainLastInputVectorLength)
 		{
 			FixTravelPointOffset(Pawn, myMemory);
@@ -249,7 +260,7 @@ void UBTTask_FlyToCustom::Pathfinding_OnFinish(const FDoNNavigationQueryData& Da
 		//Here
 
 		myMemory->Metadata.Length = Pawn->GetLastMovementInputVector().Size();
-		
+	
 		//UE_LOG(LogTemp, Warning, TEXT("%s Metadata.Length = %f"), *Pawn->GetLastMovementInputVector().ToString(), myMemory->Metadata.Length)
 		//myMemory->Metadata.Length = 0.0f;
 		//UE_LOG(LogTemp, Warning, TEXT("Start %s, Delta %s, MaxLength %f"), *Start.ToString(), *Delta.ToString(), MaxLength)

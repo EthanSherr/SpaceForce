@@ -89,16 +89,8 @@ bool USFTurretController::LeadTarget(ASFTurretActor* Turret, FVector& OutTarget)
 		Turret->GetProjectileSpeed(),
 		Turret->GetBarrelLength()
 	);
-	if (Result.bSuccess)
-	{
-		OutTarget = Result.predictedImpact;
-		DrawDebugPoint(GetWorld(), OutTarget, 20, FColor::Purple, false, 0.0f, 5);
-	}
 
-	FString Message = FString::Printf(TEXT("pos %s, velocity %s, Turret %s speed %f, length %f"),
-		*Position.ToString(), *Velocity.ToString(), *Turret->GetBarrelTransform().GetLocation().ToString(), Turret->GetProjectileSpeed(), Turret->GetBarrelLength());
-	GEngine->AddOnScreenDebugMessage(11, 0.0f, Result.bSuccess ? FColor::Green : FColor::Red, *Message);
-
+	OutTarget = Result.predictedImpact;
 	return true;
 }
 
