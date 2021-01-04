@@ -3,7 +3,7 @@
 
 #include "AI/SFBehaviorTreeStatesComponent.h"
 #include "AI/SFAIController.h"
-#include "AI/SFSpeedParams.h"
+#include "AI/BehaviorTree/Params/SFSpeedParams.h"
 #include "AI/SFAttackParams.h"
 
 // AIInterface
@@ -111,6 +111,12 @@ bool USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior, FSFBeh
 	{
 		ISFAIInterface::Execute_SwitchAttack(Pawn, AttackParams->InitialAttackId);
 		ISFAIInterface::Execute_AttackActor(Pawn, Enemy.Get());
+	}
+
+	USFSpeedParams* SpeedParams = GetSpeedParams();
+	if (SpeedParams && SpeedParams->bApplyAtBegin)
+	{
+		SpeedParams->Apply(Pawn, SFController);
 	}
 
 	return true;

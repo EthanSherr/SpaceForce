@@ -25,6 +25,11 @@ void USFTurretControllerManager::Initialize(USFTracker* Tracker)
 
 void USFTurretControllerManager::RegisterTurret(int ControllerId, ASFTurretActor* Turret)
 {
+	if (!Controllers.IsValidIndex(ControllerId))
+	{
+		UE_LOG(LogTemp, Error, TEXT("SFTurretControllerManager Error RegisterTurret : %s not a valid TurretController at index %d"), *GetOwner()->GetName(), ControllerId)
+		return;
+	}
 	USFTurretController* Controller = Controllers[ControllerId];
 	if (!Controller)
 	{
@@ -43,7 +48,11 @@ void USFTurretControllerManager::SwitchController(int ControllerId)
 		return;
 	}
 	DeactivateAll();
-
+	if (!Controllers.IsValidIndex(ControllerId))
+	{
+		UE_LOG(LogTemp, Error, TEXT("SFTurretControllerManager SwitchController Error : Invalid index for controller at %d"), ControllerId)
+		return;
+	}
 	if (USFTurretController* NewController = Controllers[ControllerId])
 	{
 		ActiveControllers.Add(ControllerId);

@@ -36,6 +36,9 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
     void SetEnemyInBlackboard(AActor* Enemy);
 
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    AActor* GetEnemyFromBlackboard();
+
     UFUNCTION(BlueprintCallable, Category = "Blackboard Access")
     void SetCanAttackInBlackboard(bool InValue);
 

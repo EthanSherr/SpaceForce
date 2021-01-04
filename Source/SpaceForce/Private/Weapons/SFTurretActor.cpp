@@ -85,7 +85,7 @@ void ASFTurretActor::TriggerAction_Implementation(bool bIsPressed)
 {
 	if (bIsPressed)
 	{
-		SpawnProjectile(TurretComp->GetSocketTransform(MuzzleName, ERelativeTransformSpace::RTS_World));
+		SpawnProjectile(GetMuzzleTransform());
 	}
 }
 

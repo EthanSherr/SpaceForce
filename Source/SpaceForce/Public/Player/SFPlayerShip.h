@@ -33,4 +33,7 @@ public:
     UFUNCTION(BlueprintCallable, BlueprintPure)
     USFSplineMovementComponent* GetAssociatedSplineMovementComponent();
 
+    UFUNCTION(BlueprintCallable, BlueprintPure)
+    bool GetSpeed(float& Speed);
+
 };

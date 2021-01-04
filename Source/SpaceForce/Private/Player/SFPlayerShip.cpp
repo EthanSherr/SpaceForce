@@ -28,3 +28,15 @@ USFSplineMovementComponent* ASFPlayerShip::GetAssociatedSplineMovementComponent(
 	}
 	return NULL;
 }
+
+bool ASFPlayerShip::GetSpeed(float& OutSpeed)
+{
+	USFSplineMovementComponent* SplineMovement = GetAssociatedSplineMovementComponent();
+	if (!SplineMovement)
+	{
+		return false;
+	}
+
+	OutSpeed = SplineMovement->GetMaxSpeed();
+	return true;
+}

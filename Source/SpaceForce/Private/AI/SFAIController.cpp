@@ -43,8 +43,15 @@ void ASFAIController::SetCanAttackInBlackboard(bool InValue)
 void ASFAIController::SetEnemyInBlackboard(AActor* Enemy) {
 	if (BlackboardComp) {
 		BlackboardComp->SetValue<UBlackboardKeyType_Object>(EnemyKeyID, Enemy);
-		//SetFocus(InPawn);
 	}
+}
+
+AActor* ASFAIController::GetEnemyFromBlackboard()
+{
+	if (BlackboardComp) {
+		return Cast<AActor>(BlackboardComp->GetValue<UBlackboardKeyType_Object>(EnemyKeyID));
+	}
+	return NULL;
 }
 
 void ASFAIController::IsValidLocation_OLD(const FVector& Vector, bool& bIsValid, FVector& OutBumpDirection, const bool& bDebug)
