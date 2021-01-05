@@ -19,7 +19,7 @@ bool USFSpeedParamsStatic::Apply_Implementation(APawn* Bot, AAIController* Contr
 		return false;
 
 	AActor* Enemy = SFController->GetEnemyFromBlackboard();
-	float SpeedValue;
+	float SpeedValue = 0.0f;
 
 	if (!bRelativeToEnemy)
 	{

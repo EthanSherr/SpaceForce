@@ -68,7 +68,7 @@ FTransform ASFTurretActor::GetMuzzleTransform() const
 	return Transform;
 }
 
-bool ASFTurretActor::GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget)
+bool ASFTurretActor::GetTarget_Implementation(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutTarget)
 {
 	UObject* Delegate = DelegateRef.Get();
 	if (!bActivated ||
@@ -78,7 +78,7 @@ bool ASFTurretActor::GetTarget_Implementation(ASFTurretActor* Turret, FVector& O
 	{
 		return false;
 	}
-	return ISFTurretDelegate::Execute_GetTarget(Delegate, this, OutTarget);
+	return ISFTurretDelegate::Execute_GetTarget(Delegate, this, DeltaSeconds, OutTarget);
 }
 
 void ASFTurretActor::TriggerAction_Implementation(bool bIsPressed)

@@ -64,5 +64,5 @@ public:
 // SFTurretDelegate
 	// Bots' turrets have TurretController delegates
 	// swapped in runtime after init TurretManager->RegisterTurret(ControllerId, Turret)
-	virtual bool GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget) override;
+	virtual bool GetTarget_Implementation(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutTarget) override;
 };

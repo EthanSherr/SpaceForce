@@ -43,7 +43,7 @@ void USFSimpleTurretAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 	FVector Target;
 	if (!OwningActor ||
 		!OwningActor->GetClass()->ImplementsInterface(USFTurretDelegate::StaticClass()) ||
-		!ISFTurretDelegate::Execute_GetTarget(OwningActor, NULL, Target))
+		!ISFTurretDelegate::Execute_GetTarget(OwningActor, NULL, DeltaSeconds, Target))
 	{
 		Yaw = 0.0f;
 		Pitch = 0.0f;

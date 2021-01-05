@@ -17,5 +17,5 @@ class SPACEFORCE_API ISFTurretDelegate
 
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Turret Delegate")
-	bool GetTarget(ASFTurretActor* Turret, FVector& OutTarget);
+	bool GetTarget(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutTarget);
 };

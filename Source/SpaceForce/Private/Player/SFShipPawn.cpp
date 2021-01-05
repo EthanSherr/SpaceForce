@@ -172,7 +172,7 @@ void ASFShipPawn::TriggerAction(bool bIsPressed)
 // end inventory setup
 
 //SFAITurret delegate
-bool ASFShipPawn::GetTarget_Implementation(ASFTurretActor* Target, FVector& OutTarget)
+bool ASFShipPawn::GetTarget_Implementation(ASFTurretActor* Target, float DeltaSeconds, FVector& OutTarget)
 {
 	FVector Velocity;
 	return EnemyTracker->GetTarget(OutTarget, Velocity);

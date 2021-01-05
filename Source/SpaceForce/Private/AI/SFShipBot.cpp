@@ -72,7 +72,7 @@ void ASFShipBot::SwitchAttack_Implementation(int AttackId)
 }
 
 // SFTurretDelegate & Aim
-bool ASFShipBot::GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget)
+bool ASFShipBot::GetTarget_Implementation(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutTarget)
 {
 	return false;
 }

@@ -51,7 +51,7 @@ public:
 
 // TurretDelegate
 	UFUNCTION(BlueprintCallable)
-	virtual bool GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutTarget) override;
+	virtual bool GetTarget_Implementation(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutTarget) override;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetBarrelLength();

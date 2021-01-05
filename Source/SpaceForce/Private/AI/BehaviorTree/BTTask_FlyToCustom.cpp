@@ -273,6 +273,7 @@ void UBTTask_FlyToCustom::DebugPath(TArray<FVector>* Path, int32 Index)
 	{
 		FColor Color = Index == i ? FColor::Green : FColor::White;
 		DrawDebugLine(GetWorld(), (*Path)[i], (*Path)[i + 1], Color, false, 0.0f, 0, 3.0f);
+		DrawDebugPoint(GetWorld(), (*Path)[i], 5, Color, false, 3.0f, 0);
 	}
 }
 
@@ -431,8 +432,11 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 	}
 	float Speed = ISFAIInterface::Execute_GetSpeed(pawn);
 	float NextLength = Meta->Length + DeltaSeconds * Speed;
+	UE_LOG(LogTemp, Warning, TEXT(""))
 	while (NextLength >= Meta->MaxLength)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Index %d NextLength = %f >= MaxLength = Meta->MaxLength %f and Meta->Length is %f"),
+			MyMemory->solutionTraversalIndex, NextLength, Meta->MaxLength, Meta->Length)
 		NextLength -= Meta->MaxLength;
 		MyMemory->solutionTraversalIndex++;
 
@@ -481,8 +485,8 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 			}
 		}
 
-		Meta->Start = queryResults.PathSolutionOptimized[MyMemory->solutionTraversalIndex - 1];
-		FVector End = queryResults.PathSolutionOptimized[MyMemory->solutionTraversalIndex];
+		Meta->Start = queryResults.PathSolutionOptimized[MyMemory->solutionTraversalIndex];
+		FVector End = queryResults.PathSolutionOptimized[MyMemory->solutionTraversalIndex + 1];
 		Meta->Direction = End - Meta->Start;
 		Meta->MaxLength = Meta->Direction.Size(); //TODO - same points ever possible?  MaxLength = 0 problematic.
 		Meta->Direction /= Meta->MaxLength;

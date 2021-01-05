@@ -36,6 +36,15 @@ USFTracker* USFTurretController::GetTracker() const
 	return NULL;
 }
 
+APawn* USFTurretController::GetPawn() const
+{
+	if (USFTurretControllerManager* Manager = ManagerRef.Get())
+	{
+		return Cast<APawn>(Manager->GetOwner());
+	}
+	return NULL;
+}
+
 bool USFTurretController::SetIsActive(bool bValue)
 {
 	if (bIsActive == bValue)
@@ -106,7 +115,7 @@ bool USFTurretController::OnDeactivate_Implementation()
 }
 
 // TurretDelegate
-bool USFTurretController::GetTarget_Implementation(ASFTurretActor* Turret, FVector& OutVector)
+bool USFTurretController::GetTarget_Implementation(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutVector)
 {
 	return LeadTarget(Turret, OutVector);
 }
@@ -122,4 +131,22 @@ TArray<ASFTurretActor*> USFTurretController::GetTurrets() const
 		}
 	}
 	return Arr;
+}
+
+UWorld* USFTurretController::GetWorld() const
+{
+	if (GetOuter() == nullptr)
+	{
+		return nullptr;
+	}
+
+	// Special case for behavior tree nodes in the editor
+	if (Cast<UPackage>(GetOuter()) != nullptr)
+	{
+		// GetOuter should return a UPackage and its Outer is a UWorld
+		return Cast<UWorld>(GetOuter()->GetOuter());
+	}
+
+	// In all other cases...
+	return GetOuter()->GetWorld();
 }
