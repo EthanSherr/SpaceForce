@@ -88,6 +88,9 @@ public:
 	void ReceiveActivated(bool bValue);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetProjectileSecondsUntilImpact(float& OutSeconds);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetProjectileSpeed() const;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)

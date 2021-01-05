@@ -75,15 +75,16 @@ bool USFSpeedParamsChase::GetHalfSpaceDistance(AActor* Bot, AActor* Enemy, float
 		RelativeLocation = EnemyForward * FVector::DotProduct(EnemyForward, BotLocation - EnemyLocation);
 	}
 	
-	DebugDistanceVisually(EnemyLocation, BotLocation, Enemy, Bot);
-
+	if (bVisualizeDistance)
+	{
+		DebugDistanceVisually(EnemyLocation, BotLocation, Enemy, Bot);
+	}
 	OutHalfspaceDistance = FVector::DotProduct(RelativeLocation, EnemyForward);
 	return true;
 }
 
 void USFSpeedParamsChase::DebugDistanceVisually(const FVector& EnemyLocation, const FVector& BotLoction, AActor* Enemy, AActor* Bot)
 {
-	if (!bVisualizeDistance) return;
 	FColor LineColor = FColor::White;
 	float LineSize = 5.0f;
 	float PointSize = 10.0f;

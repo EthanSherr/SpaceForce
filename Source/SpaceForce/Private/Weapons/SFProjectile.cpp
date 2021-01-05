@@ -107,7 +107,7 @@ void ASFProjectile::OnImpact(const FHitResult& HitResult)
 }
 
 void ASFProjectile::DisableAndDestroy() {
-	if (AudioComp->IsPlaying()) {
+	if (AudioComp && AudioComp->IsPlaying()) {
 		AudioComp->FadeOut(0.1f, 0.f);
 	}
 
@@ -192,4 +192,12 @@ void ASFProjectile::ApplyDeferredImpulse()
 		UE_LOG(LogTemp, Warning, TEXT("ApplyDeferredImpulse()"))
 		HitPrimitive->AddImpulseAtLocation(DeferredImpulse, DeferredImpulseLocation, FName());
 	}
+}
+
+void ASFProjectile::DelayedExplosion(float DelaySeconds)
+{
+	FTimerDelegate TimerCallback;
+	TimerCallback.BindLambda([=]{ TriggerExplosion(); });
+	FTimerHandle Handle;
+	GetWorld()->GetTimerManager().SetTimer(Handle, TimerCallback, DelaySeconds, false);
 }

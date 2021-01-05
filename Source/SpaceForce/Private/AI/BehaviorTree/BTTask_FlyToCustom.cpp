@@ -60,7 +60,7 @@ void UBTTask_FlyToCustom::InitializeFromAsset(UBehaviorTree& Asset)
 EBTNodeResult::Type UBTTask_FlyToCustom::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
 	EBTNodeResult::Type NodeResult = SchedulePathfindingRequest(OwnerComp, NodeMemory);
-	UE_LOG(LogTemp, Warning, TEXT("Pathfinding ExecuteTask start %d"), (NodeResult == EBTNodeResult::InProgress))
+	//UE_LOG(LogTemp, Warning, TEXT("Pathfinding ExecuteTask start %d"), (NodeResult == EBTNodeResult::InProgress))
 	if (bRecalcPathOnDestinationChanged && (NodeResult == EBTNodeResult::InProgress))
 	{
 		UBlackboardComponent* BlackboardComp = OwnerComp.GetBlackboardComponent();
@@ -69,7 +69,7 @@ EBTNodeResult::Type UBTTask_FlyToCustom::ExecuteTask(UBehaviorTreeComponent& Own
 		{
 			if (myMemory->BBObserverDelegateHandle.IsValid())
 			{
-				UE_VLOG(OwnerComp.GetAIOwner(), LogTemp, Warning, TEXT("UBTTask_MoveTo::ExecuteTask \'%s\' Old BBObserverDelegateHandle is still valid! Removing old Observer."), *GetNodeName());
+				//UE_VLOG(OwnerComp.GetAIOwner(), LogTemp, Warning, TEXT("UBTTask_MoveTo::ExecuteTask \'%s\' Old BBObserverDelegateHandle is still valid! Removing old Observer."), *GetNodeName());
 				BlackboardComp->UnregisterObserver(FlightLocationKey.GetSelectedKeyID(), myMemory->BBObserverDelegateHandle);
 			}
 			myMemory->BBObserverDelegateHandle = BlackboardComp->RegisterObserver(FlightLocationKey.GetSelectedKeyID(), this, FOnBlackboardChangeNotification::CreateUObject(this, &UBTTask_FlyToCustom::OnBlackboardValueChange));
@@ -95,14 +95,14 @@ EBTNodeResult::Type UBTTask_FlyToCustom::SchedulePathfindingRequest(UBehaviorTre
 	NavigationManager =  UDonNavigationHelper::DonNavigationManagerForActor(pawn);
 	if (NavigationManager->HasTask(pawn) && !QueryParams.bForceRescheduleQuery)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Pathfinding ScheduleRequest, Failure, hastask & !force"))
+		//UE_LOG(LogTemp, Warning, TEXT("Pathfinding ScheduleRequest, Failure, hastask & !force"))
 
 		return EBTNodeResult::Failed; // early exit instead of going through the manager's internal checks and fallback via HandleTaskFailure (which isn't appropriate here)
 	}
 	// Validate internal state:
 	if (!pawn || !myMemory || !blackboard || !NavigationManager)
 	{
-		UE_LOG(LogTemp, Log, TEXT("BTTask_FlyToCustom has invalid data for AI Pawn or NodeMemory or NavigationManager. Unable to proceed."));
+		//UE_LOG(LogTemp, Log, TEXT("BTTask_FlyToCustom has invalid data for AI Pawn or NodeMemory or NavigationManager. Unable to proceed."));
 
 		return HandleTaskFailure(OwnerComp, NodeMemory, blackboard);
 	}
@@ -110,7 +110,7 @@ EBTNodeResult::Type UBTTask_FlyToCustom::SchedulePathfindingRequest(UBehaviorTre
 	// Validate blackboard key data:
 	if(FlightLocationKey.SelectedKeyType != UBlackboardKeyType_Vector::StaticClass())
 	{
-		UE_LOG(LogTemp, Log, TEXT("Invalid FlightLocationKey. Expected Vector type, found %s"), *(FlightLocationKey.SelectedKeyType ? FlightLocationKey.SelectedKeyType->GetName() : FString("?")));
+		//UE_LOG(LogTemp, Log, TEXT("Invalid FlightLocationKey. Expected Vector type, found %s"), *(FlightLocationKey.SelectedKeyType ? FlightLocationKey.SelectedKeyType->GetName() : FString("?")));
 		return HandleTaskFailure(OwnerComp, NodeMemory, blackboard);
 	}
 
@@ -146,7 +146,7 @@ EBTNodeResult::Type UBTTask_FlyToCustom::SchedulePathfindingRequest(UBehaviorTre
 
 void UBTTask_FlyToCustom::AbortPathfindingRequest(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Pathfinding AbortPathFindingRequest"))
+	//UE_LOG(LogTemp, Warning, TEXT("Pathfinding AbortPathFindingRequest"))
 	APawn* pawn = OwnerComp.GetAIOwner()->GetPawn();
 	FBT_FlyToCustomTarget* myMemory = (FBT_FlyToCustomTarget*)NodeMemory;
 
@@ -178,7 +178,7 @@ FBT_FlyToCustomTarget* UBTTask_FlyToCustom::TaskMemoryFromGenericPayload(void* G
 	// Is it still working on this task or has it moved on to another one?
 	if (ownerComp->GetTaskStatus(this) != EBTTaskStatus::Active)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Task (Fly To) is not active."));
+		//UE_LOG(LogTemp, Warning, TEXT("Task (Fly To) is not active."));
 		return nullptr;
 	}
 
@@ -192,11 +192,11 @@ FBT_FlyToCustomTarget* UBTTask_FlyToCustom::TaskMemoryFromGenericPayload(void* G
 
 void UBTTask_FlyToCustom::Pathfinding_OnFinish(const FDoNNavigationQueryData& Data)
 {	
-	UE_LOG(LogTemp, Warning, TEXT("Pathfinding Pathfinding_OnFinish"))
+	//UE_LOG(LogTemp, Warning, TEXT("Pathfinding Pathfinding_OnFinish"))
 	auto myMemory = TaskMemoryFromGenericPayload(Data.QueryParams.CustomDelegatePayload);
 	if (!myMemory)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Pathfinding  1) !myMemory"))
+		//UE_LOG(LogTemp, Warning, TEXT("Pathfinding  1) !myMemory"))
 		return;
 	}
 	// Store query results:	
@@ -213,10 +213,10 @@ void UBTTask_FlyToCustom::Pathfinding_OnFinish(const FDoNNavigationQueryData& Da
 		}
 		else
 		{
-			UE_LOG(LogTemp, Log, TEXT("Found empty pathsolution in Fly To node. Aborting task..."));
+			//UE_LOG(LogTemp, Log, TEXT("Found empty pathsolution in Fly To node. Aborting task..."));
 			myMemory->QueryResults.QueryStatus = EDonNavigationQueryStatus::Failure;
 		}
-		UE_LOG(LogTemp, Warning, TEXT("Pathfinding  2) !PathSolutionOptimized"))
+		//UE_LOG(LogTemp, Warning, TEXT("Pathfinding  2) !PathSolutionOptimized"))
 		return;
 	}
 
@@ -238,9 +238,9 @@ void UBTTask_FlyToCustom::Pathfinding_OnFinish(const FDoNNavigationQueryData& Da
 	{
 		APawn* Pawn = ownerComp->GetAIOwner()->GetPawn();
 
-		FString Message = FString::Printf(TEXT("Pathing Solution Found"));
-		GEngine->AddOnScreenDebugMessage(123, 2.0f, FColor::Yellow, Message);
-		UE_LOG(LogTemp, Warning, TEXT("Pathfinding 3) %s"), *Message)
+		//FString Message = FString::Printf(TEXT("Pathing Solution Found"));
+		//GEngine->AddOnScreenDebugMessage(123, 2.0f, FColor::Yellow, Message);
+		//UE_LOG(LogTemp, Warning, TEXT("Pathfinding 3) %s"), *Message)
 
 		if (bMaintainLastInputVectorLength)
 		{
@@ -751,7 +751,6 @@ bool UBTTask_FlyToCustom::TeleportAndExit(UBehaviorTreeComponent& OwnerComp, boo
 		{
 			flightDestination = blackboard->GetValueAsVector(FlightLocationKey.SelectedKeyName);
 			pawn->SetActorLocation(flightDestination, false);
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::White, FString::Printf(TEXT("%s teleported, being unable to find pathfind aerially!"), pawn ? *pawn->GetName() : *FString("")));
 			bTeleportSuccess = true;
 		}
 	}

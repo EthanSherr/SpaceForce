@@ -81,6 +81,14 @@ bool ASFTurretActor::GetTarget_Implementation(ASFTurretActor* Turret, float Delt
 	return ISFTurretDelegate::Execute_GetTarget(Delegate, this, DeltaSeconds, OutTarget);
 }
 
+bool ASFTurretActor::GetProjectileSecondsUntilImpact(float& OutSeconds)
+{
+	FVector Target;
+	if (!GetTarget_Implementation(this, 0, Target)) return false;
+	OutSeconds = (GetMuzzleTransform().GetLocation() - Target).Size() / GetProjectileSpeed();
+	return true;
+}
+
 void ASFTurretActor::TriggerAction_Implementation(bool bIsPressed)
 {
 	if (bIsPressed)
@@ -124,6 +132,14 @@ ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 	}
 
 	UGameplayStatics::FinishSpawningActor(Projectile, Transform);
+
+	if (auto* Delegate = DelegateRef.Get())
+	{
+		if (Delegate->GetClass()->ImplementsInterface(USFTurretDelegate::StaticClass()))
+		{
+			ISFTurretDelegate::Execute_ProjectileSpawned(Delegate, this, Projectile);
+		}
+	}
 
 	return Projectile;
 }

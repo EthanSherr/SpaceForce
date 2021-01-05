@@ -76,6 +76,9 @@ public:
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "ProjectileOnExplode"), Category = "Projectile")
 	void ReceiveOnExplode(const FHitResult& HitResult);
 
+	UFUNCTION(BlueprintCallable, Category = "Projectile")
+	void DelayedExplosion(float DelaySeconds);
+
 	//Used to manually explode in place.
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
 	void TriggerExplosion();

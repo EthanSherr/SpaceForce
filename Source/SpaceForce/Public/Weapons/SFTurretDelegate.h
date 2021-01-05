@@ -4,6 +4,7 @@
 #include "SFTurretDelegate.generated.h"
 
 class ASFTurretActor;
+class ASFProjectile;
 
 UINTERFACE(BlueprintType)
 class SPACEFORCE_API USFTurretDelegate : public UInterface
@@ -18,4 +19,7 @@ class SPACEFORCE_API ISFTurretDelegate
 public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Turret Delegate")
 	bool GetTarget(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutTarget);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Turret Delegate")
+	bool ProjectileSpawned(ASFTurretActor* Turret, ASFProjectile* Projectile);
 };
