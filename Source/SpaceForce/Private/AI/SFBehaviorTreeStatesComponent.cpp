@@ -3,8 +3,10 @@
 
 #include "AI/SFBehaviorTreeStatesComponent.h"
 #include "AI/SFAIController.h"
+#include "AI/BehaviorTree/Params/SFAttackTargetParams.h"
+
 #include "AI/BehaviorTree/Params/SFSpeedParams.h"
-#include "AI/SFAttackParams.h"
+#include "AI/BehaviorTree/Params/SFWeaponParams.h"
 
 // AIInterface
 USFAIInterface::USFAIInterface(const class FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -16,6 +18,8 @@ USFAIInterface::USFAIInterface(const class FObjectInitializer& ObjectInitializer
 USFBehaviorTreeStatesComponent::USFBehaviorTreeStatesComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
 	PrimaryComponentTick.bCanEverTick = false;
+	//DefaultAttackParams = ObjectInitializer.CreateDefaultSubobject <USFAttackTargetParams>(this, TEXT("AttackParams"));
+	//DefaultAttackParams->TargetIsTriggerEventInstigator = true;
 }
 
 void USFBehaviorTreeStatesComponent::BeginPlay()
@@ -29,13 +33,13 @@ void USFBehaviorTreeStatesComponent::BeginPlay()
 	}
 }
 
-bool USFBehaviorTreeStatesComponent::CurrentBehaviorState(FSFBehaviorTreeState& State)
+bool USFBehaviorTreeStatesComponent::GetBehaviorState(const FString& BehaviorName, FSFBehaviorTreeState& State)
 {
-	if (!BehaviorMap.Contains(Behavior))
+	if (!BehaviorMap.Contains(BehaviorName))
 	{
 		return false;
 	}
-	State = BehaviorMap[Behavior];
+	State = BehaviorMap[BehaviorName];
 
 	//Populate Defaults
 	if (!State.SpeedParams)
@@ -46,8 +50,17 @@ bool USFBehaviorTreeStatesComponent::CurrentBehaviorState(FSFBehaviorTreeState& 
 	{
 		State.AttackParams = DefaultAttackParams;
 	}
+	if (!State.WeaponParams)
+	{
+		State.WeaponParams = DefaultWeaponParams;
+	}
 
 	return true;
+}
+
+bool USFBehaviorTreeStatesComponent::CurrentBehaviorState(FSFBehaviorTreeState& State)
+{
+	return GetBehaviorState(Behavior, State);
 }
 
 bool USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior, FSFBehaviorTreeState& OutState, AActor* EventInstigator)
@@ -55,12 +68,13 @@ bool USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior, FSFBeh
 	APawn* Pawn = Cast<APawn>(GetOwner());
 	if (!Pawn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: BehaviorTreeStateCompnent Owner must be a Pawn"), *GetOwner()->GetName())
+		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: BehaviorTreeStateCompnent must be a pawn"), *GetOwner()->GetName())
 		return false;
 	}
-	if (DebugDisabled)
+
+	if (!Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass()))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: ChangeBehavior failed DebugDisabled true"), *Pawn->GetName())
+		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: BehaviorTreeStateCompnent Owner must Implmenet SFAIInterface"), *GetOwner()->GetName())
 		return false;
 	}
 
@@ -68,6 +82,12 @@ bool USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior, FSFBeh
 	if (!SFController)
 	{
 		UE_LOG(LogTemp, Error, TEXT("Pawn %s: ChangeBehavior(%s) failed: No SFAIController owner."), *GetOwner()->GetName(), *NextBehavior)
+		return false;
+	}
+
+	if (DebugDisabled)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Pawn %s: ChangeBehavior failed DebugDisabled true"), *Pawn->GetName())
 		return false;
 	}
 
@@ -102,22 +122,7 @@ bool USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior, FSFBeh
 	
 	Behavior = NextBehavior;
 
-	USFAttackParams* AttackParams = GetAttackParams();
-	TWeakObjectPtr<AActor> Enemy = (!AttackParams || AttackParams->bInferEnemy) ? EventInstigator : AttackParams->Enemy;
-	
-	SFController->SetEnemyInBlackboard(Enemy.Get());
-
-	if (AttackParams && AttackParams->InitialAttackId >= 0)
-	{
-		ISFAIInterface::Execute_SwitchAttack(Pawn, AttackParams->InitialAttackId);
-		ISFAIInterface::Execute_AttackActor(Pawn, Enemy.Get());
-	}
-
-	USFSpeedParams* SpeedParams = GetSpeedParams();
-	if (SpeedParams && SpeedParams->bApplyAtBegin)
-	{
-		SpeedParams->Apply(Pawn, SFController);
-	}
+	ApplyInitialParams(Pawn, SFController);
 
 	return true;
 }
@@ -129,11 +134,18 @@ USFSpeedParams* USFBehaviorTreeStatesComponent::GetSpeedParams()
 	return CurrentState.SpeedParams;
 }
 
-USFAttackParams* USFBehaviorTreeStatesComponent::GetAttackParams()
+USFAttackTargetParams* USFBehaviorTreeStatesComponent::GetAttackParams()
 {
 	FSFBehaviorTreeState CurrentState;
 	CurrentBehaviorState(CurrentState);
 	return CurrentState.AttackParams;
+}
+
+USFWeaponParams* USFBehaviorTreeStatesComponent::GetWeaponParams()
+{
+	FSFBehaviorTreeState CurrentState;
+	CurrentBehaviorState(CurrentState);
+	return CurrentState.WeaponParams;
 }
 
 ASFAIController* USFBehaviorTreeStatesComponent::GetSFAIController() const
@@ -142,3 +154,54 @@ ASFAIController* USFBehaviorTreeStatesComponent::GetSFAIController() const
 	if (!Pawn) return NULL;
 	return Cast<ASFAIController>(Pawn->GetController());
 }
+
+
+bool USFBehaviorTreeStatesComponent::ApplyInitialParams(APawn* PawnInterface, ASFAIController* AIController)
+{
+	FSFBehaviorTreeState CurrentState;
+	if (!CurrentBehaviorState(CurrentState)) return false;
+
+	TArray<USFAppliedParams*> Params;
+	if (auto* Attack = CurrentState.AttackParams)
+	{
+		Params.Add(Attack);
+	}
+	if (auto* Weapon = CurrentState.WeaponParams)
+	{
+		Params.Add(Weapon);
+	}
+	if (auto* Speed = CurrentState.SpeedParams)
+	{
+		Params.Add(Speed);
+	}
+
+	for (auto* Param : Params)
+	{
+		if (Param->bApplyAtBegin) 
+			Param->Apply(PawnInterface, AIController);
+	}
+
+	return true;
+}
+
+//USFAttackParams* AttackParams = GetAttackParams();
+//TWeakObjectPtr<AActor> Enemy = (!AttackParams || AttackParams->bInferEnemy) ? EventInstigator : AttackParams->Enemy;
+//
+//SFController->SetEnemyInBlackboard(Enemy.Get());
+
+//if (AttackParams)
+//{
+//	ISFAIInterface::Execute_AttackActor(Pawn, Enemy.Get());
+//}
+
+//USFSpeedParams* SpeedParams = GetSpeedParams();
+//if (SpeedParams && SpeedParams->bApplyAtBegin)
+//{
+//	SpeedParams->Apply(Pawn, SFController);
+//}
+
+//USFWeaponParams* WeaponParams = GetWeaponParams();
+//if (USFWeaponParams* WeaponParams = GetWeaponParams())
+//{
+//	WeaponParams->Apply(Pawn, SFController);
+//}

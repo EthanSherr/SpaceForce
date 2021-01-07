@@ -33,12 +33,24 @@ EBTNodeResult::Type UBTTask_SetSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerC
 
 	APawn* Pawn = Controller->GetPawn();
 
-	if (Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass()))
+	if (USFSpeedParams* SpeedParams = GetSpeedParams(Pawn))
 	{
-		USFSpeedParams* SpeedParams = ISFAIInterface::Execute_GetBehaviorTreeStatesComp(Pawn)->GetSpeedParams();
 		SpeedParams->Apply(Pawn, Controller);
 		return EBTNodeResult::Succeeded;
 	}
 	
 	return EBTNodeResult::Failed;
+}
+
+USFSpeedParams* UBTTask_SetSpeed::GetSpeedParams(APawn* Pawn) const
+{
+	if (OverrideSpeedParams)
+	{
+		return OverrideSpeedParams;
+	}
+	if (Pawn && Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass()))
+	{
+		return ISFAIInterface::Execute_GetBehaviorTreeStatesComp(Pawn)->GetSpeedParams();
+	}
+	return NULL;
 }

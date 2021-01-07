@@ -83,3 +83,9 @@ USFTracker* USFTurretControllerManager::GetTracker() const
 {
 	return TrackerRef.Get();
 }
+
+bool USFTurretControllerManager::GetControllers(TArray<USFTurretController*>& OutControllers)
+{
+	OutControllers = Controllers;
+	return Controllers.Num() > 0;
+}

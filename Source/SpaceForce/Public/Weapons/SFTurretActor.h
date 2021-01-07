@@ -74,10 +74,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable)
 	void TriggerAction(bool bIsPressed);
 
-	//REMOVE?
-	UFUNCTION(BlueprintPure)
-	float GetTriggetAxis();
-
 	UFUNCTION(BlueprintCallable)
 	ASFProjectile* SpawnProjectile(const FTransform& Transform);
 

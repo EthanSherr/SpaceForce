@@ -78,4 +78,6 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector FindLocationClosestToWorldLocation(FVector Location);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	float GetApproxDistanceClosestToWorldLocation(FVector Pos_WS);
 };

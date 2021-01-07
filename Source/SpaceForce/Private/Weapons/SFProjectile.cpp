@@ -107,8 +107,8 @@ void ASFProjectile::OnImpact(const FHitResult& HitResult)
 }
 
 void ASFProjectile::DisableAndDestroy() {
-	if (AudioComp && AudioComp->IsPlaying()) {
-		AudioComp->FadeOut(0.1f, 0.f);
+	if (AudioComp->IsPlaying()) {
+		AudioComp->FadeOut(0.2f, 0.f);
 	}
 
 	MovementComp->StopMovementImmediately();
@@ -196,8 +196,11 @@ void ASFProjectile::ApplyDeferredImpulse()
 
 void ASFProjectile::DelayedExplosion(float DelaySeconds)
 {
-	FTimerDelegate TimerCallback;
-	TimerCallback.BindLambda([=]{ TriggerExplosion(); });
-	FTimerHandle Handle;
-	GetWorld()->GetTimerManager().SetTimer(Handle, TimerCallback, DelaySeconds, false);
+	GetWorld()->GetTimerManager().SetTimer(DelayedExplosionHandle, this, &ASFProjectile::TriggerExplosion, DelaySeconds, false);
+}
+
+void ASFProjectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+	GetWorld()->GetTimerManager().ClearTimer(DelayedExplosionHandle);
 }

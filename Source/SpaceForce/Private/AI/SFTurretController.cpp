@@ -120,7 +120,7 @@ bool USFTurretController::GetTarget_Implementation(ASFTurretActor* Turret, float
 	return LeadTarget(Turret, OutVector);
 }
 
-TArray<ASFTurretActor*> USFTurretController::GetTurrets() const
+bool USFTurretController::GetTurrets(TArray<ASFTurretActor*>& OutTurrets)
 {
 	TArray<ASFTurretActor*> Arr;
 	for (TWeakObjectPtr<ASFTurretActor> TurretRef : Turrets)
@@ -130,7 +130,8 @@ TArray<ASFTurretActor*> USFTurretController::GetTurrets() const
 			Arr.Add(Turret);
 		}
 	}
-	return Arr;
+	OutTurrets = Arr;
+	return Arr.Num() > 0;
 }
 
 UWorld* USFTurretController::GetWorld() const

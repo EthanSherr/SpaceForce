@@ -8,7 +8,7 @@ class APawn;
 class AAIController;
 class UCurveFloat;
 
-UCLASS()
+UCLASS(DefaultToInstanced, EditInlineNew, Blueprintable)
 class SPACEFORCE_API USFSpeedParamsChase : public USFSpeedParams
 {
 	GENERATED_BODY()

@@ -137,7 +137,37 @@ FVector ASFFlightPath::FindLocationClosestToWorldLocation(FVector Target) {
 	if (!Spline) {
 		return FVector::ZeroVector;
 	}
+
 	return Spline->FindLocationClosestToWorldLocation(Target, ESplineCoordinateSpace::World);
 }
 
 //Closest point on spline to location end
+
+float ASFFlightPath::GetApproxDistanceClosestToWorldLocation(FVector Pos_WS)
+{
+	const USplineComponent& spline = *Spline;
+	const auto TargetInputKey = spline.FindInputKeyClosestToWorldLocation(Pos_WS);
+	const auto PointIdx = static_cast<int32>(TargetInputKey);
+
+	auto LowDistBound_cm = spline.GetDistanceAlongSplineAtSplinePoint(PointIdx);
+	auto HighDistBound_cm = spline.GetDistanceAlongSplineAtSplinePoint(PointIdx + 1);
+	auto MiddleDistEstimate_cm = (LowDistBound_cm + HighDistBound_cm) * 0.5f;
+
+	const auto& DistanceToInputMapping = spline.SplineCurves.ReparamTable;
+
+	for (auto IterCount = 0; IterCount < 10; ++IterCount)
+	{
+		const auto MiddleInputKey = DistanceToInputMapping.Eval(MiddleDistEstimate_cm);
+
+		if (TargetInputKey < MiddleInputKey) {
+			HighDistBound_cm = MiddleDistEstimate_cm;
+		}
+		else {
+			LowDistBound_cm = MiddleDistEstimate_cm;
+		}
+
+		MiddleDistEstimate_cm = (LowDistBound_cm + HighDistBound_cm) * 0.5f;
+	}
+
+	return MiddleDistEstimate_cm;
+}

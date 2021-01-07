@@ -64,6 +64,11 @@ void ASFShipBot::AttackActor_Implementation(AActor* Actor)
 {
 	bool OutChanged;
 	EnemyTracker->SetTargetActor(Actor, OutChanged);
+
+	if (auto* SFController = GetSFAIController())
+	{
+		SFController->SetEnemyInBlackboard(Actor);
+	}
 }
 
 void ASFShipBot::SwitchAttack_Implementation(int AttackId)

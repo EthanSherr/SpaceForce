@@ -89,6 +89,8 @@ protected:
 
 	virtual void PreInitializeComponents() override;
 	virtual void PostInitializeComponents() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	void Explode(const FHitResult& HitResult);
 
 	void DisableAndDestroy();
@@ -116,5 +118,6 @@ private:
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComp;
 
-
+	UPROPERTY(VisibleDefaultsOnly)
+	FTimerHandle DelayedExplosionHandle;
 };

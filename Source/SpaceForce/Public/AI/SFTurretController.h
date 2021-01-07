@@ -52,9 +52,6 @@ protected:
 	UPROPERTY(Transient)
 	TArray<TWeakObjectPtr<ASFTurretActor>> Turrets;
 
-	UFUNCTION(BlueprintPure, BlueprintCallable)
-	TArray<ASFTurretActor*> GetTurrets() const;
-
 	UPROPERTY(Transient)
 	TWeakObjectPtr<USFTurretControllerManager> ManagerRef;
 
@@ -68,4 +65,7 @@ protected:
 public:
 	UFUNCTION()
 	virtual bool GetTarget_Implementation(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutVector) override;
+
+	UFUNCTION(BlueprintPure, BlueprintCallable)
+	bool GetTurrets(TArray<ASFTurretActor*>& OutTurrets);
 };

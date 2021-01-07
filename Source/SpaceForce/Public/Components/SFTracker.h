@@ -40,6 +40,11 @@ public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool HasTarget() const;
 
+	// Uses Component's forward vector if this is a component style tracker, 
+	// Uses Velocity if this is a FVector tracker
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool HalfSpaceDistance(const FVector& ComparedLocation, float& OutDistance, float MinimalStableSpeed = 50.0f);
+
 public:
 	virtual void BeginPlay() override;
 

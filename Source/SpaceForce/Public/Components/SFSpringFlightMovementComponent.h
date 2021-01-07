@@ -126,6 +126,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	bool bCalculateVelocityOfTarget = true;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FVector GetLastMoveTarget() const;
+
 private:
 	UPROPERTY()
 	bool bHasTarget;

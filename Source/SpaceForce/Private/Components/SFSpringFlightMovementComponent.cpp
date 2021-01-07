@@ -46,6 +46,11 @@ void USFSpringFlightMovementComponent::AddInputVector(FVector WorldVector, bool 
 	//PendingInputVector grows until cleared with ConsumeInputVector().
 }
 
+FVector USFSpringFlightMovementComponent::GetLastMoveTarget() const
+{
+	return bHasTarget ? LastTargetPosition : GetOwner()->GetActorLocation();
+}
+
 void USFSpringFlightMovementComponent::BeginPlay() {
 	Super::BeginPlay();
 	if (!IsValid(true))

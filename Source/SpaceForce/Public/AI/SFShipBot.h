@@ -32,13 +32,14 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Personality")
 	USFBehaviorTreeStatesComponent* BehaviorStates;
 
-	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Personality")
+	UPROPERTY(EditDefaultsOnly, BlueprintReadonly, Category = "Personality")
 	USFTurretControllerManager* TurretManager;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	ASFAIController* GetSFAIController() const;
 
 	// Triggerable
+	UFUNCTION(BlueprintCallable)
 	virtual void RespondToTrigger_Implementation(AActor* Source, ASFPlayerTriggerBox* TriggerBox) override;
 
 	//AI Interface

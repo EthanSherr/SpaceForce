@@ -8,7 +8,7 @@
 class AAIController;
 class APawn;
 
-UCLASS()
+UCLASS(DefaultToInstanced, EditInlineNew, Blueprintable)
 class SPACEFORCE_API USFSpeedParamsStatic : public USFSpeedParams
 {
 	GENERATED_BODY()

@@ -62,6 +62,7 @@ bool USFTracker::GetTarget(FVector& OutPosition, FVector& OutVelocity)
 	if (TrackerType == ETrackerType::Vector)
 	{
 		OutPosition = TrackedVector;
+		UE_LOG(LogTemp, Error, TEXT("USFTracker GetTarget Error: Velocity is not yet tracked when ETrackerType::Vector"))
 		bSuccess = true;
 	}
 	return bSuccess;
@@ -70,6 +71,26 @@ bool USFTracker::GetTarget(FVector& OutPosition, FVector& OutVelocity)
 bool USFTracker::HasTarget() const
 {
 	return TrackerType != ETrackerType::None;
+}
+
+bool USFTracker::HalfSpaceDistance(const FVector& ComparedLocation, float& OutDistance, float MinimalStableSpeed)
+{
+	FVector TrackedLocation;
+	FVector TrackedVelocity;
+	if (!GetTarget(TrackedLocation, TrackedVelocity)) return false;
+
+	if (TrackerType == ETrackerType::Component)
+	{
+		OutDistance = FVector::DotProduct(ComparedLocation - TrackedLocation, TrackedComponent->GetForwardVector());
+	}
+	else
+	if (TrackerType == ETrackerType::Vector)
+	{
+		//TODO use velocity and MinimalStableSpeed here
+		UE_LOG(LogTemp, Error, TEXT("USFTracker Error : HalfSpaceDistance doesn't know how to use forward vector of ETrackerType::Vector yet, use velocity!"))
+		return false;
+	}
+	return false;
 }
 
 void USFTracker::ClearTarget()

@@ -9,7 +9,8 @@
 class UBehaviorTree;
 class USFSpeedParams;
 class USFPathParams;
-class USFAttackParams;
+class USFAttackTargetParams;
+class USFWeaponParams;
 class ASFAIController;
 
 USTRUCT(BlueprintType)
@@ -30,7 +31,10 @@ struct FSFBehaviorTreeState
 	USFPathParams* PathParams;
 
 	UPROPERTY(Instanced, BlueprintReadWRite, EditAnywhere, Category = "Behaviors|Attack")
-	USFAttackParams* AttackParams;
+	USFAttackTargetParams* AttackParams;
+
+	UPROPERTY(Instanced, BlueprintReadWrite, EditAnywhere, Category = "Behaviors|Attack")
+	USFWeaponParams* WeaponParams;
 };
 
 UINTERFACE(BlueprintType)
@@ -69,7 +73,7 @@ class SPACEFORCE_API USFBehaviorTreeStatesComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
-public:		
+public:	
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	bool DebugDisabled;
 
@@ -80,10 +84,16 @@ public:
 	USFSpeedParams* DefaultSpeedParams;
 
 	UPROPERTY(Instanced, EditAnywhere, Category = "Settings")
-	USFAttackParams* DefaultAttackParams;
+	USFAttackTargetParams* DefaultAttackParams;
+
+	UPROPERTY(Instanced, EditAnywhere, Category = "Settings")
+	USFWeaponParams* DefaultWeaponParams;
 
 	UPROPERTY(EditAnywhere, Category = "Settings")
 	TMap<FString, FSFBehaviorTreeState> BehaviorMap;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetBehaviorState(const FString& BehaviorName, FSFBehaviorTreeState& State);
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	bool CurrentBehaviorState(FSFBehaviorTreeState& State);
@@ -98,14 +108,20 @@ public:
 	USFSpeedParams* GetSpeedParams();
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	USFAttackParams* GetAttackParams();
+	USFAttackTargetParams* GetAttackParams();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	USFWeaponParams* GetWeaponParams();
 
 public:
 	USFBehaviorTreeStatesComponent(const FObjectInitializer& ObjectInitializer);
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY()
+	UPROPERTY(Transient)
 	FString Behavior;
+
+	UFUNCTION()
+	bool ApplyInitialParams(APawn* PawnInterface, ASFAIController* AIController);
 		
 };

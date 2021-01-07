@@ -97,16 +97,6 @@ void ASFTurretActor::TriggerAction_Implementation(bool bIsPressed)
 	}
 }
 
-//REMOVE?
-float ASFTurretActor::GetTriggetAxis()
-{
-	if (APlayerController* PC = Cast<APlayerController>(GetOwner()))
-	{
-		return PC->GetInputAxisKeyValue("TriggerAxis");
-	}
-	return 0.0f;
-}
-
 ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 {
 	if (!ProjectileClass)

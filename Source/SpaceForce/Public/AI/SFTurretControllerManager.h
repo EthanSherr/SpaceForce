@@ -32,6 +32,9 @@ public:
 
 	USFTracker* GetTracker() const;
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetControllers(TArray<USFTurretController*>& OutControllers);
+
 protected:
 
 	UPROPERTY(EditDefaultsOnly, Instanced, Category = "Initialization")

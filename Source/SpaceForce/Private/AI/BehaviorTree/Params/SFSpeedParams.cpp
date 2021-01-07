@@ -7,12 +7,6 @@ USFSpeedParams::USFSpeedParams(const FObjectInitializer& ObjectInitializer) : Su
 	bApplyAtBegin = false;
 }
 
-bool USFSpeedParams::Apply_Implementation(APawn* Bot, AAIController* Controller)
-{
-	UE_LOG(LogTemp, Warning, TEXT("SFSpeedParams Apply_Implementation has no default implemmentation"))
-	return false;
-}
-
 bool USFSpeedParams::AddEnemySpeed(AActor* Enemy, float InSpeed, float& OutSpeed)
 {
 	if (!Enemy)
