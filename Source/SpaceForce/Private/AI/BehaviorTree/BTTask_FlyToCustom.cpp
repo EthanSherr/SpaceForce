@@ -432,7 +432,6 @@ void UBTTask_FlyToCustom::TickPathNavigationCustom(UBehaviorTreeComponent& Owner
 	}
 	float Speed = ISFAIInterface::Execute_GetSpeed(pawn);
 	float NextLength = Meta->Length + DeltaSeconds * Speed;
-	UE_LOG(LogTemp, Warning, TEXT(""))
 	while (NextLength >= Meta->MaxLength)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Index %d NextLength = %f >= MaxLength = Meta->MaxLength %f and Meta->Length is %f"),

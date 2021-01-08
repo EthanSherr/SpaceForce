@@ -1,11 +1,10 @@
 #include "BTTask_SetSpeed.h"
 #include "BehaviorTree/BlackboardComponent.h"
 #include "BehaviorTree/Blackboard/BlackboardKeyType_Object.h"
-#include "../SFAIController.h"
 #include "AI/BehaviorTree/Params/SFSpeedParams.h"
 #include "Player/SFPlayerShip.h"
-#include "../../Components/SFSplineMovementComponent.h"
 #include "AI/SFBehaviorTreeStatesComponent.h"
+#include "AIController.h"
 
 UBTTask_SetSpeed::UBTTask_SetSpeed(const FObjectInitializer& ObjectInitializer)
 {
@@ -28,9 +27,7 @@ FString UBTTask_SetSpeed::GetStaticDescription() const
 
 EBTNodeResult::Type UBTTask_SetSpeed::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)
 {
-	ASFAIController* Controller = Cast<ASFAIController>(OwnerComp.GetAIOwner());
-	if (!Controller) return EBTNodeResult::Failed;
-
+	AAIController* Controller = OwnerComp.GetAIOwner();
 	APawn* Pawn = Controller->GetPawn();
 
 	if (USFSpeedParams* SpeedParams = GetSpeedParams(Pawn))

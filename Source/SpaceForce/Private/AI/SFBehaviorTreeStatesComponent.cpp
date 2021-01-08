@@ -155,7 +155,6 @@ ASFAIController* USFBehaviorTreeStatesComponent::GetSFAIController() const
 	return Cast<ASFAIController>(Pawn->GetController());
 }
 
-
 bool USFBehaviorTreeStatesComponent::ApplyInitialParams(APawn* PawnInterface, ASFAIController* AIController)
 {
 	FSFBehaviorTreeState CurrentState;
@@ -183,25 +182,3 @@ bool USFBehaviorTreeStatesComponent::ApplyInitialParams(APawn* PawnInterface, AS
 
 	return true;
 }
-
-//USFAttackParams* AttackParams = GetAttackParams();
-//TWeakObjectPtr<AActor> Enemy = (!AttackParams || AttackParams->bInferEnemy) ? EventInstigator : AttackParams->Enemy;
-//
-//SFController->SetEnemyInBlackboard(Enemy.Get());
-
-//if (AttackParams)
-//{
-//	ISFAIInterface::Execute_AttackActor(Pawn, Enemy.Get());
-//}
-
-//USFSpeedParams* SpeedParams = GetSpeedParams();
-//if (SpeedParams && SpeedParams->bApplyAtBegin)
-//{
-//	SpeedParams->Apply(Pawn, SFController);
-//}
-
-//USFWeaponParams* WeaponParams = GetWeaponParams();
-//if (USFWeaponParams* WeaponParams = GetWeaponParams())
-//{
-//	WeaponParams->Apply(Pawn, SFController);
-//}

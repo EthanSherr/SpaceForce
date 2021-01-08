@@ -11,6 +11,7 @@ class USFSpeedParams;
 class USFPathParams;
 class USFAttackTargetParams;
 class USFWeaponParams;
+class USFAppliedParams;
 class ASFAIController;
 
 USTRUCT(BlueprintType)

@@ -7,7 +7,7 @@
 class AAIController;
 class APawn;
 
-UCLASS()
+UCLASS(DefaultToInstanced, EditInlineNew, Blueprintable)
 class SPACEFORCE_API USFAppliedParams : public UObject
 {
 	GENERATED_BODY()

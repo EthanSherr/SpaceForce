@@ -69,6 +69,12 @@ void ASFShipBot::AttackActor_Implementation(AActor* Actor)
 	{
 		SFController->SetEnemyInBlackboard(Actor);
 	}
+
+	if (!Actor)
+	{
+		TurretManager->DeactivateAll();
+		EnemyTracker->ClearTarget();
+	}
 }
 
 void ASFShipBot::SwitchAttack_Implementation(int AttackId)
