@@ -43,4 +43,6 @@ protected:
 private:
 	UPROPERTY(Transient)
 	float DistanceSquared;
+
+	void AbortWithMessage(UBehaviorTreeComponent& OwnerComp, FString Message);
 };

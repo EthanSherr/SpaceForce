@@ -82,6 +82,7 @@ bool USFTracker::HalfSpaceDistance(const FVector& ComparedLocation, float& OutDi
 	if (TrackerType == ETrackerType::Component)
 	{
 		OutDistance = FVector::DotProduct(ComparedLocation - TrackedLocation, TrackedComponent->GetForwardVector());
+		return true;
 	}
 	else
 	if (TrackerType == ETrackerType::Vector)

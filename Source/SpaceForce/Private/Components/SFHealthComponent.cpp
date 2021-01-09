@@ -15,6 +15,7 @@ USFHealthComponent::USFHealthComponent(const FObjectInitializer& ObjectInitializ
 void USFHealthComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
+	Health = MaxHealth;
 	if (MegaDeathThreshold > 0.0f)
 	{
 		UE_LOG(LogTemp, Error, TEXT("MegaDeathThreshold for %s is %f and must not be > 0.0f"), *GetOwner()->GetName(), MegaDeathThreshold);
@@ -34,6 +35,7 @@ float USFHealthComponent::TakeDamage(float Damage, struct FDamageEvent const& Da
 
 float USFHealthComponent::ChangeHealth(float DeltaHealth, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser)
 {
+	if (bGodMode) return 0.0f;
 	LastEventInstigator = EventInstigator;
 	LastDamageCauser = DamageCauser;
 

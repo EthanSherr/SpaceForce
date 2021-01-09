@@ -46,11 +46,14 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FHealthEventDelegate OnMegaDeath;
 
-	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	UPROPERTY(BlueprintReadOnly, Transient)
 	float Health;
 
 	UPROPERTY(BlueprintReadOnly, EditAnywhere)
 	float MaxHealth;
+
+	UPROPERTY(BlueprintReadOnly, EditAnywhere)
+	bool bGodMode;
 
 	UPROPERTY(BlueprintReadOnly, EditDefaultsOnly)
 	float MegaDeathThreshold;

@@ -39,8 +39,6 @@ void UBTTask_Charge::InitializeFromAsset(UBehaviorTree& Asset)
 {
 	Super::InitializeFromAsset(Asset);
 
-	DistanceSquared = Distance * Distance;
-
 	//auto blackboard = GetBlackboardAsset();
 	//if (!blackboard)
 	//	return;
@@ -65,25 +63,28 @@ void UBTTask_Charge::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 	FBT_Charge* ChargeMemory = (FBT_Charge*)NodeMemory;
 
 	ASFShipPawn* Pawn = Cast<ASFShipPawn>(OwnerComp.GetAIOwner()->GetPawn());
-	if (!Pawn) { FinishLatentAbort(OwnerComp); return; }
-	if (!Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass())) { FinishLatentAbort(OwnerComp); return; }
+	if (!Pawn) { AbortWithMessage(OwnerComp, FString("PAWN")); return; }
+	if (!Pawn->GetClass()->ImplementsInterface(USFAIInterface::StaticClass())) { AbortWithMessage(OwnerComp, FString("USFAIInterface")); return; }
 
 	float PawnSpeed = ISFAIInterface::Execute_GetSpeed(Pawn);
 
 	FVector PawnTarget;
 	FVector PawnTargetVelocity;
-	if (!Pawn->EnemyTracker->GetTarget(PawnTarget, PawnTargetVelocity)) { FinishLatentAbort(OwnerComp); return; }
+	if (!Pawn->EnemyTracker->GetTarget(PawnTarget, PawnTargetVelocity)) { AbortWithMessage(OwnerComp, FString("Target")); }
 
-	float DistanceToTargetSquared = (PawnTarget - Pawn->GetActorLocation()).SizeSquared();
-	UE_LOG(LogTemp, Warning, TEXT("DeltaSquaredDistance %f"), (DistanceToTargetSquared - DistanceSquared))
-	if (DistanceToTargetSquared < DistanceSquared)
+	float HSDistance;
+	if (!Pawn->EnemyTracker->HalfSpaceDistance(Pawn->GetActorLocation(), HSDistance)) { AbortWithMessage(OwnerComp, FString("HalfspaceDist")); return; }
+
+	if (HSDistance < Distance)
 	{
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 		return;
 	}
 
 	FVector Target;
-	if (!GetChargeLocationFromTurret(Pawn, TurretId, PawnTarget, PawnTargetVelocity, Target)) { FinishLatentAbort(OwnerComp); return; }
+	if (!GetChargeLocationFromTurret(Pawn, TurretId, PawnTarget, PawnTargetVelocity, Target)) { 
+		AbortWithMessage(OwnerComp, FString("!GetChargeLocationFromTurret ")); return;
+	}
 
 	DrawDebugPoint(GetWorld(), Target, 5, FColor::Purple, false, 0.0f, 5);
 
@@ -111,4 +112,10 @@ bool UBTTask_Charge::GetChargeLocationFromTurret(ASFShipPawn* Ship, int TurretIn
 bool UBTTask_Charge::GetHalfSpaceDistance(ASFShipPawn* ShipPawn, float& OutDistance)
 {
 	return ShipPawn->EnemyTracker->HalfSpaceDistance(ShipPawn->GetActorLocation(), OutDistance);
+}
+
+void UBTTask_Charge::AbortWithMessage(UBehaviorTreeComponent& OwnerComp, FString Message)
+{
+	UE_LOG(LogTemp, Warning, TEXT("BTTask_Charge %s aborting with message: %s"), *OwnerComp.GetAIOwner()->GetPawn()->GetName(), *Message)
+	FinishLatentAbort(OwnerComp);
 }

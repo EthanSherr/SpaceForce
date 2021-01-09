@@ -79,7 +79,14 @@ void ASFShipBot::AttackActor_Implementation(AActor* Actor)
 
 void ASFShipBot::SwitchAttack_Implementation(int AttackId)
 {
-	TurretManager->SwitchController(AttackId);
+	if (AttackId == -1)
+	{
+		TurretManager->DeactivateAll();
+	}
+	else
+	{
+		TurretManager->SwitchController(AttackId);
+	}
 }
 
 // SFTurretDelegate & Aim
