@@ -10,12 +10,17 @@ class ASFTurretActor;
 class USFTurretControllerManager;
 class USFTracker;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnLoopFinished);
+
 UCLASS(DefaultToInstanced, EditInlineNew, Blueprintable)
 class SPACEFORCE_API USFTurretController : public UObject, public ISFTurretDelegate
 {
 	GENERATED_BODY()
 
 public:
+	UPROPERTY(BlueprintAssignable)
+	FOnLoopFinished LoopFinished;
+
 	USFTurretController(const FObjectInitializer& ObjectInitializer);
 
 	//needed for kismet library
@@ -44,6 +49,9 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly)
 	bool bNeedsTick;
+
+	UFUNCTION(BlueprintCallable)
+	void BroadcastLoopFinished();
 
 protected:
 	UPROPERTY(Transient)

@@ -151,3 +151,8 @@ UWorld* USFTurretController::GetWorld() const
 	// In all other cases...
 	return GetOuter()->GetWorld();
 }
+
+void USFTurretController::BroadcastLoopFinished()
+{
+	LoopFinished.Broadcast();
+}
