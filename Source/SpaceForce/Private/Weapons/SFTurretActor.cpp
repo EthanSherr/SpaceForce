@@ -5,6 +5,8 @@
 #include "SFAimVisualization.h"
 #include "SFProjectile.h"
 #include "SFSimpleTurretAnimInstance.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 ASFTurretActor::ASFTurretActor(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -121,6 +123,19 @@ ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 		AC = UGameplayStatics::SpawnSoundAttached(FireSound, TurretComp);
 	}
 
+	if (MuzzleFlashFx)
+	{
+		FTransform Transform = GetMuzzleTransform();
+		UNiagaraFunctionLibrary::SpawnSystemAttached(
+			MuzzleFlashFx,
+			TurretComp,
+			FName("None"), 
+			Transform.GetLocation(),
+			Transform.GetRotation().Rotator(), 
+			EAttachLocation::KeepWorldPosition,
+			true);
+	}
+
 	UGameplayStatics::FinishSpawningActor(Projectile, Transform);
 
 	if (auto* Delegate = DelegateRef.Get())
@@ -168,4 +183,9 @@ float ASFTurretActor::GetProjectileSpeed() const
 bool ASFTurretActor::HasAimLock(float DeltaDegrees)
 {
 	return false;
+}
+
+bool ASFTurretActor::GetActivated() const
+{
+	return bActivated;
 }

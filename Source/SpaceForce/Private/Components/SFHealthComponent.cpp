@@ -15,12 +15,17 @@ USFHealthComponent::USFHealthComponent(const FObjectInitializer& ObjectInitializ
 void USFHealthComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
-	Health = MaxHealth;
 	if (MegaDeathThreshold > 0.0f)
 	{
 		UE_LOG(LogTemp, Error, TEXT("MegaDeathThreshold for %s is %f and must not be > 0.0f"), *GetOwner()->GetName(), MegaDeathThreshold);
 		MegaDeathThreshold = -10.0f;
 	}
+}
+
+void USFHealthComponent::BeginPlay()
+{
+	Super::BeginPlay();
+	Health = MaxHealth;
 }
 
 float USFHealthComponent::Damage(float DamageAmount)

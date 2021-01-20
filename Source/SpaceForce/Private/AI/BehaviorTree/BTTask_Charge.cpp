@@ -86,7 +86,7 @@ void UBTTask_Charge::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemo
 		AbortWithMessage(OwnerComp, FString("!GetChargeLocationFromTurret ")); return;
 	}
 
-	DrawDebugPoint(GetWorld(), Target, 5, FColor::Purple, false, 0.0f, 5);
+//	DrawDebugPoint(GetWorld(), Target, 5, FColor::Purple, false, 0.0f, 5);
 
 	const FVector LastInputLocation = Pawn->FlightMovement->GetLastMoveTarget(); 
 	const FVector InputWorld = (PawnSpeed * DeltaSeconds * (Target - LastInputLocation).GetSafeNormal()) + LastInputLocation;

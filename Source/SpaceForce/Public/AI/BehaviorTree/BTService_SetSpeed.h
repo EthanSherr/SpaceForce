@@ -2,10 +2,11 @@
 
 #include "CoreMinimal.h"
 #include "BehaviorTree/BTService.h"
+#include "AI/BehaviorTree/BTService_HalfspaceBase.h"
 #include "BTService_SetSpeed.generated.h"
 
 UCLASS()
-class SPACEFORCE_API UBTService_SetSpeed : public UBTService
+class SPACEFORCE_API UBTService_SetSpeed : public UBTService_HalfspaceBase
 {
 	GENERATED_BODY()
 	

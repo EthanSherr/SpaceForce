@@ -12,6 +12,7 @@ class ASFProjectile;
 class ASFAimVisualization;
 class USoundBase;
 class USkeletalMeshComponent;
+class UNiagaraSystem;
 
 UCLASS()
 class SPACEFORCE_API ASFTurretActor : public AActor, public ISFTurretDelegate
@@ -19,8 +20,6 @@ class SPACEFORCE_API ASFTurretActor : public AActor, public ISFTurretDelegate
 	GENERATED_UCLASS_BODY()
 
 public:
-	UPROPERTY(EditDefaultsOnly)
-	FName SocketName;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 	TSubclassOf<ASFProjectile> ProjectileClass;
@@ -33,6 +32,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 	USoundBase* ActivationSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
+	UNiagaraSystem* MuzzleFlashFx;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Initialization")
 	TSubclassOf<ASFAimVisualization> AimVisualizationTemplate;
@@ -98,6 +100,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadonly)
 	UMaterialInterface* MaterialIcon;
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	bool GetActivated() const;
 
 private:
 	UPROPERTY(Transient)

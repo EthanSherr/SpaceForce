@@ -47,7 +47,7 @@ void USFTurretControllerManager::SwitchController(int ControllerId)
 		UE_LOG(LogTemp, Error, TEXT("SFTurretControllerManager Error : Invalid Tracker - %s must call Initialize in/after Super::PostInitComonents()"), *GetOwner()->GetName());
 		return;
 	}
-	DeactivateAll();
+	//DeactivateAll();
 	if (!Controllers.IsValidIndex(ControllerId))
 	{
 		UE_LOG(LogTemp, Error, TEXT("SFTurretControllerManager SwitchController Error : Invalid index for controller at %d"), ControllerId)

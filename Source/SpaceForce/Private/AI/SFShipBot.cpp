@@ -72,7 +72,7 @@ void ASFShipBot::AttackActor_Implementation(AActor* Actor)
 
 	if (!Actor)
 	{
-		TurretManager->DeactivateAll();
+		//TurretManager->DeactivateAll();
 		EnemyTracker->ClearTarget();
 	}
 }

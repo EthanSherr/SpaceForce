@@ -145,9 +145,11 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 			DeferredImpulse = -Impact.ImpactNormal * Impulse;
 			DeferredImpulseLocation = Impact.ImpactPoint;
 
-			if (HitPrimitive) {
-				GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ASFProjectile::ApplyDeferredImpulse);
-			}
+			//if (HitPrimitive) {
+			//	GetWorld()->GetTimerManager().SetTimerForNextTick(this, &ASFProjectile::ApplyDeferredImpulse);
+			//}
+			if (HitPrimitive && HitPrimitive->IsSimulatingPhysics())
+			ApplyDeferredImpulse();
 		}
 	}
 
@@ -186,10 +188,10 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 
 void ASFProjectile::ApplyDeferredImpulse()
 {
-	UE_LOG(LogTemp, Warning, TEXT("ApplyDeferredImpulse from projectile %s"), *GetName())
+	//UE_LOG(LogTemp, Warning, TEXT("ApplyDeferredImpulse from projectile %s"), *GetName())
 	if (HitPrimitive)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ApplyDeferredImpulse()"))
+		//UE_LOG(LogTemp, Warning, TEXT("ApplyDeferredImpulse()"))
 		HitPrimitive->AddImpulseAtLocation(DeferredImpulse, DeferredImpulseLocation, FName());
 	}
 }

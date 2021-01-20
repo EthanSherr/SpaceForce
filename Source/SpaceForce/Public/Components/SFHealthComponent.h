@@ -63,6 +63,8 @@ public:
 
 protected:
 	virtual void InitializeComponent() override;
+
+	virtual void BeginPlay() override;
 private:
 	bool DeadBroadcasted;
 	bool MegaDeadBroadcasted;
