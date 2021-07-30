@@ -60,6 +60,9 @@ public:
 	virtual void SwitchAttack_Implementation(int AttackId) override;
 
 	UFUNCTION(BlueprintCallable)
+	virtual void OnBehaviorChanged_Implementation(const FString& Behavior, const FString& PrevBehavior, AActor* EventInstigator) override;
+
+	UFUNCTION(BlueprintCallable)
 	virtual void ReceiveDeath_Implementation(float Damage, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, class AActor* DamageCauser) override;
 
 // SFTurretDelegate
