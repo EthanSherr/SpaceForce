@@ -89,6 +89,11 @@ void ASFShipBot::SwitchAttack_Implementation(int AttackId)
 	}
 }
 
+void ASFShipBot::OnBehaviorChanged_Implementation(const FString& Behavior, const FString& PrevBehavior, AActor* EventInstigator)
+{
+	UE_LOG(LogTemp, Warning, TEXT("No OnBehaviorChanged_Implementation"))
+}
+
 // SFTurretDelegate & Aim
 bool ASFShipBot::GetTarget_Implementation(ASFTurretActor* Turret, float DeltaSeconds, FVector& OutTarget)
 {

@@ -120,9 +120,12 @@ bool USFBehaviorTreeStatesComponent::ChangeBehavior(FString NextBehavior, FSFBeh
 		return false;
 	}
 	
+	FString PrevBehavior = Behavior;
 	Behavior = NextBehavior;
 
 	ApplyInitialParams(Pawn, SFController);
+
+	ISFAIInterface::Execute_OnBehaviorChanged(Pawn, Behavior, PrevBehavior, EventInstigator);
 
 	return true;
 }

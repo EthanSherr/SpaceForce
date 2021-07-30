@@ -66,6 +66,9 @@ public:
 
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
 	void SwitchAttack(int AttackId);
+
+	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "AI Interface")
+	void OnBehaviorChanged(const FString& Behavior, const FString& PrevBehavior, class AActor* EventInstigator);
 };
 
 
