@@ -112,6 +112,7 @@ ASFProjectile* ASFTurretActor::SpawnProjectile(const FTransform& Transform)
 		IgnoreActors.Add(GetOwner());
 	}
 	Projectile->IgnoreActors = IgnoreActors;
+	UE_LOG(LogTemp, Warning, TEXT("ProjectileSpeed %f Projectile->Speed %f"), ProjectileSpeed, Projectile->Speed)
 	if (ProjectileSpeed)
 	{
 		Projectile->Speed = ProjectileSpeed;
