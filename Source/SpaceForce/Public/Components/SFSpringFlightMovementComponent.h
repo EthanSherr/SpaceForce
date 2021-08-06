@@ -35,6 +35,7 @@ struct SPACEFORCE_API FSpringConfig {
 };
 
 class AActor;
+class USceneComponent;
 
 UCLASS(ClassGroup = Movement, meta = (BlueprintSpawnableComponent), ShowCategories = (Velocity))
 class SPACEFORCE_API USFSpringFlightMovementComponent : public UPawnMovementComponent
@@ -49,6 +50,9 @@ public:
 		//UE_LOG(LogTemp, WARNING, TEXT("Returning GetMaxSpeed %f", LinearMaxSpeed))
 		return LinearMaxSpeed;
 	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadonly, Category = "Movement")
+	USceneComponent* SecondaryTargetComp;
 
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	float LinearStiffness;
@@ -89,6 +93,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
 	bool bDebugTorque;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Debug")
+	bool bDebugSecondaryTargetComp;
+
 	UPROPERTY(EditAnywhere, Category = "Movement")
 	AActor* InitialTarget;
 
@@ -112,6 +119,9 @@ public:
 	void SetTargetComponent(USceneComponent* NewComponent);
 
 	UFUNCTION(BlueprintCallable)
+	void ParentSecondaryTargetTo(USceneComponent* ParentComp);
+
+	UFUNCTION(BlueprintCallable)
 	void SetSpeed(float NewLinearMaxSpeed);
 
 	UFUNCTION(BlueprintCallable)
@@ -128,6 +138,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FVector GetLastMoveTarget() const;
+
+	void InitializeComponent() override;
 
 private:
 	UPROPERTY()

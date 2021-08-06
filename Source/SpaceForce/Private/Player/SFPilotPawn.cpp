@@ -321,6 +321,7 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFPlaye
 	NewDrivingHand->RadialMenuComponent->SetData(DefensiveMenuOptions);
 	NewDrivingHand->RadialMenuComponent->SetSelectedIndex(0);
 	NewShip->FlightMovement->SetTargetComponent(NewDrivingHand->ShipTargetComponent);
+	NewShip->FlightMovement->ParentSecondaryTargetTo(NewDrivingHand->ShipTargetComponent);
 	LastDrivingHandRotation = NewDrivingHand->ShipTargetComponent->GetComponentQuat();
 
 	auto NewAimingHand = GetOtherHand(NewDrivingHand);

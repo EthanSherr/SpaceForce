@@ -6,6 +6,8 @@
 #include "DrawDebugHelpers.h"
 #include "Engine/Engine.h"
 #include "Helpers/LoggingHelper.h"
+#include "Components/SceneComponent.h"
+#include "Helpers/LoggingHelper.h"
 
 USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -18,6 +20,37 @@ USFSpringFlightMovementComponent::USFSpringFlightMovementComponent(const FObject
 	AngularDampingPrimary = 7.0f;
 	AngularDampingSecondary = 7.0f;
 	bMaintainMaxSpeed = false;
+	bWantsInitializeComponent = true;
+
+	SecondaryTargetComp = ObjectInitializer.CreateDefaultSubobject<USceneComponent>(this, FName("SecondaryTargetComp"));
+}
+
+void USFSpringFlightMovementComponent::InitializeComponent() 
+{
+	if (IsValid(true)) 
+	{
+		ParentSecondaryTargetTo(GetUpdatedPrimitiveComp());
+	}
+	Super::InitializeComponent();
+}
+
+void USFSpringFlightMovementComponent::ParentSecondaryTargetTo(USceneComponent* SceneComp) 
+{
+	if (!SceneComp)
+	{
+		SecondaryTargetComp->DetachFromComponent(FDetachmentTransformRules::KeepWorldTransform);
+		SecondaryTargetComp->SetWorldRotation(FRotationMatrix::MakeFromX(GetUpdatedPrimitiveComp()->GetForwardVector()).Rotator());
+		return;
+	}
+
+	// SecondaryTargetComp->SetWorldLocation(SceneComp->GetComponentLocation());
+	FAttachmentTransformRules SnapLocationKeepRotation = FAttachmentTransformRules(
+		EAttachmentRule::SnapToTarget,
+		EAttachmentRule::SnapToTarget,
+		EAttachmentRule::KeepRelative,
+		false);
+
+	SecondaryTargetComp->AttachToComponent(SceneComp, SnapLocationKeepRotation);
 }
 
 bool USFSpringFlightMovementComponent::IsValid(bool logError) {
@@ -81,7 +114,7 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 	FVector TargetForward = ShipVelocity.GetSafeNormal();
 	FVector TargetUp = FRotationMatrix::MakeFromX(TargetForward).Rotator().RotateVector(FVector::UpVector);
 	if (bUseTargetOrientation && TargetComponent) {
-		FVector targetUp = TargetComponent->GetUpVector();
+		FVector targetUp = SecondaryTargetComp->GetUpVector();
 		TargetUp = ShipUp * FVector::DotProduct(ShipUp, targetUp) + ShipRight * FVector::DotProduct(ShipRight, targetUp);
 	}
 
@@ -103,10 +136,18 @@ void USFSpringFlightMovementComponent::TickComponent(float DeltaTime, ELevelTick
 		DrawDebugLine(GetWorld(), Start, Start + SecondaryTorque * 100, FColor::Purple, false, 0, 8, 1.0f);
 	}
 
+	if (bDebugSecondaryTargetComp)
+	{
+		DrawDebugLine(GetWorld(), Start, Start + SecondaryTargetComp->GetUpVector() * 120, FColor::White, false, 0, 5, 0.5f);
+		DrawDebugLine(GetWorld(), Start, Start + SecondaryTargetComp->GetForwardVector() * 120, FColor::Red, false, 0, 5, 0.5f);
+		DrawDebugPoint(GetWorld(), Start, 10, FColor::Red, false, 0.0f, 10);
+	}
+
 	if (bDebugTarget)
 	{
 		DrawDebugPoint(GetWorld(), Target, 10, FColor::Yellow, false, 0.0f, 5);
 	}
+
 
 	Prim->AddForce(Force);
 	Prim->AddTorqueInRadians(PrimaryTorque + SecondaryTorque, FName(), true);
