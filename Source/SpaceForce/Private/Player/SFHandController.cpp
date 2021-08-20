@@ -12,6 +12,7 @@
 #include "DrawDebugHelpers.h"
 #include "../UI/SFRadialMenuComponent.h"
 #include "DrawDebugHelpers.h"
+#include "Helpers/LoggingHelper.h"
 
 USFHandController::USFHandController(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	this->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -94,11 +95,14 @@ void USFHandController::FocusInteractables()
 				FocusedActor.Reset();
 			}
 
-			
 			//FocusedActor->SetFocus(false);
-			UE_LOG(LogTemp, Warning, TEXT("NewFocusedActor %s"), *NewFocusedActor->GetName())
-			NewFocusedActor->SetFocused(true);
-			FocusedActor = TWeakObjectPtr<AActor>(NewFocusedActor);
+			UE_LOG(LogTemp, Warning, TEXT("NewFocusedActor %s"), *ULoggingHelper::GetNameOrNull(NewFocusedActor))
+			if (NewFocusedActor)
+			{
+				NewFocusedActor->SetFocused(true);
+				FocusedActor = TWeakObjectPtr<AActor>(NewFocusedActor);
+
+			}
 		}
 		DrawDebugLine(GetWorld(), Start, HitResult.ImpactPoint, FColor::Green, false, 0.0f, 2, 0.5f);
 	} 

@@ -15,5 +15,7 @@ void ASFCampaignGameMode::LoadUnlockedLevels()
 
 bool ASFCampaignGameMode::IsLevelUnlocked(const FName& LevelName)
 {
+	bool IsLevlUnlocked = UnlockedLevels.Contains(LevelName);
+	UE_LOG(LogTemp, Warning, TEXT("ASFCampaignGameMode Level %s is unlocked: %d"), *LevelName.ToString(), IsLevlUnlocked)
 	return UnlockedLevels.Contains(LevelName);
 }
