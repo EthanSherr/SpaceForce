@@ -21,6 +21,8 @@ class UCurveFloat;
 class ASFTurretActor;
 class USFRadialMenuComponent;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnShipPilotBegan);
+
 UCLASS()
 class SPACEFORCE_API ASFPilotPawn : public APawn
 {
@@ -82,6 +84,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void StartPilotingShip(USFHandController* Hand, ASFPlayerShip* NewShip);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnShipPilotBegan OnShipPilotBegan;
 
 	UFUNCTION(BlueprintCallable)
 	void ActivateTurret(int Index);

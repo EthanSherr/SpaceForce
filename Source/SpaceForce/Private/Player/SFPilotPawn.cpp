@@ -316,7 +316,7 @@ void ASFPilotPawn::SetSpeed(float Speed) {
 void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFPlayerShip* NewShip) {
 	if (!NewShip) 
 		return;
-	
+
 	NewDrivingHand->SetHandState(EHandState::Driving);
 	NewDrivingHand->RadialMenuComponent->SetData(DefensiveMenuOptions);
 	NewDrivingHand->RadialMenuComponent->SetSelectedIndex(0);
@@ -347,6 +347,8 @@ void ASFPilotPawn::StartPilotingShip(USFHandController* NewDrivingHand, ASFPlaye
 	}
 	NewAimingHand->RadialMenuComponent->SetData(OffensiveMenu);
 	NewAimingHand->RadialMenuComponent->SetSelectedIndex(0);
+
+	OnShipPilotBegan.Broadcast();
 }
 
 void ASFPilotPawn::ActivateTurret(int Index)
