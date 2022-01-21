@@ -79,6 +79,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
 	void DelayedExplosion(float DelaySeconds);
 
+	UFUNCTION(BlueprintCallable, Category = "Projectile")
+	void EnableHoming(USceneComponent* HomingComponent, float HomingAccelerationMagnitude);
+
+	UFUNCTION(BlueprintCallable, Category = "Projectile")
+	void DisableHoming();
+
 	//Used to manually explode in place.
 	UFUNCTION(BlueprintCallable, Category = "Projectile")
 	void TriggerExplosion();
@@ -109,11 +115,10 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "Projectile", Meta = (ExposeOnSpawn = true))
 	TArray<AActor*> IgnoreActors;
 
-private:
-
-	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadonly, Category = Projectile)
 	UProjectileMovementComponent* MovementComp;
 
+private:
 	/** collisions */
 	UPROPERTY(VisibleDefaultsOnly, Category = Projectile)
 	USphereComponent* CollisionComp;

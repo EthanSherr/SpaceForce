@@ -111,6 +111,7 @@ void ASFProjectile::DisableAndDestroy() {
 		AudioComp->FadeOut(0.2f, 0.f);
 	}
 
+	DisableHoming();
 	MovementComp->StopMovementImmediately();
 	SetLifeSpan(LifeSpanAfterImpact);
 	CollisionComp->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -119,7 +120,6 @@ void ASFProjectile::DisableAndDestroy() {
 void ASFProjectile::Explode(const FHitResult& Impact) {
 	ReceiveOnExplode(Impact);
 	ProjectileEffect->SetVariableBool(FName("Exploded"), true);
-	//UE_LOG(LogTemp, Warning, TEXT("SFProjectile exploded %s on %s"), *GetName(), *ULoggingHelper::GetNameOrNull(Impact.GetActor()))
 
 	const FVector BumpedImpactLocation = Impact.ImpactPoint + Impact.ImpactNormal * ExplosionBump;
 	
@@ -199,6 +199,18 @@ void ASFProjectile::ApplyDeferredImpulse()
 void ASFProjectile::DelayedExplosion(float DelaySeconds)
 {
 	GetWorld()->GetTimerManager().SetTimer(DelayedExplosionHandle, this, &ASFProjectile::TriggerExplosion, DelaySeconds, false);
+}
+
+void ASFProjectile::EnableHoming(USceneComponent* HomingComponent, float HomingAccelerationMagnitude)
+{
+	MovementComp->bIsHomingProjectile = true;
+	MovementComp->HomingTargetComponent = HomingComponent;
+	MovementComp->HomingAccelerationMagnitude = HomingAccelerationMagnitude;
+}
+
+void ASFProjectile::DisableHoming()
+{
+	MovementComp->HomingTargetComponent = NULL;
 }
 
 void ASFProjectile::EndPlay(const EEndPlayReason::Type EndPlayReason)
