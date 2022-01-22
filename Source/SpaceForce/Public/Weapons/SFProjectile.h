@@ -13,6 +13,8 @@ class UNiagaraComponent;
 class UNiagaraSystem;
 class ASFExplosionEffect;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnProjectileExplode, ASFProjectile*, Projectile, FHitResult, HitResult);
+
 UCLASS()
 class SPACEFORCE_API ASFProjectile : public AActor
 {
@@ -73,6 +75,9 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile|Damage")
 	TSubclassOf<UDamageType> DamageType;
 public:
+	UPROPERTY(BlueprintAssignable, Category = "DialogueManager")
+	FOnProjectileExplode OnProjectileExploded;
+
 	UFUNCTION(BlueprintImplementableEvent, meta = (DisplayName = "ProjectileOnExplode"), Category = "Projectile")
 	void ReceiveOnExplode(const FHitResult& HitResult);
 

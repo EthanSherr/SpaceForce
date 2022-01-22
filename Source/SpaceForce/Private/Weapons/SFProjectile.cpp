@@ -184,6 +184,8 @@ void ASFProjectile::Explode(const FHitResult& Impact) {
 	}
 
 	bExploded = true;
+
+	OnProjectileExploded.Broadcast(this, Impact);
 }
 
 void ASFProjectile::ApplyDeferredImpulse()
